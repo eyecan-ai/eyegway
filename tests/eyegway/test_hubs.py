@@ -4,7 +4,7 @@ import redis.asyncio as aioredis
 import pytest
 
 
-class TestSimpleMessageHub:
+class TestMessageHub:
 
     @pytest.mark.asyncio
     async def test_lifecycle(self, redis_test_mock_async: aioredis.Redis):
@@ -12,7 +12,7 @@ class TestSimpleMessageHub:
         max_buffer_size = 10
         max_history_size = max_buffer_size
 
-        hub = eh.SimpleMessageHub(
+        hub = eh.AsyncMessageHub(
             redis=redis_test_mock_async,
             name="test",
             packer=ecm.PicklePacker(),
@@ -67,3 +67,24 @@ class TestSimpleMessageHub:
 
         assert await hub.history_size() == data_size
         assert await hub.buffer_size() == data_size
+
+    @pytest.mark.asyncio
+    async def test_max_payload(self, redis_test_mock_async: aioredis.Redis):
+
+        max_buffer_size = 10
+        max_history_size = max_buffer_size
+        max_payload_size = 1_000_000
+
+        hub = eh.AsyncMessageHub(
+            redis=redis_test_mock_async,
+            name="test",
+            packer=ecm.PicklePacker(),
+            max_buffer_size=max_buffer_size,
+            max_history_size=max_history_size,
+            max_payload_size=max_payload_size,
+        )
+
+        data = [b'0' * max_payload_size * 2]
+
+        with pytest.raises(ValueError):
+            await hub.push(data)

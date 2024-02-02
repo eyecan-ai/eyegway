@@ -15,10 +15,10 @@ if __name__ == "__main__":
         redis = fakeredis.FakeAsyncRedis()
         channel = ecom.AsyncHistoryChannel(redis, "test")
 
-        hub = amc.SimpleMessageHub(
+        hub = amc.AsyncMessageHub(
             redis,
             "test",
-            packer=emp.SmartMsgPacker(),
+            packer=emp.DefaultMsgPacker(),
             max_buffer_size=5,
             max_history_size=5,
         )

@@ -1,4 +1,4 @@
-from typing import Any
+from __future__ import annotations
 import numpy as np
 import io
 import imageio.v3 as iio
@@ -63,7 +63,7 @@ class TIFFImageEncoder(ImageEncoder):
 class PNGImageEncoder(ImageEncoder):
     def encode(self, image: np.ndarray) -> bytes:
         buff = io.BytesIO()
-        iio.imwrite(buff, image, format="png")
+        iio.imwrite(buff, image, extension=".png")
         return buff.getvalue()
 
     def decode(self, buff: bytes) -> np.ndarray:
@@ -80,7 +80,7 @@ class JPEGImageEncoder(ImageEncoder):
 
     def encode(self, image: np.ndarray) -> bytes:
         buff = io.BytesIO()
-        iio.imwrite(buff, image, format="jpeg", **{"quality": self._quality})
+        iio.imwrite(buff, image, extension=".jpeg", **{"quality": self._quality})
         return buff.getvalue()
 
     def decode(self, buff: bytes) -> np.ndarray:
@@ -121,28 +121,6 @@ class CustomMessageParser(ABC):
         pass
 
 
-class MultipleMessageParser(CustomMessageParser):
-    def __init__(self, parsers: t.List[CustomMessageParser] = []) -> None:
-        super().__init__()
-        self._parsers = parsers if len(parsers) > 0 else []  # handle clash
-
-    def add(self, parser: CustomMessageParser):
-        self._parsers.append(parser)
-
-    def match(self, obj) -> bool:
-        for parser in self._parsers:
-            if parser.match(obj):
-                return True
-        return False  # pragma: no cover
-
-    def __call__(self, obj) -> t.Union[msgpack.ExtType, t.Any]:
-        if self.match(obj):
-            for parser in self._parsers:
-                if parser.match(obj):
-                    return parser(obj)
-        return obj  # pragma: no cover
-
-
 class NumpyToImageMessageParser(CustomMessageParser):
     def __init__(
         self,
@@ -152,7 +130,7 @@ class NumpyToImageMessageParser(CustomMessageParser):
     ) -> None:
         super().__init__()
         self._shape = shape
-        self._dtype = dtype
+        self._dtype = np.dtype(dtype) if dtype is not Ellipsis else dtype
         self._encoder = encoder
 
     def match(self, obj) -> bool:
@@ -172,6 +150,42 @@ class NumpyToImageMessageParser(CustomMessageParser):
             ),
         )
 
+    def __str__(self) -> str:
+        """String representation of the parser like "(...,...,3) uint8 > image/jpg"
+        so convert each Elliipsis to "..." and the dtype to its name"""
+
+        if self._shape is Ellipsis:
+            shape = "..."
+        else:
+            shape = ",".join(["..." if x is Ellipsis else str(x) for x in self._shape])
+            shape = f'({shape})'
+        dtype = self._dtype.name if self._dtype is not Ellipsis else "..."
+        return f"{shape} {dtype} > {self._encoder.name()}"
+
+    @classmethod
+    def build(cls, string: str) -> NumpyToImageMessageParser:
+        """Parse a string to a NumpyToImageMessageParser object,
+
+        Examples:
+            "...  uint8 > image/png"
+            "(...,...,3) uint8 > image/jpg"
+
+        Args:
+            string (str): the string to parse
+
+        Returns:
+            NumpyToImageMessageParser: the parser object
+        """
+        import ast
+
+        chunks = string.split(">")
+        shapedtype, encoder = chunks[0].strip(), chunks[1].strip()
+        shape, dtype = [x for x in shapedtype.split(" ") if x != ""]
+        shape = ast.literal_eval(shape)
+        dtype = np.dtype(dtype) if dtype != "..." else Ellipsis
+        encoder = ImageEncoderFactory().get(encoder)
+        return NumpyToImageMessageParser(shape, dtype, encoder)
+
 
 class NumpyToTensorMessageParser(CustomMessageParser):
     def match(self, obj) -> bool:
@@ -190,6 +204,64 @@ class NumpyToTensorMessageParser(CustomMessageParser):
                 }
             ),
         )
+
+    def __str__(self) -> str:
+        return f"numpy2tensor"
+
+    @classmethod
+    def build(cls, string: str) -> NumpyToTensorMessageParser:
+        string = string.strip()
+        if string != "numpy2tensor":
+            raise ValueError("Invalid string for NumpyToTensorMessageParser")
+        return NumpyToTensorMessageParser()
+
+
+class MultipleMessageParser(CustomMessageParser):
+    REGISTERED_PARSERS = [
+        NumpyToImageMessageParser,
+        NumpyToTensorMessageParser,
+    ]
+
+    def __init__(self, parsers: t.List[CustomMessageParser] = []) -> None:
+        super().__init__()
+        self._parsers = parsers if len(parsers) > 0 else []  # handle clash
+
+    @property
+    def subparsers(self) -> t.List[CustomMessageParser]:
+        return self._parsers
+
+    def add(self, parser: CustomMessageParser):
+        self._parsers.append(parser)
+
+    def match(self, obj) -> bool:
+        for parser in self._parsers:
+            if parser.match(obj):
+                return True
+        return False  # pragma: no cover
+
+    def __call__(self, obj) -> t.Union[msgpack.ExtType, t.Any]:
+        if self.match(obj):
+            for parser in self._parsers:
+                if parser.match(obj):
+                    return parser(obj)
+        return obj  # pragma: no cover
+
+    def __str__(self) -> str:
+        return " | ".join([str(parser) for parser in self._parsers])
+
+    @classmethod
+    def build(cls, string: str) -> MultipleMessageParser:
+        parsers = []
+        tokens = [x.strip() for x in string.split("|")]
+        for token in tokens:
+            for parser in cls.REGISTERED_PARSERS:
+                try:
+                    parsers.append(parser.build(token))
+                except Exception as e:
+                    pass
+
+        built = MultipleMessageParser(parsers)
+        return built
 
 
 class CustomMessageUnparser(ABC):
@@ -261,17 +333,27 @@ class MsgPacker(ecmn.Packer):
         self._unpacker.feed(buff)
         return self._unpacker.unpack()
 
+    @classmethod
+    def pretty_print(cls, data: t.Any):
+        from rich import pretty
 
-class SmartMsgPacker(MsgPacker):
-    def __init__(self) -> None:
+        np.set_printoptions(threshold=1, edgeitems=1, linewidth=100, suppress=True)
+        pretty.install()
+        pretty.pprint(data, max_string=10)
+
+
+class DefaultMsgPacker(MsgPacker):
+    DEFAULT_PARSERS_STRING = (
+        '(...,...,3) uint8 > image/jpg | '
+        + '(...,...) uint8 > image/png | '
+        + 'numpy2tensor'
+    )
+
+    def __init__(self, parsers_string: t.Optional[str] = None) -> None:
+        if parsers_string is None:
+            parsers_string = self.DEFAULT_PARSERS_STRING
         super().__init__(
-            parser=MultipleMessageParser(
-                [
-                    NumpyToImageMessageParser((..., ..., 3), np.uint8, JPEGImageEncoder()),
-                    NumpyToImageMessageParser((..., ...), np.uint8, PNGImageEncoder()),
-                    NumpyToTensorMessageParser(),
-                ]
-            ),
+            parser=MultipleMessageParser.build(parsers_string),
             unparser=MultipleMessageUnparser(
                 {
                     CustomMessageTypes.IMAGE.value: NumpyFromImageMessageUnparser(),

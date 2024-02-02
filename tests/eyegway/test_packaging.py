@@ -82,7 +82,9 @@ class TestPackaging:
         parser = ep.MultipleMessageParser()
 
         # Convert all images (..., ..., 3) / uint8 to PNG [so they are lossless]
-        parser.add(ep.NumpyToImageMessageParser((..., ..., 3), np.uint8, ep.PNGImageEncoder()))
+        parser.add(
+            ep.NumpyToImageMessageParser((..., ..., 3), np.uint8, ep.PNGImageEncoder())
+        )
 
         # Convert all other numpy arrays to generic tensors
         parser.add(ep.NumpyToTensorMessageParser())
@@ -109,7 +111,7 @@ class TestPackaging:
         # Smart pickpacker converts all images (..., ..., 3) / uint8 to JPEG [lossy]
         # all (..., ...) / uint8 images to PNG [lossless], and other numpy arrays to
         # generic tensors
-        pickpacker = ep.SmartMsgPacker()
+        pickpacker = ep.DefaultMsgPacker()
 
         packed = pickpacker.pack(message)
         assert len(packed) > 0
@@ -134,7 +136,9 @@ class TestPackaging:
 
         # Multi unparsers
         unparser = ep.MultipleMessageUnparser()
-        unparser.add(ep.CustomMessageTypes.IMAGE.value, ep.NumpyFromImageMessageUnparser())
+        unparser.add(
+            ep.CustomMessageTypes.IMAGE.value, ep.NumpyFromImageMessageUnparser()
+        )
 
         # Build custom pickpacker
         pickpacker = ep.MsgPacker(parser=parser, unparser=unparser)
@@ -144,6 +148,33 @@ class TestPackaging:
         unpacked = pickpacker.unpack(packed)
 
         assert not DeepDiff(data, unpacked)
+
+
+class TestParserBuilding:
+
+    def test_building(self):
+
+        parser = ep.MultipleMessageParser(
+            parsers=[
+                ep.NumpyToImageMessageParser(
+                    (..., ..., 3), np.uint8, ep.JPEGImageEncoder()
+                ),
+                ep.NumpyToImageMessageParser(
+                    (..., ...), np.uint8, ep.PNGImageEncoder()
+                ),
+                ep.NumpyToImageMessageParser(..., np.float32, ep.TIFFImageEncoder()),
+                ep.NumpyToImageMessageParser(..., ..., ep.TIFFImageEncoder()),
+                ep.NumpyToImageMessageParser((10, 10, 3), ..., ep.TIFFImageEncoder()),
+                ep.NumpyToTensorMessageParser(),
+            ]
+        )
+
+        reparser = ep.MultipleMessageParser.build(str(parser))
+
+        assert len(parser.subparsers) == len(reparser.subparsers)
+
+        for idx, subparser in enumerate(parser.subparsers):
+            assert str(subparser) == str(reparser.subparsers[idx])
 
 
 # def test_buffer():

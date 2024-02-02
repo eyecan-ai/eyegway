@@ -130,3 +130,6 @@ tests = ["tests", "*/eyegway/tests"]
 
 [tool.coverage.report]
 exclude_lines = ["no cov", "if __name__ == .__main__.:", "if TYPE_CHECKING:"]
+
+[project.scripts]
+eyegway = "eyegway.cli.main:cli"

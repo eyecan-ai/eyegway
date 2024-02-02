@@ -1,0 +1,30 @@
+import typer as tp
+
+cli_packer = tp.Typer(
+    name="packer",
+    no_args_is_help=True,
+    add_completion=False,
+)
+
+
+# ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+# ░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄
+# ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+
+
+@cli_packer.command(
+    short_help="Vision Pipeline info",
+)
+def info(
+    filename: str = tp.Option(
+        ...,
+        "--input-filename",
+        "-i",
+        help="Packed file to load",
+    )
+):
+    import eyegway.packaging as ecp
+
+    data = open(filename, "rb").read()
+    unpacked = ecp.DefaultMsgPacker().unpack(data)
+    ecp.MsgPacker.pretty_print(unpacked)
