@@ -23,6 +23,15 @@ class MessageHubConfig(pyd.BaseSettings):
         env_prefix = "EYEGWAY_MESSAGE_HUB_"
 
 
+class MessageHubConnector:
+
+    def data_in(self, data: t.Any) -> t.Any:
+        return data
+
+    def data_out(self, data: t.Any) -> t.Any:
+        return data
+
+
 class AsyncMessageHub:
 
     def __init__(
@@ -33,6 +42,7 @@ class AsyncMessageHub:
         max_buffer_size: int = 0,
         max_history_size: int = 0,
         max_payload_size: int = 0,
+        connector: t.Optional[MessageHubConnector] = None,
     ):
         self.redis = redis
         self.name = name
@@ -40,12 +50,14 @@ class AsyncMessageHub:
         self.max_history_size = max_history_size
         self.max_payload_size = max_payload_size
         self.packer = packer
+        self.connector = connector or MessageHubConnector()
         self.buffer = ecom.AsyncFIFOChannel(redis, f"{name}:buffer", max_buffer_size)
         self.history = ecom.AsyncHistoryChannel(
             redis, f"{name}:history", max_history_size
         )
 
     async def push(self, obj: t.Any) -> None:
+        obj = self.connector.data_in(obj)
         with eut.LoguruTimer("HUB Packing"):
             data = self.packer.pack(obj)
 
@@ -65,24 +77,24 @@ class AsyncMessageHub:
         data = await self.pop_raw(timeout)
         if data is None:
             return None
-        return self.packer.unpack(data)
+        return self.connector.data_out(self.packer.unpack(data))
 
     async def last_raw(self, offset: int = 0) -> t.Optional[bytes]:
         return await self.history.get(offset)
 
-    async def last(self, offset: int = 0) -> t.Optional[bytes]:
+    async def last(self, offset: int = 0) -> t.Optional[t.Any]:
         data = await self.last_raw(offset)
         if data is None:
             return None
-        return self.packer.unpack(data)
+        return self.connector.data_out(self.packer.unpack(data))
 
     async def last_multiple_raw(self, start: int, stop: int) -> t.List[bytes]:
         datas = await self.history.slice(start, stop)
         return datas
 
-    async def last_multiple(self, start: int, stop: int) -> t.List[bytes]:
+    async def last_multiple(self, start: int, stop: int) -> t.List[t.Any]:
         datas = await self.last_multiple_raw(start, stop)
-        return [self.packer.unpack(data) for data in datas]
+        return [self.connector.data_out(self.packer.unpack(data)) for data in datas]
 
     async def history_size(self) -> int:
         return await self.history.size()
@@ -103,7 +115,13 @@ class AsyncMessageHub:
         if config is None:
             config = MessageHubConfig()
 
-        redis = Redis(host=config.redis_host, port=config.redis_port)
+        if config.redis_host == 'fakeredis':
+            import fakeredis
+
+            redis = fakeredis.FakeAsyncRedis()
+        else:
+            redis = Redis(host=config.redis_host, port=config.redis_port)
+
         import eyegway.packaging as ecp
 
         return AsyncMessageHub(

@@ -68,9 +68,9 @@ def pipelime(
         nonlocal keys
 
         # Create hub
-        hub = eh.AsyncMessageHub.create(
-            name=hub_name,  # config=eh.MessageHubConfig(parsers_string="numpy2tensor")
-        )
+        hub = eh.AsyncMessageHub.create(name=hub_name)
+
+        await hub.clear_history()
 
         # Create image resize transform
         transform = A.Compose([A.SmallestMaxSize(max_size=image_resize)])
@@ -186,7 +186,7 @@ def viewer(
 
         while True:
             # Get last data in history
-            data = await hub.last()
+            data = await hub.pop()
 
             # No data? wait a bit
             if data is None:

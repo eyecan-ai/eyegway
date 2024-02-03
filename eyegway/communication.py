@@ -2,6 +2,7 @@ from redis.asyncio import Redis
 from redis.asyncio.client import Pipeline
 import typing as t
 from abc import ABC
+import loguru
 
 
 class AsyncChannel(ABC):
@@ -9,7 +10,7 @@ class AsyncChannel(ABC):
         self,
         redis: Redis,
         name: str,
-        max_size: int = 0,
+        max_size: int = -1,
         push_method: str = "lpush",
         pop_method: t.Optional[str] = "brpop",
     ):
@@ -23,7 +24,8 @@ class AsyncChannel(ABC):
         Args:
             redis (Redis): the redis instance
             name (str): the name of the channel
-            max_size (int, optional): the max size of the channel. Defaults to 0.
+            max_size (int, optional): the max size of the channel (-1 for unlimited).
+                Defaults to -1.
             push_method (str, optional): push method. Defaults to "lpush".
             pop_method (t.Optional[str], optional): pop method. Defaults to "brpop".
         """
@@ -34,12 +36,17 @@ class AsyncChannel(ABC):
         self.pop_method = pop_method
 
     async def push(self, data: bytes, external_pipe: t.Optional[Pipeline] = None):
+        if self.max_size == 0:
+            return
+
         pipe = self.redis.pipeline() if external_pipe is None else external_pipe
         await pipe.execute_command(self.push_method, self.channel_name, data)
 
         # trim the list if the max size is reached
         if self.max_size > 0:
             await pipe.ltrim(self.channel_name, 0, self.max_size - 1)
+        else:
+            loguru.logger.warning("Max size is not set for channel {self.channel_name}")
 
         if external_pipe is None:
             await pipe.execute()

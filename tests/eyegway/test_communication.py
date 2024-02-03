@@ -35,6 +35,23 @@ class TestChannels:
         assert await channel.pop(1) is None
 
     @pytest.mark.asyncio
+    async def test_empty_fifo_channels(self, redis_test_mock_async: aioredis.Redis):
+
+        max_size = 100
+        channel = ecom.AsyncFIFOChannel(
+            redis_test_mock_async,
+            "test",
+            max_size=0,
+        )
+
+        messages = [f"msg-{idx}".encode('utf-8') for idx in range(max_size)]
+
+        # Push all messages and pop them
+        for idx in range(max_size):
+            await channel.push(messages[idx])
+        assert await channel.size() == 0
+
+    @pytest.mark.asyncio
     async def test_lifo_channels(self, redis_test_mock_async: aioredis.Redis):
 
         max_size = 100

@@ -88,3 +88,24 @@ class TestMessageHub:
 
         with pytest.raises(ValueError):
             await hub.push(data)
+
+    @pytest.mark.asyncio
+    async def test_factory(self):
+
+        max_buffer_size = 10
+        max_history_size = max_buffer_size
+
+        hub = eh.AsyncMessageHub.create(
+            "test",
+            config=eh.MessageHubConfig(
+                redis_host="fakeredis",
+                max_buffer_size=max_buffer_size,
+                max_history_size=max_history_size,
+            ),
+        )
+
+        data = [b'0']
+        for _ in range(max_buffer_size):
+            await hub.push(data)
+
+        assert await hub.buffer_size() == max_buffer_size

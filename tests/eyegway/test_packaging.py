@@ -147,6 +147,8 @@ class TestPackaging:
         assert len(packed) > 0
         unpacked = pickpacker.unpack(packed)
 
+        ep.MsgPacker.pretty_print(unpacked)
+
         assert not DeepDiff(data, unpacked)
 
 
