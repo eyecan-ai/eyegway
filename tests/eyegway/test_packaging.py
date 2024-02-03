@@ -185,3 +185,87 @@ class TestParserBuilding:
 
 #     packed = pickpacker.pack(data)
 #     print(data, packed)
+
+
+class TestPackagingV2:
+
+    @pytest.mark.parametrize("message", messages())
+    def test_equality(self, message):
+        # Multi Parser
+
+        conversions = [
+            ep.NumpyConversion(
+                numpy_format=ep.NumpyFormat(
+                    shape=(..., ..., 3),
+                    dtype=np.uint8,
+                ),
+                image_encoder=ep.PNGImageEncoder(),
+            ),
+        ]
+
+        parser = ep.MessageParserCompose(
+            parsers=[ep.NumpyMessageParser(numpy_conversions=conversions)]
+        )
+
+        unparser = ep.MessageUnparserCompose(unparsers=[ep.NumpyMessageUnparser()])
+
+        # Build custom pickpacker
+        pickpacker = ep.MsgPacker(parser=parser, unparser=unparser)
+
+        packed = pickpacker.pack(message)
+        assert len(packed) > 0
+        unpacked = pickpacker.unpack(packed)
+
+        assert not DeepDiff(message, unpacked, ignore_numeric_type_changes=True)
+
+    @pytest.mark.parametrize("message", messages())
+    def test_packer_smart_images(self, message):
+        pickpacker = ep.message_packer_smart_images()
+        packed = pickpacker.pack(message)
+        assert len(packed) > 0
+        unpacked = pickpacker.unpack(packed)
+        assert not DeepDiff(message, unpacked, exclude_types=[np.ndarray])
+
+    @pytest.mark.parametrize("message", messages())
+    def test_packer_raw(self, message):
+        pickpacker = ep.message_packer_raw()
+        packed = pickpacker.pack(message)
+        assert len(packed) > 0
+        unpacked = pickpacker.unpack(packed)
+        assert not DeepDiff(message, unpacked)
+
+    def test_tiff(self):
+        data = {
+            "image": np.random.randint(0, 255, (100, 100, 3)).astype(np.uint8),
+            "tensor": np.random.rand(100, 100, 3),
+            "tensor16": np.random.rand(100, 100, 3).astype(np.float16),
+            "tensor32": np.random.rand(100, 100, 3).astype(np.float32),
+            "tensor64": np.random.rand(19, 20, 33).astype(np.float64),
+        }
+
+        conversions = [
+            ep.NumpyConversion(
+                numpy_format=ep.NumpyFormat(
+                    shape=...,
+                    dtype=...,
+                ),
+                image_encoder=ep.TIFFImageEncoder(),
+            ),
+        ]
+
+        parser = ep.MessageParserCompose(
+            parsers=[ep.NumpyMessageParser(numpy_conversions=conversions)]
+        )
+
+        unparser = ep.MessageUnparserCompose(unparsers=[ep.NumpyMessageUnparser()])
+
+        # Build custom pickpacker
+        pickpacker = ep.MsgPacker(parser=parser, unparser=unparser)
+
+        packed = pickpacker.pack(data)
+        assert len(packed) > 0
+        unpacked = pickpacker.unpack(packed)
+
+        ep.MsgPacker.pretty_print(unpacked)
+
+        assert not DeepDiff(data, unpacked)

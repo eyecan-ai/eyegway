@@ -8,9 +8,54 @@ import typing as t
 from abc import ABC, abstractmethod, abstractclassmethod
 from enum import Enum
 import eyegway.commons as ecmn
+import pydantic as pyd
+import ast
 
 MatchShape = t.Union[t.Sequence, type(Ellipsis)]
 MatchDtype = t.Union[np.dtype, type(Ellipsis)]
+
+
+class NumpyFormat(pyd.BaseModel, arbitrary_types_allowed=True):
+    shape: MatchShape = pyd.Field(...)
+    dtype: MatchDtype = pyd.Field(...)
+
+    @pyd.validator('dtype', pre=True)
+    def dtype_conversion(cls, v):
+        return np.dtype(v) if v is not Ellipsis else v
+
+    def __eq__(self, format: NumpyFormat) -> bool:
+        return self.shape == format.shape and self.dtype == format.dtype
+
+    def __str__(self) -> str:
+        shape = (
+            "..."
+            if self.shape is Ellipsis
+            else ",".join(["..." if x is Ellipsis else str(x) for x in self.shape])
+        )
+        dtype = self.dtype.name if self.dtype is not Ellipsis else "..."
+        return f"({shape})/{dtype}"
+
+    @classmethod
+    def parse(cls, string: str) -> NumpyFormat:
+        shape, dtype = string.split("/")
+        shape = ast.literal_eval(shape)
+        dtype = dtype.strip()
+        dtype = np.dtype(dtype) if dtype != "..." else Ellipsis
+        return NumpyFormat(shape=shape, dtype=dtype)
+
+    def match(self, array: np.ndarray) -> bool:
+        if self.shape is not ...:
+            if len(array.shape) != len(self.shape):
+                return False
+            else:
+                for i, s in enumerate(self.shape):
+                    if s is not ... and array.shape[i] != s:
+                        return False
+
+        if self.dtype is not ...:
+            if array.dtype != self.dtype:
+                return False
+        return True
 
 
 def match_shape(
@@ -44,6 +89,9 @@ class ImageEncoder(ABC):
     @abstractclassmethod
     def name(cls) -> str:
         pass
+
+    def __eq__(self, encoder: ImageEncoder) -> bool:
+        return self.name() == encoder.name()
 
 
 class TIFFImageEncoder(ImageEncoder):
@@ -91,6 +139,13 @@ class JPEGImageEncoder(ImageEncoder):
         return "image/jpeg"
 
 
+ImageEncodersMap = {
+    TIFFImageEncoder.name(): TIFFImageEncoder(),
+    PNGImageEncoder.name(): PNGImageEncoder(),
+    JPEGImageEncoder.name(): JPEGImageEncoder(),
+}
+
+
 class ImageEncoderFactory:
     def __init__(self) -> None:
         self._encoders = {
@@ -103,9 +158,201 @@ class ImageEncoderFactory:
         return self._encoders[name]
 
 
+class NumpyConversion(pyd.BaseModel, arbitrary_types_allowed=True):
+    numpy_format: NumpyFormat = pyd.Field(...)
+    image_encoder: ImageEncoder = pyd.Field(...)
+
+    def __eq__(self, conversion: NumpyConversion) -> bool:
+        return (
+            self.numpy_format == conversion.numpy_format
+            and self.image_encoder == conversion.image_encoder
+        )
+
+    def __str__(self) -> str:
+        return f"{str(self.numpy_format)}={self.image_encoder.name()}"
+
+    @classmethod
+    def parse(cls, string: str) -> NumpyConversion:
+        numpy_format, encoder = string.split("=")
+        numpy_format = NumpyFormat.parse(numpy_format)
+        encoder = ImageEncodersMap.get(encoder.strip())
+        return NumpyConversion(numpy_format=numpy_format, image_encoder=encoder)
+
+    def match(self, array: np.ndarray) -> bool:
+        return self.numpy_format.match(array)
+
+    def encode(self, image: np.ndarray) -> bytes:
+        return self.image_encoder.encode(image)
+
+    def decode(self, buff: bytes) -> np.ndarray:
+        return self.image_encoder.decode(buff)
+
+
 class CustomMessageTypes(Enum):
     TENSOR = 66
     IMAGE = 67
+
+
+class GenericMessageParser(ABC, pyd.BaseModel):
+    @abstractmethod
+    def match(self, obj) -> bool:
+        pass
+
+    @abstractmethod
+    def __call__(self, obj) -> t.Union[msgpack.ExtType, t.Any]:
+        pass
+
+
+class NumpyMessageParser(GenericMessageParser):
+    numpy_conversions: t.List[NumpyConversion] = pyd.Field(default_factory=list)
+
+    def match(self, obj) -> bool:
+        return isinstance(obj, np.ndarray)
+
+    def __call__(self, obj) -> t.Union[msgpack.ExtType, t.Any]:
+        for conversion in self.numpy_conversions:
+            if conversion.numpy_format.match(obj):
+                return msgpack.ExtType(
+                    CustomMessageTypes.IMAGE.value,
+                    msgpack.packb(
+                        {
+                            "shape": obj.shape,
+                            "type": conversion.image_encoder.name(),
+                            "data": conversion.image_encoder.encode(obj),
+                        }
+                    ),
+                )
+
+        return msgpack.ExtType(
+            CustomMessageTypes.TENSOR.value,
+            msgpack.packb(
+                {
+                    "shape": obj.shape,
+                    "type": obj.dtype.name,
+                    "data": obj.tobytes(),
+                }
+            ),
+        )
+
+
+class MessageParserCompose(GenericMessageParser):
+    parsers: t.List[GenericMessageParser] = pyd.Field(...)
+
+    def match(self, obj) -> bool:
+        for parser in self.parsers:
+            if parser.match(obj):
+                return True
+        return False  # pragma: no cover
+
+    def __call__(self, obj) -> t.Union[msgpack.ExtType, t.Any]:
+        for parser in self.parsers:
+            if parser.match(obj):
+                return parser(obj)
+        return obj  # pragma: no cover
+
+
+class GenericMessageUnparser(ABC, pyd.BaseModel):
+    @abstractmethod
+    def match(self, code: int) -> bool:
+        pass
+
+    @abstractmethod
+    def __call__(self, code: int, data: bytes) -> t.Any:
+        pass
+
+
+class NumpyMessageUnparser(GenericMessageUnparser):
+
+    def match(self, code: int) -> bool:
+        return code in [CustomMessageTypes.TENSOR.value, CustomMessageTypes.IMAGE.value]
+
+    def __call__(self, code: int, data: bytes) -> t.Any:
+        if code == CustomMessageTypes.IMAGE.value:
+            data = msgpack.unpackb(data, raw=False)
+            encoder = ImageEncoderFactory().get(data["type"])
+            shape = data["shape"]  # format check
+            return encoder.decode(data["data"])
+        else:
+            data = msgpack.unpackb(data, raw=False)
+            return np.frombuffer(data["data"], dtype=data["type"]).reshape(
+                data["shape"]
+            )
+
+
+class MessageUnparserCompose(GenericMessageUnparser):
+    unparsers: t.List[GenericMessageUnparser] = pyd.Field(...)
+
+    def match(self, code: int) -> bool:
+        for unparser in self.unparsers:
+            if unparser.match(code):
+                return True
+        return False
+
+    def __call__(self, code: int, data: bytes) -> t.Any:
+        for unparser in self.unparsers:
+            if unparser.match(code):
+                return unparser(code, data)
+        return data
+
+
+class MessagePacker(pyd.BaseModel, arbitrary_types_allowed=True):
+    parser: MessageParserCompose = pyd.Field(...)
+    unparser: MessageUnparserCompose = pyd.Field(...)
+    _packer: msgpack.Packer = pyd.PrivateAttr()
+    _unpacker: msgpack.Unpacker = pyd.PrivateAttr()
+
+    # self._packer = msgpack.Packer(default=self._parser, use_bin_type=True)
+    #     self._unpacker = msgpack.Unpacker(ext_hook=self._unparser, raw=False)
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self._packer = msgpack.Packer(default=self.parser, use_bin_type=True)
+        self._unpacker = msgpack.Unpacker(ext_hook=self.unparser, raw=False)
+
+    def pack(self, obj) -> bytes:
+        return self._packer.pack(obj)
+
+    def unpack(self, buff: bytes) -> t.Any:
+        self._unpacker.feed(buff)
+        return self._unpacker.unpack()
+
+    @classmethod
+    def pretty_print(cls, data: t.Any):
+        from rich import pretty
+
+        np.set_printoptions(threshold=1, edgeitems=1, linewidth=100, suppress=True)
+        pretty.install()
+        pretty.pprint(data, max_string=10)
+
+
+def message_packer_smart_images() -> MessagePacker:
+    conversions = [
+        NumpyConversion(
+            numpy_format=NumpyFormat(shape=(..., ..., 3), dtype=np.uint8),
+            image_encoder=JPEGImageEncoder(),
+        ),
+        NumpyConversion(
+            numpy_format=NumpyFormat(shape=(..., ...), dtype=np.uint8),
+            image_encoder=PNGImageEncoder(),
+        ),
+    ]
+
+    parser = MessageParserCompose(
+        parsers=[NumpyMessageParser(numpy_conversions=conversions)]
+    )
+
+    unparser = MessageUnparserCompose(unparsers=[NumpyMessageUnparser()])
+
+    return MessagePacker(parser=parser, unparser=unparser)
+
+
+def message_packer_raw() -> MessagePacker:
+    parser = MessageParserCompose(parsers=[NumpyMessageParser()])
+    unparser = MessageUnparserCompose(unparsers=[NumpyMessageUnparser()])
+    return MessagePacker(parser=parser, unparser=unparser)
+
+
+############################################################################################################
 
 
 class CustomMessageParser(ABC):
