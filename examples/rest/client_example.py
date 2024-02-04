@@ -1,17 +1,16 @@
 import asyncio
-import eyegway.rest.hubs as erh
 import rich
 import numpy as np
 import httpx
 import eyegway.packers.factory as epf
-import eyegway.rest.hubs as erh
+import eyegway.hubs.rest.api as erha
 import pydantic as pyd
 import typing as t
 
 
 class HubsRestAPIClientAsync(pyd.BaseModel):
     host: str = "0.0.0.0"
-    port: int = erh.HUBS_REST_API_DEFAULT_PORT
+    port: int = erha.HUBS_REST_API_DEFAULT_PORT
 
     async def history_size(self, name: str) -> int:
         async with httpx.AsyncClient() as client:

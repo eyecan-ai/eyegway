@@ -5,22 +5,8 @@ import fastapi.responses as far
 import fastapi.requests as farq
 import typing as t
 import fastapi.middleware.cors as fa_cors
-import pydantic as pyd
-import httpx
 
 HUBS_REST_API_DEFAULT_PORT = 55221
-
-
-class HubsRestAPI(pyd.BaseSettings):
-    host: str = "0.0.0.0"
-    port: int = HUBS_REST_API_DEFAULT_PORT
-
-    class Config:
-        env_prefix = "eyegway_rest_hubs_"
-
-
-class PushedData(pyd.BaseModel):
-    data: bytes
 
 
 class HubsRestAPI(fa.FastAPI):

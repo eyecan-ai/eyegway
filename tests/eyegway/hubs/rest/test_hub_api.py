@@ -1,4 +1,4 @@
-import eyegway.rest.hubs as erh
+import eyegway.hubs.rest.api as erha
 import eyegway.packers.factory as epf
 import eyegway.hubs as eh
 from httpx import AsyncClient
@@ -9,7 +9,7 @@ class TestHubsRestAPI:
 
     @pytest.mark.asyncio
     async def test_lifecycle(self):
-        api = erh.HubsRestAPI(config=eh.HubsConfig(redis_host="fakeredis"))
+        api = erha.HubsRestAPI(config=eh.HubsConfig(redis_host="fakeredis"))
         packer = epf.PackersFactory.default()
         assert api is not None
 

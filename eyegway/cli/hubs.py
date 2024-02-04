@@ -29,8 +29,8 @@ def rest_serve(
         help="Port to serve the API",
     ),
 ):
-    import eyegway.rest.hubs as erh
+    import eyegway.hubs.rest.api as erha
     import uvicorn
 
-    api = erh.HubsRestAPI()
+    api = erha.HubsRestAPI()
     uvicorn.run(api, host=host, port=port)
