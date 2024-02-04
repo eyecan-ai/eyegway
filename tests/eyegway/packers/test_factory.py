@@ -23,6 +23,15 @@ class TestPackersFactory:
         unpacked = pickpacker.unpack(packed)
         assert not DeepDiff(message, unpacked)
 
+    @pytest.mark.parametrize("message", test_valid_messages())
+    def test_packer_default(self, message):
+        pickpacker = epf.PackersFactory.default()
+        packed = pickpacker.pack(message)
+        assert len(packed) > 0
+        # Givne that default packer can change, we can only check that it can be
+        # unpacked
+        unpacked = pickpacker.unpack(packed)
+
     @pytest.mark.parametrize("message", test_invalid_messages())
     def test_packer_raw_with_invalid_message(self, message):
         pickpacker = epf.PackersFactory.create("raw")

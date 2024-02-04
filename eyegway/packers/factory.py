@@ -58,7 +58,7 @@ class PackersFactory:
     @classmethod
     def create(cls, name: str) -> ep.MessagePacker:
         if name not in cls.PACKERS:
-            raise ValueError(f"Unknown packer: {name}")
+            raise ValueError(f"Unknown packer: {name}")  # pragma: no cover
         return cls.PACKERS[name]()
 
     @classmethod

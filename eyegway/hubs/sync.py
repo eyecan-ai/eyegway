@@ -1,17 +1,15 @@
 from __future__ import annotations
 import eyegway.packers as ecm
-import eyegway.communication.async_channels as ecom
+import eyegway.communication.channels as ecom
 import eyegway.packers.factory as ecp
 import eyegway.utils as eut
 import eyegway.hubs as eh
 import eyegway.hubs.connectors as ehc
-from redis.asyncio import Redis
-
-
+from redis import Redis
 import typing as t
 
 
-class AsyncMessageHub:
+class MessageHub:
 
     def __init__(
         self,
@@ -32,14 +30,14 @@ class AsyncMessageHub:
         self.connectors = connectors or []
 
         # Buffer channel
-        self.buffer = ecom.AsyncFIFOChannel(
+        self.buffer = ecom.FIFOChannel(
             redis,
             f"{name}:buffer",
             max_buffer_size,
         )
 
         # History channel
-        self.history = ecom.AsyncHistoryChannel(
+        self.history = ecom.HistoryChannel(
             redis,
             f"{name}:history",
             max_history_size,
@@ -57,7 +55,7 @@ class AsyncMessageHub:
             output_data = connector.hub_to_world(output_data)
         return output_data
 
-    async def push(self, obj: t.Any) -> None:
+    def push(self, obj: t.Any) -> None:
         obj = self.world_to_hub(obj)
         with eut.LoguruTimer("HUB Packing"):
             data = self.packer.pack(obj)
@@ -67,61 +65,61 @@ class AsyncMessageHub:
 
         with eut.LoguruTimer("HUB Pushing"):
             pipe = self.redis.pipeline()
-            await self.buffer.push(data, pipe)
-            await self.history.push(data, pipe)
-            await pipe.execute()
+            self.buffer.push(data, pipe)
+            self.history.push(data, pipe)
+            pipe.execute()
 
-    async def pop_raw(self, timeout: int = 0) -> t.Optional[bytes]:
-        return await self.buffer.pop(timeout)
+    def pop_raw(self, timeout: int = 0) -> t.Optional[bytes]:
+        return self.buffer.pop(timeout)
 
-    async def pop(self, timeout: int = 0) -> t.Optional[t.Any]:
-        data = await self.pop_raw(timeout)
+    def pop(self, timeout: int = 0) -> t.Optional[t.Any]:
+        data = self.pop_raw(timeout)
         if data is None:
             return None
         return self.hub_to_world(self.packer.unpack(data))
 
-    async def last_raw(self, offset: int = 0) -> t.Optional[bytes]:
-        return await self.history.get(offset)
+    def last_raw(self, offset: int = 0) -> t.Optional[bytes]:
+        return self.history.get(offset)
 
-    async def last(self, offset: int = 0) -> t.Optional[t.Any]:
-        data = await self.last_raw(offset)
+    def last(self, offset: int = 0) -> t.Optional[t.Any]:
+        data = self.last_raw(offset)
         if data is None:
             return None
         return self.hub_to_world(self.packer.unpack(data))
 
-    async def last_multiple_raw(self, start: int, stop: int) -> t.List[bytes]:
-        datas = await self.history.slice(start, stop)
+    def last_multiple_raw(self, start: int, stop: int) -> t.List[bytes]:
+        datas = self.history.slice(start, stop)
         return datas
 
-    async def last_multiple(self, start: int, stop: int) -> t.List[t.Any]:
-        datas = await self.last_multiple_raw(start, stop)
+    def last_multiple(self, start: int, stop: int) -> t.List[t.Any]:
+        datas = self.last_multiple_raw(start, stop)
         return [self.hub_to_world(self.packer.unpack(data)) for data in datas]
 
-    async def history_size(self) -> int:
-        return await self.history.size()
+    def history_size(self) -> int:
+        return self.history.size()
 
-    async def buffer_size(self) -> int:
-        return await self.buffer.size()
+    def buffer_size(self) -> int:
+        return self.buffer.size()
 
-    async def clear_buffer(self) -> None:
-        await self.buffer.clear()
+    def clear_buffer(self) -> None:
+        self.buffer.clear()
 
-    async def clear_history(self) -> None:
-        await self.history.clear()
+    def clear_history(self) -> None:
+        self.history.clear()
 
     @staticmethod
-    def create(name: str, config: t.Optional[eh.HubsConfig] = None) -> AsyncMessageHub:
+    def create(name: str, config: t.Optional[eh.HubsConfig] = None) -> MessageHub:
         if config is None:
             config = eh.HubsConfig()
 
         if config.redis_host == 'fakeredis':
             import fakeredis
 
-            redis = fakeredis.FakeAsyncRedis()
+            redis = fakeredis.FakeRedis()
         else:
             redis = Redis(host=config.redis_host, port=config.redis_port)
 
-        return AsyncMessageHub(
+        return MessageHub(
             redis,
             name,
             ecp.PackersFactory.create(config.packer),

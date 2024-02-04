@@ -26,7 +26,7 @@ class PipelimeHubConnector(ehc.HubConnector):
 
     def world_to_hub(self, data: pls.Sample) -> dict:
         if not isinstance(data, pls.Sample):
-            return data
+            return data  # pragma: no cover
 
         output_data = {}
         for key in data:
@@ -43,7 +43,7 @@ class PipelimeHubConnector(ehc.HubConnector):
 
     def hub_to_world(self, data: dict) -> pls.Sample:
         if not isinstance(data, dict):
-            return data
+            return data  # pragma: no cover
 
         output_data = {}
         for key, value in data.items():

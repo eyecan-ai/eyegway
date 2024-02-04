@@ -103,6 +103,10 @@ class TestMessageHub:
         await hub.clear_history()
 
     @pytest.mark.asyncio
+    async def test_factory_only_creation(self):
+        hub = eha.AsyncMessageHub.create("test")
+
+    @pytest.mark.asyncio
     async def test_factory(self):
 
         max_buffer_size = 10

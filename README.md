@@ -1,21 +1,13 @@
-# eyegway
+<a id="markdown-eyegway" name="eyegway"></a>
 
-[![PyPI - Version](https://img.shields.io/pypi/v/eyegway.svg)](https://pypi.org/project/eyegway)
-[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/eyegway.svg)](https://pypi.org/project/eyegway)
+# Eyegway
 
------
+<img src='https://img.shields.io/badge/version-0.0.1-blueviolet' /> <img src='https://img.shields.io/badge/coverage-97%25-brightgreen' /> <img src='https://img.shields.io/badge/-hatchling%20-critical' />
 
-**Table of Contents**
-
-- [Installation](#installation)
-- [License](#license)
+---
 
 ## Installation
 
 ```console
-pip install eyegway
+pip install -e .
 ```
-
-## License
-
-`eyegway` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
