@@ -4,6 +4,7 @@ import msgpack
 import pydantic as pyd
 import typing as t
 import numpy as np
+import pickle
 
 
 class CustomMessageTypes(Enum):
@@ -82,6 +83,16 @@ class MessageUnparserCompose(GenericMessageUnparser):
 # ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
 
+class Packer(ABC):
+    @abstractmethod
+    def pack(self, data: t.Any) -> bytes:
+        pass
+
+    @abstractmethod
+    def unpack(self, buff: bytes) -> t.Any:
+        pass
+
+
 class MessagePacker(pyd.BaseModel, arbitrary_types_allowed=True):
     parser: MessageParserCompose = pyd.Field(...)
     unparser: MessageUnparserCompose = pyd.Field(...)
@@ -107,3 +118,11 @@ class MessagePacker(pyd.BaseModel, arbitrary_types_allowed=True):
         np.set_printoptions(threshold=1, edgeitems=1, linewidth=100, suppress=True)
         pretty.install()
         pretty.pprint(data, max_string=10)
+
+
+class PicklePacker(Packer):
+    def pack(self, data: t.Any) -> bytes:
+        return pickle.dumps(data)
+
+    def unpack(self, buff: bytes) -> t.Any:
+        return pickle.loads(buff)

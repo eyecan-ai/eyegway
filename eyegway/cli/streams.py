@@ -50,14 +50,9 @@ def pipelime(
 ):
     import pipelime.sequences as pls
     import pipelime.stages as pst
-    import pipelime.items as pli
     import eyegway.hubs.asyn as eha
     import eyegway.hubs.connectors.pipelime as ehcp
-    import eyegway.utils as eut
     import asyncio
-    import time
-    import loguru
-    import albumentations as A
 
     async def run():
         nonlocal keys
@@ -160,7 +155,8 @@ def viewer(
             ]
         )
 
-        # Helper to display images, creates a colored version of any image and adds a border
+        # Helper to display images, creates a colored version of any image and adds
+        # borders
         def displayable_image(image: np.ndarray):
             image = transform(image=image)['image']
             image = cv2.normalize(image, None, 0, 255, cv2.NORM_MINMAX, cv2.CV_8U)

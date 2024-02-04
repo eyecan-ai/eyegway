@@ -1,8 +1,8 @@
+import loguru
 from redis.asyncio import Redis
 from redis.asyncio.client import Pipeline
 import typing as t
 from abc import ABC
-import loguru
 
 
 class AsyncChannel(ABC):

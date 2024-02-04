@@ -1,6 +1,6 @@
 import eyegway.hubs as eh
 import eyegway.hubs.asyn as eha
-import eyegway.commons as ecm
+import eyegway.packers as ecm
 import redis.asyncio as aioredis
 import pytest
 

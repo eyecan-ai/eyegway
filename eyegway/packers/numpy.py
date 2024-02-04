@@ -4,9 +4,6 @@ import typing as t
 import numpy as np
 import pydantic as pyd
 import msgpack
-import numpy as np
-import pydantic as pyd
-import typing as t
 from eyegway.packers.images import ImageEncoder, ImageEncodersMap
 from eyegway.packers import (
     CustomMessageTypes,
@@ -135,7 +132,8 @@ class NumpyMessageUnparser(GenericMessageUnparser):
         if code == CustomMessageTypes.IMAGE.value:
             data = msgpack.unpackb(data, raw=False)
             encoder = ImageEncodersMap.get(data["type"])
-            shape = data["shape"]  # format check
+            if 'shape' not in data:
+                raise ValueError("Invalid image format, missing 'shape'")
             return encoder.decode(data["data"])
         else:
             data = msgpack.unpackb(data, raw=False)

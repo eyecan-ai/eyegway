@@ -1,7 +1,5 @@
 import pytest
 import numpy as np
-import eyegway.packers.numpy as epn
-import eyegway.packers.images as epi
 import eyegway.packers.factory as epf
 from deepdiff import DeepDiff
 from .commons import test_valid_messages, test_invalid_messages
@@ -30,4 +28,4 @@ class TestPackersFactory:
         pickpacker = epf.PackersFactory.create("raw")
 
         with pytest.raises(TypeError):
-            packed = pickpacker.pack(message)
+            pickpacker.pack(message)

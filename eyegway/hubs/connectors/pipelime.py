@@ -1,7 +1,6 @@
 import eyegway.hubs.connectors as ehc
 import pipelime.sequences as pls
 import pipelime.items as pli
-import typing as t
 import loguru
 import numpy as np
 

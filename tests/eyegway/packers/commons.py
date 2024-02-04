@@ -1,5 +1,4 @@
 import numpy as np
-import pytest
 import typing as t
 import pydantic as pyd
 
@@ -54,7 +53,7 @@ def test_valid_messages() -> t.List[t.Any]:
     return test_valid_numpy_messages() + []
 
 
-### Invalid messages
+# Invalid messages
 
 
 class InvalidObject(pyd.BaseModel):

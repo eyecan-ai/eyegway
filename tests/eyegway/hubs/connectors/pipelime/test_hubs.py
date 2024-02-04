@@ -1,8 +1,6 @@
 import eyegway.hubs as eh
 import eyegway.hubs.asyn as eha
 import eyegway.hubs.connectors.pipelime as ehcp
-import eyegway.commons as ecm
-import redis.asyncio as aioredis
 import pytest
 import pathlib as pl
 import pipelime.sequences as pls

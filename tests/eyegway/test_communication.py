@@ -1,5 +1,5 @@
 import redis.asyncio as aioredis
-import eyegway.communication as ecom
+import eyegway.communication.async_channels as ecom
 import pytest
 
 
@@ -109,7 +109,7 @@ class TestChannels:
 
         assert await channel.slice(0, max_size - 1) == reversed_messages
 
-        assert await channel.get(max_size) == None
+        assert await channel.get(max_size) is None
 
         await channel.clear()
 
