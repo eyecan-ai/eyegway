@@ -47,17 +47,12 @@ def pipelime(
         "-k",
         help="Keys to include in the sequence",
     ),
-    image_resize: int = tp.Option(
-        380,
-        "--image-resize",
-        "-r",
-        help="Image resize",
-    ),
 ):
     import pipelime.sequences as pls
     import pipelime.stages as pst
     import pipelime.items as pli
-    import eyegway.hubs as eh
+    import eyegway.hubs.asyn as eha
+    import eyegway.hubs.connectors.pipelime as ehcp
     import eyegway.utils as eut
     import asyncio
     import time
@@ -68,12 +63,12 @@ def pipelime(
         nonlocal keys
 
         # Create hub
-        hub = eh.AsyncMessageHub.create(name=hub_name)
+        hub = eha.AsyncMessageHub.create(name=hub_name)
+
+        # Add pipelime connector to parse input samples into plain dictionaries
+        hub.connectors.append(ehcp.PipelimeHubConnector())
 
         await hub.clear_history()
-
-        # Create image resize transform
-        transform = A.Compose([A.SmallestMaxSize(max_size=image_resize)])
 
         # load dataset
         dataset = pls.SamplesSequence.from_underfolder(folder)
@@ -84,16 +79,8 @@ def pipelime(
             dataset = dataset.map(pst.StageKeysFilter(key_list=keys))
 
         while True:
-            for sample_idx, sample in enumerate(dataset):
-                data = {}
-                for key in sample:
-                    item = sample[key]
-                    if isinstance(item, pli.ImageItem):
-                        data[key] = transform(image=item())['image']
-                    else:
-                        data[key] = item()
-
-                await hub.push(data)
+            for _, sample in enumerate(dataset):
+                await hub.push(sample)
                 await asyncio.sleep(tick)
 
             if not loop:
@@ -125,8 +112,9 @@ def viewer(
         help="Image resize",
     ),
 ):
-    import eyegway.hubs as eh
+    import eyegway.hubs.asyn as eha
     import eyegway.packers.numpy as epn
+    import eyegway.hubs.connectors.pipelime as ehcp
     import asyncio
     import loguru
     import albumentations as A
@@ -139,11 +127,6 @@ def viewer(
         nonlocal keys
 
         # What is an image?
-        images_matches = [
-            ((..., ..., 3), np.uint8),
-            ((..., ...), np.uint8),
-            ((..., ...), ...),
-        ]
         images_format = [
             epn.NumpyFormat(shape=(..., ..., 3), dtype=np.uint8),
             epn.NumpyFormat(shape=(..., ...), dtype=np.uint8),
@@ -159,7 +142,10 @@ def viewer(
             )
 
         # Create hub
-        hub = eh.AsyncMessageHub.create(name=hub_name)
+        hub = eha.AsyncMessageHub.create(name=hub_name)
+
+        # Add pipelime connector to parse input samples into plain dictionaries
+        hub.connectors.append(ehcp.PipelimeHubConnector())
 
         # Create transforms to resize and center images in a square
         transform = A.Compose(
@@ -202,15 +188,15 @@ def viewer(
                 continue
 
             # Check if data is a dictionary, if not, skip
-            if not isinstance(data, dict):
-                loguru.logger.error("Viewer can manipulate only dictionary Data")
-                continue
+            # if not isinstance(data, dict):
+            #     loguru.logger.error("Viewer can manipulate only dictionary Data")
+            #     continue
 
             images = []
             metadata = []
             for key in keys:
                 if key in data:
-                    value = data[key]
+                    value = data[key]()
                     if is_image(value):
                         images.append(displayable_image(value))
                     else:

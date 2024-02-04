@@ -1,32 +1,14 @@
 from __future__ import annotations
-from redis.asyncio import Redis
-import eyegway.communication as ecom
 import eyegway.commons as ecm
+import eyegway.communication as ecom
 import eyegway.packers.factory as ecp
 import eyegway.utils as eut
+import eyegway.hubs as eh
+import eyegway.hubs.connectors as ehc
+from redis.asyncio import Redis
+
+
 import typing as t
-import pydantic as pyd
-
-
-class MessageHubConfig(pyd.BaseSettings):
-    max_buffer_size: int = 64
-    max_history_size: int = 64
-    max_payload_size: int = 64_000_000
-    redis_host: str = "localhost"
-    redis_port: int = 6379
-    packer: t.Optional[str] = "default"
-
-    class Config:
-        env_prefix = "EYEGWAY_MESSAGE_HUB_"
-
-
-class MessageHubConnector:
-
-    def data_in(self, data: t.Any) -> t.Any:
-        return data
-
-    def data_out(self, data: t.Any) -> t.Any:
-        return data
 
 
 class AsyncMessageHub:
@@ -39,7 +21,7 @@ class AsyncMessageHub:
         max_buffer_size: int = 0,
         max_history_size: int = 0,
         max_payload_size: int = 0,
-        connector: t.Optional[MessageHubConnector] = None,
+        connectors: t.Optional[t.List[ehc.HubConnector]] = None,
     ):
         self.redis = redis
         self.name = name
@@ -47,14 +29,40 @@ class AsyncMessageHub:
         self.max_history_size = max_history_size
         self.max_payload_size = max_payload_size
         self.packer = packer
-        self.connector = connector or MessageHubConnector()
-        self.buffer = ecom.AsyncFIFOChannel(redis, f"{name}:buffer", max_buffer_size)
-        self.history = ecom.AsyncHistoryChannel(
-            redis, f"{name}:history", max_history_size
+        self.connectors = connectors or []
+
+        # Buffer channel
+        self.buffer = ecom.AsyncFIFOChannel(
+            redis,
+            f"{name}:buffer",
+            max_buffer_size,
         )
 
+        # History channel
+        self.history = ecom.AsyncHistoryChannel(
+            redis,
+            f"{name}:history",
+            max_history_size,
+        )
+
+    def world_to_hub(self, data: t.Any) -> t.Any:
+        if self.connectors is None:
+            return data
+        input_data = data
+        for connector in self.connectors:
+            input_data = connector.world_to_hub(input_data)
+        return input_data
+
+    def hub_to_world(self, data: t.Any) -> t.Any:
+        if self.connectors is None:
+            return data
+        output_data = data
+        for connector in self.connectors:
+            output_data = connector.hub_to_world(output_data)
+        return output_data
+
     async def push(self, obj: t.Any) -> None:
-        obj = self.connector.data_in(obj)
+        obj = self.world_to_hub(obj)
         with eut.LoguruTimer("HUB Packing"):
             data = self.packer.pack(obj)
 
@@ -74,7 +82,7 @@ class AsyncMessageHub:
         data = await self.pop_raw(timeout)
         if data is None:
             return None
-        return self.connector.data_out(self.packer.unpack(data))
+        return self.hub_to_world(self.packer.unpack(data))
 
     async def last_raw(self, offset: int = 0) -> t.Optional[bytes]:
         return await self.history.get(offset)
@@ -83,7 +91,7 @@ class AsyncMessageHub:
         data = await self.last_raw(offset)
         if data is None:
             return None
-        return self.connector.data_out(self.packer.unpack(data))
+        return self.hub_to_world(self.packer.unpack(data))
 
     async def last_multiple_raw(self, start: int, stop: int) -> t.List[bytes]:
         datas = await self.history.slice(start, stop)
@@ -91,7 +99,7 @@ class AsyncMessageHub:
 
     async def last_multiple(self, start: int, stop: int) -> t.List[t.Any]:
         datas = await self.last_multiple_raw(start, stop)
-        return [self.connector.data_out(self.packer.unpack(data)) for data in datas]
+        return [self.hub_to_world(self.packer.unpack(data)) for data in datas]
 
     async def history_size(self) -> int:
         return await self.history.size()
@@ -106,11 +114,9 @@ class AsyncMessageHub:
         await self.history.clear()
 
     @staticmethod
-    def create(
-        name: str, config: t.Optional[MessageHubConfig] = None
-    ) -> AsyncMessageHub:
+    def create(name: str, config: t.Optional[eh.HubsConfig] = None) -> AsyncMessageHub:
         if config is None:
-            config = MessageHubConfig()
+            config = eh.HubsConfig()
 
         if config.redis_host == 'fakeredis':
             import fakeredis
