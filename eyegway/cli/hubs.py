@@ -1,7 +1,7 @@
 import typer as tp
 
-cli_packer = tp.Typer(
-    name="packer",
+cli_hubs = tp.Typer(
+    name="hubs",
     no_args_is_help=True,
     add_completion=False,
 )
@@ -12,20 +12,25 @@ cli_packer = tp.Typer(
 # ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
 
-@cli_packer.command(
-    short_help="Vision Pipeline info",
+@cli_hubs.command(
+    short_help="Serve HUBS Rest API",
 )
-def info(
-    filename: str = tp.Option(
-        ...,
-        "--input-filename",
-        "-i",
-        help="Packed file to load",
-    )
+def rest_serve(
+    host: str = tp.Option(
+        "0.0.0.0",  # Default value
+        "--host",
+        "-h",
+        help="Host to serve the API",
+    ),
+    port: int = tp.Option(
+        55221,  # Default value
+        "--port",
+        "-p",
+        help="Port to serve the API",
+    ),
 ):
-    import eyegway.packers.factory as epf
-    import eyegway.packers as ep
+    import eyegway.hubs.rest.api as erha
+    import uvicorn
 
-    data = open(filename, "rb").read()
-    unpacked = epf.PackersFactory.default().unpack(data)
-    ep.MessagePacker.pretty_print(unpacked)
+    api = erha.HubsRestAPI()
+    uvicorn.run(api, host=host, port=port)

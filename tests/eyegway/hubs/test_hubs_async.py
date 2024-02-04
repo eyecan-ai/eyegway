@@ -1,5 +1,6 @@
 import eyegway.hubs as eh
-import eyegway.commons as ecm
+import eyegway.hubs.asyn as eha
+import eyegway.packers as ecm
 import redis.asyncio as aioredis
 import pytest
 
@@ -12,13 +13,16 @@ class TestMessageHub:
         max_buffer_size = 10
         max_history_size = max_buffer_size
 
-        hub = eh.AsyncMessageHub(
+        hub = eha.AsyncMessageHub(
             redis=redis_test_mock_async,
             name="test",
             packer=ecm.PicklePacker(),
             max_buffer_size=max_buffer_size,
             max_history_size=max_history_size,
         )
+
+        await hub.clear_buffer()
+        await hub.clear_history()
 
         data_size = max_buffer_size
         datas = []
@@ -68,6 +72,9 @@ class TestMessageHub:
         assert await hub.history_size() == data_size
         assert await hub.buffer_size() == data_size
 
+        await hub.clear_buffer()
+        await hub.clear_history()
+
     @pytest.mark.asyncio
     async def test_max_payload(self, redis_test_mock_async: aioredis.Redis):
 
@@ -75,7 +82,7 @@ class TestMessageHub:
         max_history_size = max_buffer_size
         max_payload_size = 1_000_000
 
-        hub = eh.AsyncMessageHub(
+        hub = eha.AsyncMessageHub(
             redis=redis_test_mock_async,
             name="test",
             packer=ecm.PicklePacker(),
@@ -84,10 +91,20 @@ class TestMessageHub:
             max_payload_size=max_payload_size,
         )
 
+        await hub.clear_buffer()
+        await hub.clear_history()
+
         data = [b'0' * max_payload_size * 2]
 
         with pytest.raises(ValueError):
             await hub.push(data)
+
+        await hub.clear_buffer()
+        await hub.clear_history()
+
+    @pytest.mark.asyncio
+    async def test_factory_only_creation(self):
+        hub = eha.AsyncMessageHub.create("test")
 
     @pytest.mark.asyncio
     async def test_factory(self):
@@ -95,17 +112,23 @@ class TestMessageHub:
         max_buffer_size = 10
         max_history_size = max_buffer_size
 
-        hub = eh.AsyncMessageHub.create(
+        hub = eha.AsyncMessageHub.create(
             "test",
-            config=eh.MessageHubConfig(
+            config=eh.HubsConfig(
                 redis_host="fakeredis",
                 max_buffer_size=max_buffer_size,
                 max_history_size=max_history_size,
             ),
         )
 
+        await hub.clear_buffer()
+        await hub.clear_history()
+
         data = [b'0']
         for _ in range(max_buffer_size):
             await hub.push(data)
 
         assert await hub.buffer_size() == max_buffer_size
+
+        await hub.clear_buffer()
+        await hub.clear_history()
