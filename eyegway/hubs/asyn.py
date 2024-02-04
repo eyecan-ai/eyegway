@@ -57,6 +57,13 @@ class AsyncMessageHub:
             output_data = connector.hub_to_world(output_data)
         return output_data
 
+    async def push_raw(self, data: bytes) -> None:
+        with eut.LoguruTimer("HUB Pushing"):
+            pipe = self.redis.pipeline()
+            await self.buffer.push(data, pipe)
+            await self.history.push(data, pipe)
+            await pipe.execute()
+
     async def push(self, obj: t.Any) -> None:
         obj = self.world_to_hub(obj)
         with eut.LoguruTimer("HUB Packing"):
@@ -65,11 +72,7 @@ class AsyncMessageHub:
         if self.max_payload_size > 0 and len(data) > self.max_payload_size:
             raise ValueError(f"Payload too big [Max: {self.max_payload_size}]")
 
-        with eut.LoguruTimer("HUB Pushing"):
-            pipe = self.redis.pipeline()
-            await self.buffer.push(data, pipe)
-            await self.history.push(data, pipe)
-            await pipe.execute()
+        await self.push_raw(data)
 
     async def pop_raw(self, timeout: int = 0) -> t.Optional[bytes]:
         return await self.buffer.pop(timeout)

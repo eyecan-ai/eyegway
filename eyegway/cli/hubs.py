@@ -1,0 +1,36 @@
+import typer as tp
+
+cli_hubs = tp.Typer(
+    name="hubs",
+    no_args_is_help=True,
+    add_completion=False,
+)
+
+
+# ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+# ░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄
+# ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+
+
+@cli_hubs.command(
+    short_help="Serve HUBS Rest API",
+)
+def rest_serve(
+    host: str = tp.Option(
+        "0.0.0.0",  # Default value
+        "--host",
+        "-h",
+        help="Host to serve the API",
+    ),
+    port: int = tp.Option(
+        55221,  # Default value
+        "--port",
+        "-p",
+        help="Port to serve the API",
+    ),
+):
+    import eyegway.rest.hubs as erh
+    import uvicorn
+
+    api = erh.HubsRestAPI()
+    uvicorn.run(api, host=host, port=port)
