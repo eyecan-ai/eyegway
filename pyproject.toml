@@ -22,7 +22,16 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: CPython",
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
-dependencies = []
+dependencies = [
+  "pydantic>=1.10.13",
+  "httpx",
+  "typer",
+  "redis>=5.0.0",
+  "msgpack>=1.0.7",
+  "pipelime-python>=1.9.0",
+  "fastapi>=0.100.0",
+  "fakeredis",
+]
 
 [project.urls]
 Documentation = "https://github.com/unknown/eyegway#readme"
@@ -33,7 +42,13 @@ Source = "https://github.com/unknown/eyegway"
 path = "eyegway/__init__.py"
 
 [tool.hatch.envs.default]
-dependencies = ["coverage[toml]>=6.5", "pytest"]
+dependencies = [
+  "coverage[toml]>=6.5",
+  "pytest",
+  "pytest-asyncio",
+  "pytest-cov",
+  "fakeredis",
+]
 [tool.hatch.envs.default.scripts]
 test = "pytest {args:tests}"
 test-cov = "coverage run -m pytest {args:tests}"
