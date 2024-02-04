@@ -2,6 +2,7 @@ from __future__ import annotations
 from redis.asyncio import Redis
 import eyegway.communication as ecom
 import eyegway.commons as ecm
+import eyegway.packers.factory as ecp
 import eyegway.utils as eut
 import typing as t
 import pydantic as pyd
@@ -13,11 +14,7 @@ class MessageHubConfig(pyd.BaseSettings):
     max_payload_size: int = 64_000_000
     redis_host: str = "localhost"
     redis_port: int = 6379
-    parsers_string: t.Optional[str] = (
-        '(...,...,3) uint8 > image/jpeg | '
-        + '(...,...) uint8 > image/png | '
-        + 'numpy2tensor'
-    )
+    packer: t.Optional[str] = "default"
 
     class Config:
         env_prefix = "EYEGWAY_MESSAGE_HUB_"
@@ -122,12 +119,10 @@ class AsyncMessageHub:
         else:
             redis = Redis(host=config.redis_host, port=config.redis_port)
 
-        import eyegway.packaging as ecp
-
         return AsyncMessageHub(
             redis,
             name,
-            ecp.DefaultMsgPacker(parsers_string=config.parsers_string),
+            ecp.PackersFactory.create(config.packer),
             config.max_buffer_size,
             config.max_history_size,
             config.max_payload_size,

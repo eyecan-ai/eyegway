@@ -23,8 +23,9 @@ def info(
         help="Packed file to load",
     )
 ):
-    import eyegway.packaging as ecp
+    import eyegway.packers.factory as epf
+    import eyegway.packers as ep
 
     data = open(filename, "rb").read()
-    unpacked = ecp.DefaultMsgPacker().unpack(data)
-    ecp.MsgPacker.pretty_print(unpacked)
+    unpacked = epf.PackersFactory.default().unpack(data)
+    ep.MessagePacker.pretty_print(unpacked)

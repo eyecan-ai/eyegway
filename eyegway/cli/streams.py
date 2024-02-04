@@ -126,7 +126,7 @@ def viewer(
     ),
 ):
     import eyegway.hubs as eh
-    import eyegway.packaging as ep
+    import eyegway.packers.numpy as epn
     import asyncio
     import loguru
     import albumentations as A
@@ -144,12 +144,19 @@ def viewer(
             ((..., ...), np.uint8),
             ((..., ...), ...),
         ]
+        images_format = [
+            epn.NumpyFormat(shape=(..., ..., 3), dtype=np.uint8),
+            epn.NumpyFormat(shape=(..., ...), dtype=np.uint8),
+            epn.NumpyFormat(shape=(..., ...), dtype=...),
+        ]
 
         # Helper to check if value is an image
         def is_image(value: t.Any):
-            if not isinstance(value, np.ndarray):
-                return False
-            return any(ep.match_shape(value, m[0], m[1]) for m in images_matches)
+            return (
+                any([m.match(value) for m in images_format])
+                if isinstance(value, np.ndarray)
+                else False
+            )
 
         # Create hub
         hub = eh.AsyncMessageHub.create(name=hub_name)
