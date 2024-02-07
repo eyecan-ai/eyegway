@@ -56,7 +56,9 @@
 	"type": "module",
 	"dependencies": {
 		"@msgpack/msgpack": "^3.0.0-beta2",
-		"axios": "^1.6.7",
+		"@threlte/core": "^7.0.12",
+		"@threlte/extras": "^8.7.0",
+		"svelte-grid-extended": "^1.1.4",
 		"svelte-jsoneditor": "^0.21.5"
 	}
 }

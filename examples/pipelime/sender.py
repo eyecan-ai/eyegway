@@ -13,8 +13,10 @@ import numpy as np
 def pointcloud_to_data(item: pli.Model3DItem) -> t.Any:
     if isinstance(item, pli.PLYModel3DItem):
         pcd = item()
-        # return pcd.vertices.astype(np.float32)
-        return np.hstack((pcd.vertices, pcd.colors)).astype(np.float32)
+        return {
+            "vertices": pcd.vertices.astype(np.float32),
+            "colors": (pcd.colors[:, :3] / 255.0).astype(np.float32),
+        }
     else:
         raise Exception("Unknown item type")
 
@@ -31,6 +33,9 @@ async def run(
 
     # Create hub
     hub = eha.AsyncMessageHub.create(name=hub_name)
+
+    await hub.clear_history()
+    await hub.clear_buffer()
 
     # Add pipelime connector to parse input samples into plain dictionaries
     hub.connectors.append(
