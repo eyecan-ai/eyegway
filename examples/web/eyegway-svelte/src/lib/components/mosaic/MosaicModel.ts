@@ -60,7 +60,6 @@ export class DataExtractor {
 
         for (const key of keys) {
             if (key in value) {
-                console.log('Sub', key, value, value[key]);
                 value = value[key];
             } else {
                 return undefined;
@@ -99,7 +98,10 @@ export class DataExtractor {
      * @param key the key to pick
      * @returns the parsed value or null if it's not possible
      */
-    static pickAndParse(data: any, key: string): DataGenericType | null {
+    static pickAndParse(data: any | null, key: string): DataGenericType | null {
+        if (data === null) {
+            return null;
+        }
         const pickedData = DataExtractor._(data, key);
         return DataExtractor.parse(pickedData);
     }
@@ -121,4 +123,15 @@ export class MosaicItem {
         this.w = w;
         this.h = h;
     }
+}
+
+export class MosaicConfiguration {
+    items: MosaicItem[] = [];
+    size: [number, number] = [16, 16];
+
+    constructor(items: MosaicItem[] = [], size: [number, number] = [16, 16]) {
+        this.items = items;
+        this.size = size;
+    }
+
 }

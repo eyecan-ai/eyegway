@@ -144,10 +144,14 @@
 		background-color: #fafafa;
 
 		padding: 3px;
-		border-radius: 5px 5px 0px 0px;
 		opacity: 0.3;
 		width: 100%;
 		font-size: 0.8em;
 		transition: all 0.3s;
+	}
+	.item:hover .banner {
+		opacity: 1;
+		transform: scale(1.01);
+		box-shadow: 0px 0px 15px #ddd;
 	}
 </style>
