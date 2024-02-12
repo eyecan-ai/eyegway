@@ -5,20 +5,20 @@
 	import DataItem from './DataItem.svelte';
 
 	export let gridSize: [number, number] = [16, 16];
-	export let height: number = 400;
+	export let height: number = 600;
 	export let sharedData: any = {};
 	let purgedData: any = {};
 	let gridController: GridController;
 	let editableMode: boolean = true;
 
-	let items = [new ProtoypeItem('[placeholder]', 0, 0, 2, 2)];
+	let items = [new ProtoypeItem('[placeholder]', 0, 0, 5, 5)];
 
 	function addNewItem() {
-		const pos = gridController.getFirstAvailablePosition(2, 2);
+		const pos = gridController.getFirstAvailablePosition(5, 5);
 		if (pos == null) {
 			return;
 		} else {
-			items = [...items, new ProtoypeItem('[placeholder]', pos.x, pos.y, 2, 2)];
+			items = [...items, new ProtoypeItem('[placeholder]', pos.x, pos.y, 5, 5)];
 		}
 	}
 

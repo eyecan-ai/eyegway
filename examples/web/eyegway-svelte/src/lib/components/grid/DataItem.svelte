@@ -9,9 +9,26 @@
 	export let data: any = null;
 	let value: any | null = null;
 
+	function getValueByDotNotation(obj: any, dotNotation: string) {
+		const keys = dotNotation.split('.');
+		let value = obj;
+		console.log('GEeting ', obj, dotNotation, keys);
+
+		for (const key of keys) {
+			if (key in value) {
+				console.log('Sub', key, value, value[key]);
+				value = value[key];
+			} else {
+				return undefined;
+			}
+		}
+
+		return value;
+	}
+
 	$: {
 		if (prototype && data) {
-			value = data[prototype.name];
+			value = getValueByDotNotation(data, prototype.name);
 			console.log('Valued', data, prototype.name);
 		}
 	}

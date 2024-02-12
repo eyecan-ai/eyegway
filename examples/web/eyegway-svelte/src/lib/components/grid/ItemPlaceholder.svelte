@@ -28,11 +28,11 @@
 		activeClass="grid-item-active"
 		previewClass="bg-green rounded"
 	>
-		<div slot="moveHandle" class="move-handle" let:moveStart>
+		<!-- <div slot="moveHandle" class="move-handle" let:moveStart>
 			<div class="p-2 bg-slate-600 rounded text-white cursor-move" on:pointerdown={moveStart}>
 				Move
 			</div>
-		</div>
+		</div> -->
 		<div class="item">
 			<div>
 				<div class="label">Select Data:</div>
@@ -43,7 +43,7 @@
 					{/each}
 				</datalist>
 			</div>
-			<button class="button is-danger is-small" on:click={onDelete}>Delete</button>
+			<!-- <button class="button is-danger is-small is-outlined" on:click={onDelete}>Delete</button> -->
 		</div>
 	</GridItem>
 {/if}
@@ -58,7 +58,7 @@
 	.item {
 		display: grid;
 		place-items: center;
-		background-color: #fafafa;
+		background-color: #ddd;
 		width: 100%;
 		height: 100%;
 		overflow: hidden;

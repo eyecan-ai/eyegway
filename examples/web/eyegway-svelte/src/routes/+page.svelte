@@ -2,6 +2,7 @@
 	import { EyegwayHubClient, EyegwayTensor } from '$lib/Eyegway.js';
 
 	import Composer from '$lib/components/grid/Composer.svelte';
+	import Mosaic from '$lib/components/mosaic/Mosaic.svelte';
 	import { onMount } from 'svelte';
 
 	let hubName: string = 'fai4ba';
@@ -35,5 +36,6 @@
 </div>
 
 <div class="box">
-	<Composer {sharedData} />
+	<!-- <Composer {sharedData} /> -->
+	<Mosaic data={sharedData} />
 </div>
