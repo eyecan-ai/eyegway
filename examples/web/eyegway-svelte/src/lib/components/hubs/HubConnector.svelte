@@ -12,7 +12,6 @@
 		historySize = await client.historySize();
 		bufferSize = await client.bufferSize();
 		data = await client.last(dataPointer);
-		console.log(data);
 	}
 
 	async function increasePointer(delta: number) {
@@ -26,31 +25,15 @@
 <div class="columns is-vcentered">
 	<div class="column is-narrow">
 		<!-- svelte-ignore a11y-label-has-associated-control -->
-		<label>Hub:</label>
+		<div class="tags has-addons">
+			<span class="tag is-medium is-info is-light">Hub:</span>
+			<span class="tag is-medium"><input class="input" bind:value={hubName} /></span>
+			<!-- svelte-ignore a11y-click-events-have-key-events -->
+			<!-- svelte-ignore a11y-no-static-element-interactions -->
+			<span class="tag is-medium interactive is-primary is-light" on:click={reload}>Reload</span>
+		</div>
 	</div>
 
-	<div class="column is-narrow">
-		<input class="input is-small" bind:value={hubName} />
-	</div>
-	<div class="column is-narrow">
-		<button class="button is-small is-primary is-outlined" on:click={reload}>Reload</button>
-	</div>
-	<!-- <div class="column is-narrow">|</div>
-	<div class="column is-narrow">
-		<div class="field is-grouped is-grouped-multiline">
-			<div class="control">
-				<div class="tags has-addons">
-					<span class="tag is-medium is-info is-light">History</span>
-					<span class="tag is-medium is-success is-light">{historySize}</span>
-					<span class="tag is-medium is-info is-light">Buffer</span>
-					<span class="tag is-medium is-success is-light">{bufferSize}</span>
-				</div>
-			</div>
-			<div class="control">
-				<div class="tags has-addons"></div>
-			</div>
-		</div>
-	</div> -->
 	{#if data}
 		<div class="column is-narrow">|</div>
 		<div class="column is-narrow">
@@ -58,17 +41,17 @@
 				<!-- svelte-ignore a11y-click-events-have-key-events -->
 				<!-- svelte-ignore a11y-no-static-element-interactions -->
 				<span
-					class="tag is-medium interactive is-info"
+					class="tag is-medium interactive is-primary is-light"
 					on:click={() => {
 						increasePointer(-1);
 					}}
 					>{'<'}
 				</span>
-				<span class="tag is-medium is-primary">{dataPointer + 1} / {historySize}</span>
+				<span class="tag is-medium is-info is-light">{dataPointer + 1} / {historySize}</span>
 				<!-- svelte-ignore a11y-click-events-have-key-events -->
 				<!-- svelte-ignore a11y-no-static-element-interactions -->
 				<span
-					class="tag is-medium interactive is-info"
+					class="tag is-medium interactive is-primary is-light"
 					on:click={() => {
 						increasePointer(1);
 					}}
@@ -90,5 +73,17 @@
 	}
 	.tag.interactive:active {
 		transform: scale(0.9);
+	}
+	.tags input {
+		border: none;
+		box-shadow: none;
+		background: none;
+		padding: 0px;
+		height: 100%;
+	}
+	.tags input:focus {
+		border: none;
+		border-bottom: 1px dashed #222;
+		border-radius: 0px;
 	}
 </style>

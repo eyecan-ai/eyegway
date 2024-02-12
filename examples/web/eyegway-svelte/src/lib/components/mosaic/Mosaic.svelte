@@ -155,36 +155,38 @@
 					<button class="button is-small is-outlined is-danger" on:click={clear}> Clear </button>
 				{/if}
 			</div>
-			<div class="column is-narrow">|</div>
-			<div class="column is-narrow">
-				<!-- SAVE TO FILE-->
-				<button
-					class="button is-small is-outlined is-info"
-					disabled={items.length == 0}
-					on:click={saveConfigurationToFile}
-				>
-					Save to file
-				</button>
+			{#if editableMode}
+				<div class="column is-narrow">|</div>
+				<div class="column is-narrow">
+					<!-- SAVE TO FILE-->
+					<button
+						class="button is-small is-outlined is-info"
+						disabled={items.length == 0}
+						on:click={saveConfigurationToFile}
+					>
+						Save to file
+					</button>
 
-				<!-- LOAD FROM FILE-->
-				<button class="button is-small is-outlined is-info" on:click={loadConfigurationFromFile}>
-					Load from file
-				</button>
+					<!-- LOAD FROM FILE-->
+					<button class="button is-small is-outlined is-info" on:click={loadConfigurationFromFile}>
+						Load from file
+					</button>
 
-				<!-- SAVE AS DEFAULT-->
-				<button
-					class="button is-small is-outlined is-info"
-					disabled={items.length == 0}
-					on:click={saveConfigurationAsDefault}
-				>
-					Save as default
-				</button>
+					<!-- SAVE AS DEFAULT-->
+					<button
+						class="button is-small is-outlined is-info"
+						disabled={items.length == 0}
+						on:click={saveConfigurationAsDefault}
+					>
+						Save as default
+					</button>
 
-				<!-- LOAD DEFAULT-->
-				<button class="button is-small is-outlined is-info" on:click={loadDefaultConfiguration}>
-					Load default
-				</button>
-			</div>
+					<!-- LOAD DEFAULT-->
+					<button class="button is-small is-outlined is-info" on:click={loadDefaultConfiguration}>
+						Load default
+					</button>
+				</div>
+			{/if}
 		</div>
 	</div>
 {/if}

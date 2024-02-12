@@ -151,7 +151,6 @@
 	}
 	.item:hover .banner {
 		opacity: 1;
-		transform: scale(1.01);
 		box-shadow: 0px 0px 15px #ddd;
 	}
 </style>
