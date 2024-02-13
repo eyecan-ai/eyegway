@@ -34,14 +34,14 @@ class AsyncMessageHub:
         # Buffer channel
         self.buffer = ecom.AsyncFIFOChannel(
             redis,
-            f"{name}:buffer",
+            eh.HubsParametrization.channel_buffer_name(name),
             max_buffer_size,
         )
 
         # History channel
         self.history = ecom.AsyncHistoryChannel(
             redis,
-            f"{name}:history",
+            eh.HubsParametrization.channel_history_name(name),
             max_history_size,
         )
 
@@ -112,23 +112,47 @@ class AsyncMessageHub:
     async def clear_history(self) -> None:
         await self.history.clear()
 
+    async def clear(self) -> None:
+        await self.clear_buffer()
+        await self.clear_history()
+
     @staticmethod
-    def create(name: str, config: t.Optional[eh.HubsConfig] = None) -> AsyncMessageHub:
+    def create(
+        name: str,
+        config: t.Optional[eh.HubsConfig] = None,
+        redis: t.Optional[Redis] = None,
+    ) -> AsyncMessageHub:
         if config is None:
             config = eh.HubsConfig()
 
-        if config.redis_host == 'fakeredis':
-            import fakeredis
-
-            redis = fakeredis.FakeAsyncRedis()
-        else:
-            redis = Redis(host=config.redis_host, port=config.redis_port)
-
         return AsyncMessageHub(
-            redis,
+            redis or eh.HubsConfig.create_redis_async_instance(config),
             name,
             ecp.PackersFactory.create(config.packer),
             config.max_buffer_size,
             config.max_history_size,
             config.max_payload_size,
+        )
+
+
+class AsyncMessageHubManager:
+
+    def __init__(self, redis: Redis):
+        self.redis = redis
+
+    async def list(self) -> t.List[str]:
+        channels = await self.redis.keys(f"{eh.HubsParametrization.HUBS_PREFIX}*")
+        channels = [channel.decode() for channel in channels]
+        return eh.HubsParametrization.retrieve_hubs_names_from_channel_list(channels)
+
+    @staticmethod
+    def create(
+        config: t.Optional[eh.HubsConfig] = None,
+        redis: t.Optional[Redis] = None,
+    ) -> AsyncMessageHubManager:
+        if config is None:
+            config = eh.HubsConfig()
+
+        return AsyncMessageHubManager(
+            redis=redis or eh.HubsConfig.create_redis_async_instance(config)
         )
