@@ -4,6 +4,19 @@
 	import MosaicTile from './MosaicTile.svelte';
 	import { MosaicConfigurationsUtils } from './MosaicUtils.js';
 	import { onMount } from 'svelte';
+	import {
+		IconSettings,
+		IconPlus,
+		IconEdit,
+		IconEditOff,
+		IconDotsVertical,
+		IconClearAll,
+		IconTrash,
+		IconDeviceFloppy,
+		IconDownload,
+		IconUpload,
+		IconHistory
+	} from '@tabler/icons-svelte';
 
 	export let size: [number, number] = [16, 16];
 	export let controls: boolean = true;
@@ -120,83 +133,137 @@
 	}
 </script>
 
-<div class="p-0" style="height:{height}px;">
-	<Grid cols={size[1]} rows={size[0]} bind:controller={gridController} readOnly={!editableMode}>
-		{#if items.length == 0}
-			<div class="notification m-4 no-items">No items, add one ...</div>
-		{/if}
-		{#each items as item}
-			<MosaicTile
-				bind:item
-				tips={data ? Object.keys(data) : []}
-				editable={editableMode}
-				dataStream={data}
-				on:delete={onDeleteItem}
-			/>
-		{/each}
-	</Grid>
-</div>
-{#if controls}
-	<div class="controls p-2">
-		<div class="columns">
-			<div class="column is-narrow">
-				<button
-					class="button is-small is-outlined"
-					class:is-primary={editableMode}
-					class:is-warning={!editableMode}
-					on:click={toggleEditableMode}
-				>
-					{editableMode ? 'Play' : 'Edit'}
-				</button>
-				{#if editableMode}
-					<button class="button is-small is-outlined is-primary" on:click={newItem}>
-						New Item
-					</button>
-					<button class="button is-small is-outlined is-danger" on:click={clear}> Clear </button>
-				{/if}
-			</div>
-			{#if editableMode}
-				<div class="column is-narrow">|</div>
+<div class="mosaic">
+	<div class="p-0" style="height:{height}px;">
+		<Grid cols={size[1]} rows={size[0]} bind:controller={gridController} readOnly={!editableMode}>
+			{#if items.length == 0}
+				<div class="notification m-4 no-items">No items, add one ...</div>
+			{/if}
+			{#each items as item}
+				<MosaicTile
+					bind:item
+					tips={data ? Object.keys(data) : []}
+					editable={editableMode}
+					dataStream={data}
+					on:delete={onDeleteItem}
+				/>
+			{/each}
+		</Grid>
+	</div>
+	{#if controls}
+		<div class="controls p-2" class:controls-hidden={!editableMode}>
+			<div class="columns is-vcentered is-variable is-1">
 				<div class="column is-narrow">
-					<!-- SAVE TO FILE-->
 					<button
-						class="button is-small is-outlined is-info"
-						disabled={items.length == 0}
-						on:click={saveConfigurationToFile}
+						class="button is-warning is-small"
+						on:click={toggleEditableMode}
+						title="{editableMode ? 'Disable' : 'Enable'} Edit Mode"
 					>
-						Save to file
-					</button>
-
-					<!-- LOAD FROM FILE-->
-					<button class="button is-small is-outlined is-info" on:click={loadConfigurationFromFile}>
-						Load from file
-					</button>
-
-					<!-- SAVE AS DEFAULT-->
-					<button
-						class="button is-small is-outlined is-info"
-						disabled={items.length == 0}
-						on:click={saveConfigurationAsDefault}
-					>
-						Save as default
-					</button>
-
-					<!-- LOAD DEFAULT-->
-					<button class="button is-small is-outlined is-info" on:click={loadDefaultConfiguration}>
-						Load default
+						{#if !editableMode}
+							<IconEdit size={16} />
+						{:else}
+							<IconEditOff size={16} />
+						{/if}
 					</button>
 				</div>
-			{/if}
+				{#if editableMode}
+					<div class="column is-narrow">
+						<IconDotsVertical size={16} />
+					</div>
+					<div class="column is-narrow">
+						<button
+							class="button is-small is-inverted is-primary"
+							on:click={newItem}
+							title="Add new item"
+						>
+							<IconPlus stroke={1} size={18} />
+						</button>
+						<button
+							class="button is-small is-inverted is-danger"
+							on:click={clear}
+							title="Clear all items"
+						>
+							<IconTrash stroke={1} size={18} />
+						</button>
+					</div>
+					<div class="column is-narrow">
+						<IconDotsVertical size={16} />
+					</div>
+					<div class="column is-narrow">
+						<!-- SAVE TO FILE-->
+						<button
+							class="button is-small is-info is-inverted"
+							disabled={items.length == 0}
+							on:click={saveConfigurationToFile}
+							title="Download current Configuration to File"
+						>
+							<IconDownload stroke={1} size={18} />
+						</button>
+
+						<!-- LOAD FROM FILE-->
+						<button
+							class="button is-small is-inverted is-info"
+							on:click={loadConfigurationFromFile}
+							title="Load Configuration from File"
+						>
+							<IconUpload stroke={1} size={18} />
+						</button>
+
+						<!-- SAVE AS DEFAULT-->
+						<button
+							class="button is-small is-inverted is-info"
+							disabled={items.length == 0}
+							on:click={saveConfigurationAsDefault}
+							title="Save as Default Configuration"
+						>
+							<IconDeviceFloppy stroke={1} size={18} />
+						</button>
+
+						<!-- LOAD DEFAULT-->
+						<button
+							class="button is-small is-inverted is-info"
+							on:click={loadDefaultConfiguration}
+							title="Reload Default Configuration"
+						>
+							<IconHistory stroke={1} size={18} />
+						</button>
+					</div>
+				{/if}
+			</div>
 		</div>
-	</div>
-{/if}
+	{/if}
+</div>
 
 <style>
 	.no-items {
 		margin-top: 100px;
 		position: absolute;
 	}
+	.mosaic .controls-hidden {
+		display: none;
+	}
+	.mosaic:hover .controls-hidden {
+		display: block;
+	}
 	.controls {
 		border-top: 1px dashed #eee;
+	}
+	/** add global */
+
+	:global(.float-container .float) {
+		opacity: 0.1;
+	}
+	:global(.float-container:hover .float) {
+		opacity: 1;
+	}
+	:global(.float:hover) {
+		transform: scale(1.1);
+		cursor: pointer;
+	}
+	:global(.float) {
+		position: absolute;
+		right: -10px;
+		top: -10px;
+		z-index: 1000;
 	}
 </style>

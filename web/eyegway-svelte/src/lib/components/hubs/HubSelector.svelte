@@ -5,6 +5,7 @@
 	export let hubName: string | null = null;
 	let hubs: string[] = [];
 	let isOpen: boolean = false;
+	let isError: boolean = false;
 
 	async function toggle() {
 		isOpen = !isOpen;
@@ -12,13 +13,18 @@
 	}
 
 	async function reload() {
+		isError = false;
 		const client = new EyegwayHubClient('');
-		hubs = await client.listHubs();
+		try {
+			hubs = await client.listHubs();
+		} catch (e) {
+			isError = true;
+		}
 	}
 </script>
 
 <div class="">
-	<div class="dropdown" class:is-active={isOpen}>
+	<div class="dropdown is-right" class:is-active={isOpen}>
 		<div class="dropdown-trigger">
 			<button class="button" on:click={toggle}>
 				<span class="mr-2">
@@ -34,6 +40,16 @@
 		<div class="dropdown-menu" id="dropdown-menu4" role="menu">
 			<div class="dropdown-content">
 				<div class="dropdown-item">
+					{#if hubs.length == 0}
+						<article class="message">
+							<div class="message-body">No hubs found</div>
+						</article>
+						{#if isError}
+							<article class="message is-danger">
+								<div class="message-body">Server not connected</div>
+							</article>
+						{/if}
+					{/if}
 					{#each hubs as hub}
 						<button
 							class="button is-small is-outlined is-dark is-fullwidth"

@@ -91,6 +91,6 @@
 	.canvas-container {
 		/* width: 500px;
 		height: 400px; */
-		background-color: #888;
+		background-color: #9e9e9e;
 	}
 </style>
