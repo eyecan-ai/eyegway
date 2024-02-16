@@ -52,7 +52,21 @@ def pipelime(
     import pipelime.stages as pst
     import eyegway.hubs.asyn as eha
     import eyegway.hubs.connectors.pipelime as ehcp
+    import pipelime.items as pli
+    import typing as t
+    import numpy as np
     import asyncio
+
+    # Helper to convert pointclouds to data
+    def pointcloud_to_data(item: pli.Model3DItem) -> t.Any:
+        if isinstance(item, pli.PLYModel3DItem):
+            pcd = item()
+            return {
+                "vertices": pcd.vertices.astype(np.float32),
+                "colors": (pcd.colors[:, :3] / 255.0).astype(np.float32),
+            }
+        else:
+            raise Exception("Unknown item type")
 
     async def run():
         nonlocal keys
@@ -61,7 +75,11 @@ def pipelime(
         hub = eha.AsyncMessageHub.create(name=hub_name)
 
         # Add pipelime connector to parse input samples into plain dictionaries
-        hub.connectors.append(ehcp.PipelimeHubConnector())
+        hub.connectors.append(
+            ehcp.PipelimeHubConnector(
+                item_to_plaindata=[(pli.Model3DItem, pointcloud_to_data)]
+            )
+        )
 
         await hub.clear_history()
 
