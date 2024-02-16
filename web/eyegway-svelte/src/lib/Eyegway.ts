@@ -369,6 +369,15 @@ export class EyegwayHubClient {
         );
     }
 
+    /**
+     * Return a list of all available hubs
+     * @returns <Promise<Array<string>>>
+     */
+    async listHubs(): Promise<Array<string>> {
+        const response = await fetch(this.buildUrl('/hubs'));
+        return response.json();
+    }
+
 }
 
 // ====================================================================================
