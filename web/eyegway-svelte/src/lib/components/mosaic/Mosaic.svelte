@@ -5,12 +5,10 @@
 	import { MosaicConfigurationsUtils } from './MosaicUtils.js';
 	import { onMount } from 'svelte';
 	import {
-		IconSettings,
 		IconPlus,
 		IconEdit,
 		IconEditOff,
 		IconDotsVertical,
-		IconClearAll,
 		IconTrash,
 		IconDeviceFloppy,
 		IconDownload,
@@ -18,7 +16,7 @@
 		IconHistory
 	} from '@tabler/icons-svelte';
 
-	export let size: [number, number] = [16, 16];
+	export let size: [number, number] = [32, 32];
 	export let controls: boolean = true;
 	export let autoLoadDefault: boolean = true;
 	export let editableMode: boolean = true;
@@ -135,10 +133,10 @@
 
 <div class="mosaic">
 	<div class="p-0" style="height:{height}px;">
+		{#if items.length == 0}
+			<div class="notification m-4 no-items">No items, add one ...</div>
+		{/if}
 		<Grid cols={size[1]} rows={size[0]} bind:controller={gridController} readOnly={!editableMode}>
-			{#if items.length == 0}
-				<div class="notification m-4 no-items">No items, add one ...</div>
-			{/if}
 			{#each items as item}
 				<MosaicTile
 					bind:item

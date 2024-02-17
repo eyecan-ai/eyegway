@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { EyegwayHubClient } from '$lib/Eyegway.js';
+	import { HubsPreferences, ServerPreferences } from '$lib/Stores.js';
+	import HubSettings from './HubSettings.svelte';
 	import { IconCube } from '@tabler/icons-svelte';
 
 	export let hubName: string | null = null;
@@ -13,13 +15,18 @@
 	}
 
 	async function reload() {
+		hubs = [];
 		isError = false;
-		const client = new EyegwayHubClient('');
+		const client = new EyegwayHubClient('', $ServerPreferences.host);
 		try {
 			hubs = await client.listHubs();
 		} catch (e) {
 			isError = true;
 		}
+	}
+
+	$: if (hubName !== null) {
+		$HubsPreferences.activeHub = hubName;
 	}
 </script>
 
@@ -41,24 +48,29 @@
 			<div class="dropdown-content">
 				<div class="dropdown-item">
 					{#if hubs.length == 0}
-						<article class="message">
-							<div class="message-body">No hubs found</div>
-						</article>
 						{#if isError}
 							<article class="message is-danger">
 								<div class="message-body">Server not connected</div>
+							</article>
+						{:else}
+							<article class="message">
+								<div class="message-body">No hubs found</div>
 							</article>
 						{/if}
 					{/if}
 					{#each hubs as hub}
 						<button
-							class="button is-small is-outlined is-dark is-fullwidth"
+							class="button is-small is-dark is-fullwidth"
+							class:is-outlined={hubName !== hub}
 							on:click={() => {
 								hubName = hub;
 								isOpen = false;
 							}}>{hub}</button
 						>
 					{/each}
+				</div>
+				<div class="dropdown-item">
+					<HubSettings />
 				</div>
 			</div>
 		</div>

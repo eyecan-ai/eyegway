@@ -9,7 +9,7 @@
 </script>
 
 <div class="box container mb-1 mt-2">
-	<div class="columns">
+	<div class="columns is-vcentered">
 		<div class="column is-3">
 			<div class="columns is-vcentered">
 				<div class="column is-narrow">

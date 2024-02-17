@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { EyegwayHubClient } from '$lib/Eyegway.js';
+	import { ServerPreferences } from '$lib/Stores.js';
 	import {
 		IconChevronLeft,
 		IconChevronRight,
@@ -22,16 +23,24 @@
 
 	export async function reloadInfo() {
 		if (hubClient === null) return;
-		historySize = await hubClient.historySize();
-		bufferSize = await hubClient.bufferSize();
+		try {
+			historySize = await hubClient.historySize();
+			bufferSize = await hubClient.bufferSize();
+		} catch (e) {
+			console.log(e);
+		}
 	}
 
 	export async function reload() {
-		if (hubName === null) return;
-		const client = new EyegwayHubClient(hubName);
-		historySize = await client.historySize();
-		bufferSize = await client.bufferSize();
-		data = await client.last(dataPointer);
+		if (hubClient === null) return;
+		try {
+			historySize = await hubClient.historySize();
+			bufferSize = await hubClient.bufferSize();
+			data = await hubClient.last(dataPointer);
+		} catch (e) {
+			console.log(e);
+			data = null;
+		}
 		console.log('Reloading ...');
 	}
 
@@ -59,7 +68,7 @@
 
 	// On hubName change
 	$: if (hubName !== null) {
-		hubClient = new EyegwayHubClient(hubName);
+		hubClient = new EyegwayHubClient(hubName, $ServerPreferences.host);
 	}
 
 	// On hubClient change

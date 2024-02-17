@@ -4,6 +4,7 @@
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
+		"wbuild": "vite build --watch",
 		"preview": "vite preview",
 		"package": "svelte-kit sync && svelte-package && publint",
 		"prepublishOnly": "npm run package",
@@ -51,6 +52,8 @@
 		"@types/three": "^0.161.2",
 		"svelte-grid-extended": "^1.1.4",
 		"svelte-jsoneditor": "^0.21.5",
+		"svelte-persisted-store": "^0.9.1",
+		"svelte-tweakpane-ui": "^1.2.0",
 		"three": "^0.161.0"
 	}
 }

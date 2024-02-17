@@ -1,4 +1,5 @@
 import { encode, decode, ExtensionCodec } from '@msgpack/msgpack';
+import { Parameters } from './Parameters.js';
 
 /**
  * Map of EyegwayDataTypes to their respective numbers in the Eyegway protocol.
@@ -219,10 +220,6 @@ export class EyegwayPacker {
 // ====================================================================================
 
 
-function apiBaseUrl(): string {
-    return import.meta.env.VITE_EYEGWAY_SERVER || 'http://localhost:55221'
-}
-
 /**
  * EyegwayHubClient is a class that is used to connect to an EyegwayHub server. It provides
  * methods to push and pop data from the server. The data is encoded and decoded using the
@@ -235,7 +232,7 @@ export class EyegwayHubClient {
     baseUrl: string;
 
 
-    public constructor(hubName: string, baseUrl: string = apiBaseUrl()) {
+    public constructor(hubName: string, baseUrl: string = Parameters.host) {
         this.hubName = hubName;
         this.baseUrl = baseUrl;
         if (this.baseUrl.endsWith('/')) {
