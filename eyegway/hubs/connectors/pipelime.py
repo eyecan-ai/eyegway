@@ -5,10 +5,24 @@ import loguru
 import numpy as np
 import typing as t
 
+
+def model3d_converter(item: pli.Model3DItem) -> t.Any:
+    if isinstance(item, pli.PLYModel3DItem):
+        pcd = item()
+        return {
+            "eyegway_custom": "pointcloud",
+            "vertices": pcd.vertices.astype(np.float32),
+            "colors": (pcd.colors[:, :3] / 255.0).astype(np.float32),
+        }
+    else:
+        raise Exception("Unknown item type")  # pragma: no cover
+
+
 DEFAULT_ITEM_TO_PLAINDATA = {
     pli.NumpyItem: lambda item: item(),
     pli.MetadataItem: lambda item: item(),
     pli.BinaryItem: lambda item: item(),
+    pli.Model3DItem: model3d_converter,
 }
 
 DEFAULT_PLAINDATA_TO_ITEM = {
@@ -59,7 +73,7 @@ class PipelimeHubConnector(ehc.HubConnector):
                         loguru.logger.error(
                             f"Error converting {key} [{type(item)}] to plain data: {e}"
                         )
-            if not found:
+            if not found:  # pragma: no cover
                 loguru.logger.warning(f"Item {key} [{type(item)}] is not allowed")
         return output_data
 
