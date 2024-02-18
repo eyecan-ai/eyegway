@@ -55,7 +55,7 @@ class PipelimeHubConnector(ehc.HubConnector):
                         output_data[key] = converter(item)
                         found = True
                         break
-                    except Exception as e:
+                    except Exception as e:  # pragma: no cover
                         loguru.logger.error(
                             f"Error converting {key} [{type(item)}] to plain data: {e}"
                         )
@@ -77,10 +77,10 @@ class PipelimeHubConnector(ehc.HubConnector):
                         output_data[key] = converter(value)
                         found = True
                         break
-                    except Exception as e:
+                    except Exception as e:  # pragma: no cover
                         loguru.logger.error(
                             f"Error converting {key} [{type(value)}] to item: {e}"
                         )
-            if not found:
+            if not found:  # pragma: no cover
                 loguru.logger.warning(f"Item {key} [{type(value)}] is not allowed")
         return pls.Sample(output_data)

@@ -31,6 +31,7 @@ class TestPackersFactory:
         # Givne that default packer can change, we can only check that it can be
         # unpacked
         unpacked = pickpacker.unpack(packed)
+        pickpacker.pretty_print(unpacked)
 
     @pytest.mark.parametrize("message", test_invalid_messages())
     def test_packer_raw_with_invalid_message(self, message):

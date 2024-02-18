@@ -170,3 +170,6 @@ class TestMessageHubManager:
             hubs[hub_name].clear_history()
 
         assert len(manager.list()) == 0
+
+    def test_creation(self):
+        hub = ehs.MessageHubManager.create()

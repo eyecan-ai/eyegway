@@ -89,6 +89,11 @@ export class DataExtractor {
                 return new DataMetadata(value);
             }
         }
+        else {
+            if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+                return new DataMetadata(value);
+            }
+        }
         return null;
     }
 

@@ -191,7 +191,7 @@
 
 	@keyframes blink {
 		0% {
-			color: red;
+			transform: scale(0.9);
 		}
 	}
 </style>

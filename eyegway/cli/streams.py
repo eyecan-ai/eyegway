@@ -93,13 +93,14 @@ def pipelime(
 
         while True:
             for _, sample in enumerate(dataset):
+                print("PIUSHING", list(sample.keys()))
                 await hub.push(sample)
                 await asyncio.sleep(tick)
 
             if not loop:
                 break
 
-    asyncio.run(run())
+    asyncio.get_event_loop().run_until_complete(run())
 
 
 # ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░

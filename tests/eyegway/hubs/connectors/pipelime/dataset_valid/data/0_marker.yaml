@@ -1,0 +1,26 @@
+# Basic configuration
+pattern_cols: 35
+pattern_rows: 20
+support:
+  physical: false
+  size_meters:
+  - 0.5295
+  - 0.941
+support_resolution:
+- 1080
+- 1920
+
+# Advanced configuration
+marker_res: 4
+marker_square_ratio: 0.7
+min_board_padding: 20
+min_corners: 10
+n_markers: 350
+subpix: false
+subpix_criteria:
+- 3
+- 400
+- 1.0e-05
+
+# Version
+__calibry_version__: 0.2.1

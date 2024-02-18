@@ -175,3 +175,6 @@ class TestMessageHubManager:
             await hubs[hub_name].clear_history()
 
         assert len(await manager.list()) == 0
+
+    def test_creation(self):
+        hub = eha.AsyncMessageHubManager.create()

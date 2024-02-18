@@ -44,7 +44,7 @@ class HubsConfig(pyd.BaseSettings):
     packer: t.Optional[str] = "default"
 
     class Config:
-        env_prefix = "EYEGWAY_MESSAGE_HUB_"
+        env_prefix = "eyegway_hubs_"
 
     @classmethod
     def create_redis_async_instance(cls, config: HubsConfig) -> t.Any:

@@ -13,7 +13,7 @@ cli_packer = tp.Typer(
 
 
 @cli_packer.command(
-    short_help="Vision Pipeline info",
+    short_help="Packed data info",
 )
 def info(
     filename: str = tp.Option(

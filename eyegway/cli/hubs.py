@@ -149,3 +149,98 @@ def clear_buffer(
     hub = ehs.MessageHub.create(name=hub_name)
     hub.clear_buffer()
     rich.print(f"Hub |[red]{hub_name}[/red]| buffer cleared!")
+
+
+# ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+# ░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄
+# ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+
+
+@cli_hubs.command(
+    short_help="Pop HUB data to file",
+)
+def pop(
+    hub_name: str = tp.Option(
+        ...,
+        "--name",
+        "-n",
+        help="Hub name",
+    ),
+    filename: str = tp.Option(
+        ...,
+        "--filename",
+        "-f",
+        help="File to save the data",
+    ),
+):
+    import eyegway.hubs.sync as ehs
+    import rich
+
+    hub = ehs.MessageHub.create(name=hub_name)
+    data = hub.pop(timeout=1)
+    if data is None:
+        rich.print(f"Hub |[red]{hub_name}[/red]| buffer is empty!")
+        return
+
+    with open(filename, "wb") as f:
+        f.write(hub.packer.pack(data))
+
+    rich.print(f"Hub |[red]{hub_name}[/red]| data popped to |[red]{filename}[/red]!")
+
+
+# ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+# ░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄
+# ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+
+
+@cli_hubs.command(
+    short_help="Print HUB history data",
+)
+def last(
+    hub_name: str = tp.Option(
+        ...,
+        "--name",
+        "-n",
+        help="Hub name",
+    ),
+    offset: int = tp.Option(
+        0,
+        "--offset",
+        "-o",
+        help="History offset",
+    ),
+):
+    import eyegway.hubs.sync as ehs
+    import eyegway.packers as ep
+    import rich
+
+    hub = ehs.MessageHub.create(name=hub_name)
+    data = hub.last(offset=offset)
+    if data is None:
+        rich.print(f"Hub |[red]{hub_name}[/red]| history[{offset}] is empty!")
+        return
+    ep.MessagePacker.pretty_print(data)
+
+
+# ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+# ░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄
+# ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+
+
+@cli_hubs.command(
+    short_help="Info about packed data",
+)
+def pack_info(
+    filename: str = tp.Option(
+        ...,
+        "--filename",
+        "-f",
+        help="Packed File",
+    ),
+):
+    import eyegway.packers.factory as epf
+    import eyegway.packers as ep
+
+    data = open(filename, "rb").read()
+    unpacked = epf.PackersFactory.default().unpack(data)
+    ep.MessagePacker.pretty_print(unpacked)
