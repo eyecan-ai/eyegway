@@ -47,6 +47,10 @@ class TestHubsRestAPI:
             assert response.status_code == 200
             assert response.json() == data_to_send
 
+            response = await tc.get(f"/hubs")
+            assert response.status_code == 200
+            assert response.json() == [hub_name]
+
             last = await tc.get(f"/hubs/{hub_name}/last")
             assert last.status_code == 200
             unpacked = packer.unpack(last.content)

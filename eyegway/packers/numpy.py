@@ -96,7 +96,7 @@ class NumpyMessageParser(GenericMessageParser):
 
     def __call__(self, obj) -> t.Union[msgpack.ExtType, t.Any]:
         if not self.match(obj):
-            return obj
+            return obj  # pragma: no cover
 
         for conversion in self.numpy_conversions:
             if conversion.numpy_format.match(obj):
@@ -132,7 +132,7 @@ class NumpyMessageUnparser(GenericMessageUnparser):
         if code == CustomMessageTypes.IMAGE.value:
             data = msgpack.unpackb(data, raw=False)
             encoder = ImageEncodersMap.get(data["type"])
-            if 'shape' not in data:
+            if 'shape' not in data:  # pragma: no cover
                 raise ValueError("Invalid image format, missing 'shape'")
             return encoder.decode(data["data"])
         else:

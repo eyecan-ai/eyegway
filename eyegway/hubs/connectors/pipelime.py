@@ -3,15 +3,29 @@ import pipelime.sequences as pls
 import pipelime.items as pli
 import loguru
 import numpy as np
+import typing as t
 
 
-ITEM_TO_PLAINDATA = {
+def model3d_converter(item: pli.Model3DItem) -> t.Any:
+    if isinstance(item, pli.PLYModel3DItem):
+        pcd = item()
+        return {
+            "eyegway_custom": "pointcloud",
+            "vertices": pcd.vertices.astype(np.float32),
+            "colors": (pcd.colors[:, :3] / 255.0).astype(np.float32),
+        }
+    else:
+        raise Exception("Unknown item type")  # pragma: no cover
+
+
+DEFAULT_ITEM_TO_PLAINDATA = {
     pli.NumpyItem: lambda item: item(),
     pli.MetadataItem: lambda item: item(),
     pli.BinaryItem: lambda item: item(),
+    pli.Model3DItem: model3d_converter,
 }
 
-PLAINDATA_TO_ITEM = {
+DEFAULT_PLAINDATA_TO_ITEM = {
     bytes: lambda data: pli.BinaryItem(data),
     dict: lambda data: pli.YamlMetadataItem(data),
     list: lambda data: pli.YamlMetadataItem(data),
@@ -21,8 +35,25 @@ PLAINDATA_TO_ITEM = {
     np.ndarray: lambda data: pli.NpyNumpyItem(data),
 }
 
+ItemToPlainDataCallable = t.Callable[[pli.Item], t.Any]
+PlainDataToItemCallable = t.Callable[[t.Any], pli.Item]
+
 
 class PipelimeHubConnector(ehc.HubConnector):
+
+    def __init__(
+        self,
+        item_to_plaindata: t.List[t.Tuple[type, ItemToPlainDataCallable]] = [],
+        plaindata_to_item: t.List[t.Tuple[type, PlainDataToItemCallable]] = [],
+    ):
+        self.custom_item_to_plaindata = item_to_plaindata
+        self.custom_plaindata_to_item = plaindata_to_item
+
+    def item_to_plaindata(self) -> t.Dict[type, ItemToPlainDataCallable]:
+        return {**DEFAULT_ITEM_TO_PLAINDATA, **dict(self.custom_item_to_plaindata)}
+
+    def plaindata_to_item(self) -> t.Dict[type, PlainDataToItemCallable]:
+        return {**DEFAULT_PLAINDATA_TO_ITEM, **dict(self.custom_plaindata_to_item)}
 
     def world_to_hub(self, data: pls.Sample) -> dict:
         if not isinstance(data, pls.Sample):
@@ -32,12 +63,17 @@ class PipelimeHubConnector(ehc.HubConnector):
         for key in data:
             item = data[key]
             found = False
-            for item_type, converter in ITEM_TO_PLAINDATA.items():
+            for item_type, converter in self.item_to_plaindata().items():
                 if isinstance(item, item_type):
-                    output_data[key] = converter(item)
-                    found = True
-                    break
-            if not found:
+                    try:
+                        output_data[key] = converter(item)
+                        found = True
+                        break
+                    except Exception as e:  # pragma: no cover
+                        loguru.logger.error(
+                            f"Error converting {key} [{type(item)}] to plain data: {e}"
+                        )
+            if not found:  # pragma: no cover
                 loguru.logger.warning(f"Item {key} [{type(item)}] is not allowed")
         return output_data
 
@@ -49,11 +85,16 @@ class PipelimeHubConnector(ehc.HubConnector):
         for key, value in data.items():
             found = False
 
-            for data_map_type, converter in PLAINDATA_TO_ITEM.items():
+            for data_map_type, converter in self.plaindata_to_item().items():
                 if isinstance(value, data_map_type):
-                    output_data[key] = converter(value)
-                    found = True
-                    break
-            if not found:
+                    try:
+                        output_data[key] = converter(value)
+                        found = True
+                        break
+                    except Exception as e:  # pragma: no cover
+                        loguru.logger.error(
+                            f"Error converting {key} [{type(value)}] to item: {e}"
+                        )
+            if not found:  # pragma: no cover
                 loguru.logger.warning(f"Item {key} [{type(value)}] is not allowed")
         return pls.Sample(output_data)

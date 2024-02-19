@@ -15,6 +15,7 @@ class HubsRestAPI(fa.FastAPI):
         super().__init__()
         self.config = config
         self._message_hubs_map: t.Dict[str, eha.AsyncMessageHub] = {}
+        self._message_hubs_manager = eha.AsyncMessageHubManager.create(config=config)
 
         self.add_middleware(
             fa_cors.CORSMiddleware,
@@ -23,6 +24,7 @@ class HubsRestAPI(fa.FastAPI):
             allow_headers=["*"],
         )
 
+        self.get("/hubs")(self.hubs_list)
         self.get("/hubs/{name}/history_size")(self.history_size)
         self.get("/hubs/{name}/buffer_size")(self.buffer_size)
         self.get("/hubs/{name}/pop", response_model=bytes)(self.pop)
@@ -37,6 +39,9 @@ class HubsRestAPI(fa.FastAPI):
                 name=name, config=self.config
             )
         return self._message_hubs_map[name]
+
+    async def hubs_list(self) -> t.List[str]:
+        return await self._message_hubs_manager.list()
 
     async def clear_buffer(self, name: str) -> None:
         hub = self.get_hub(name)

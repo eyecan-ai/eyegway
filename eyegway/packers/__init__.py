@@ -102,7 +102,11 @@ class MessagePacker(pyd.BaseModel, arbitrary_types_allowed=True):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self._packer = msgpack.Packer(default=self.parser, use_bin_type=True)
-        self._unpacker = msgpack.Unpacker(ext_hook=self.unparser, raw=False)
+        self._unpacker = msgpack.Unpacker(
+            ext_hook=self.unparser,
+            raw=False,
+            strict_map_key=False,
+        )
 
     def pack(self, obj) -> bytes:
         return self._packer.pack(obj)
@@ -112,12 +116,21 @@ class MessagePacker(pyd.BaseModel, arbitrary_types_allowed=True):
         return self._unpacker.unpack()
 
     @classmethod
-    def pretty_print(cls, data: t.Any):
+    def pretty_print(cls, data: t.Any, max_depth: int = 3):
         from rich import pretty
 
-        np.set_printoptions(threshold=1, edgeitems=1, linewidth=100, suppress=True)
+        def render_object(obj):
+            if isinstance(obj, np.ndarray):
+                return f"Array([{obj.shape}] {obj.dtype})"
+            elif isinstance(obj, list):
+                return [render_object(item) for item in obj]
+            elif isinstance(obj, dict):
+                return {key: render_object(value) for key, value in obj.items()}
+            else:
+                return obj
+
         pretty.install()
-        pretty.pprint(data, max_string=10)
+        pretty.pprint(render_object(data), max_depth=max_depth)
 
 
 class PicklePacker(Packer):
