@@ -88,3 +88,37 @@ print(data)
 ### Examples
 
 You can find more examples in [Hubs Examples](examples/hubs/README.md)
+
+## CLI Usage
+
+Eyegway comes with a CLI tool to interact with the hubs. You can use the `eyegway` command to interact with the hubs.
+
+```console
+eyegway hubs
+```
+
+For example:
+
+```python
+eyegway hubs search # List all the hubs
+
+eyegway hubs info -n $HUB_NAME # Get information about the hub
+
+eyegway hubs last -n $HUB_NAME # Print the last data in the hub in a fancy way
+
+eyegway hubs stream-demo -n $HUB_NAME # Stream demo data to the hub
+```
+
+### API Rest Server
+
+Eyegway comes with a REST API server to interact with the hubs. You can use the `eyegway` command to start the server.
+
+```console
+eyegway hubs rest-serve
+```
+
+Then go to `http://0.0.0.0:55221/docs` to see the API documentation.
+
+## WebUI
+
+If the REST API server is running, you can run the battery-included WebUI to interact with the hubs. The webui is a Svelte package available in the relative `web`subfolder, see: [Eyegway Svelte](web/eyegway-svelte/README.md) for more details.

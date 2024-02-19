@@ -487,6 +487,7 @@ def stream_demo(
     import eyegway.hubs.asyn as eha
     import eyegway.utils as eut
     import asyncio
+    import loguru
 
     async def run():
         # Create hub
@@ -496,6 +497,7 @@ def stream_demo(
 
         while True:
             await hub.push(generator.generate())
+            loguru.logger.info("Streaming ...")
             await asyncio.sleep(tick)
 
     asyncio.get_event_loop().run_until_complete(run())
