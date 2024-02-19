@@ -11,6 +11,15 @@ def simple_messages():
         [1, 2, 3],
         [2.3, 2, [2, 3]],
         {"a": 1, "b": 2, "c": 3},
+        {"list": [1, 2, 3]},
+        {
+            "metadata": {
+                'alpha': 1,
+                2: "hello",
+                True: False,
+                2.2: "float",
+            }
+        },
     ]
 
 

@@ -3,6 +3,7 @@ import eyegway.hubs.asyn as eha
 import eyegway.packers as ecm
 import redis.asyncio as aioredis
 import pytest
+import typing as t
 
 
 class TestMessageHub:
@@ -61,8 +62,7 @@ class TestMessageHub:
 
         assert await hub.last(data_size) is None
 
-        await hub.clear_history()
-        await hub.clear_buffer()
+        await hub.clear()
 
         # Push double the messages and pop them
         for data in datas:
@@ -132,3 +132,49 @@ class TestMessageHub:
 
         await hub.clear_buffer()
         await hub.clear_history()
+
+
+class TestMessageHubManager:
+
+    @pytest.mark.asyncio
+    async def test_lifecycle(self, redis_test_mock_async: aioredis.Redis):
+
+        max_buffer_size = 10
+        max_history_size = max_buffer_size
+
+        config = eh.HubsConfig(
+            redis_host="fakeredis",
+            max_buffer_size=max_buffer_size,
+            max_history_size=max_history_size,
+        )
+
+        hubs_number = 5
+        hubs_names = [f"test-{idx}" for idx in range(hubs_number)]
+        hubs: t.Dict[str, eha.AsyncMessageHub] = {}
+
+        for hub_name in hubs_names:
+            hub = eha.AsyncMessageHub.create(
+                hub_name,
+                config=config,
+                redis=redis_test_mock_async,
+            )
+            hubs[hub_name] = hub
+            await hub.clear()
+            await hub.push("data".encode('utf-8'))
+
+        manager = eha.AsyncMessageHubManager.create(config, redis=redis_test_mock_async)
+
+        assert len(await manager.list()) == len(hubs_names)
+
+        for hub_name in hubs_names:
+            await hubs[hub_name].clear_buffer()
+
+        assert len(await manager.list()) == len(hubs_names)
+
+        for hub_name in hubs_names:
+            await hubs[hub_name].clear_history()
+
+        assert len(await manager.list()) == 0
+
+    def test_creation(self):
+        hub = eha.AsyncMessageHubManager.create()

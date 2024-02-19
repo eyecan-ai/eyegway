@@ -45,7 +45,7 @@ class Channel(ABC):
         # trim the list if the max size is reached
         if self.max_size > 0:
             pipe.ltrim(self.channel_name, 0, self.max_size - 1)
-        else:
+        else:  # pragma: no cover
             loguru.logger.warning("Max size is not set for channel {self.channel_name}")
 
         if external_pipe is None:
