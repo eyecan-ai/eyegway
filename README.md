@@ -87,7 +87,7 @@ print(data)
 
 ### Examples
 
-You can find more examples in [Hubs Examples](examples/hubs/README.md)
+You can find more examples (both for _Async_ and _Sync_ version of the hubs) in [Hubs Examples](examples/hubs/README.md)
 
 ## CLI Usage
 
