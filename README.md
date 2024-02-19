@@ -117,7 +117,7 @@ Eyegway comes with a REST API server to interact with the hubs. You can use the 
 eyegway hubs rest-serve
 ```
 
-Then go to `http://0.0.0.0:55221/docs` to see the API documentation.
+Then go to `http://localhost:55221/docs` to see the API documentation (where `55221`is the default Eyegwat port, you can change it using the `--port` option).
 
 ## WebUI
 
