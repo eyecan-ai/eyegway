@@ -28,11 +28,26 @@ def rest_serve(
         "-p",
         help="Port to serve the API",
     ),
+    redis_host: str = tp.Option(
+        "localhost",  # Default value
+        "--redis-host",
+        "-rh",
+        help="Redis host",
+    ),
+    redis_port: int = tp.Option(
+        6379,  # Default value
+        "--redis-port",
+        "-rp",
+        help="Redis port",
+    ),
 ):
-    import eyegway.hubs.rest.api as erha
     import uvicorn
 
-    api = erha.HubsRestAPI()
+    import eyegway.hubs as eh
+    import eyegway.hubs.rest.api as erha
+
+    config = eh.HubsConfig(redis_host=redis_host, redis_port=redis_port)
+    api = erha.HubsRestAPI(config=config)
     uvicorn.run(api, host=host, port=port)
 
 
