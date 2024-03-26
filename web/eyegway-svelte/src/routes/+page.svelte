@@ -13,7 +13,7 @@
 		<div class="column is-3">
 			<div class="columns is-vcentered">
 				<div class="column is-narrow">
-					<span class="title is-4">
+					<span class="title is-6">
 						{Parameters.title}
 					</span>
 				</div>
@@ -34,6 +34,6 @@
 
 <style>
 	.logo {
-		height: 32px;
+		height: 24px;
 	}
 </style>

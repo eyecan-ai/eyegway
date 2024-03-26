@@ -96,7 +96,7 @@
 				<!----------------------------->
 				<p class="control">
 					<button
-						class="button p-0"
+						class="button is-small p-0"
 						on:click={() => setDataPointer(-1)}
 						disabled={autoPlay || dataPointer == 0}
 					>
@@ -104,13 +104,17 @@
 					</button>
 				</p>
 				<p class="control">
-					<button class="button p-2" on:click={() => setDataPointer(null)} disabled={autoPlay}>
+					<button
+						class="button is-small p-2"
+						on:click={() => setDataPointer(null)}
+						disabled={autoPlay}
+					>
 						{dataPointer + 1} / {historySize}
 					</button>
 				</p>
 				<p class="control">
 					<button
-						class="button p-0"
+						class="button is-small p-0"
 						on:click={() => setDataPointer(1)}
 						disabled={autoPlay || dataPointer == historySize - 1}
 					>
@@ -122,7 +126,7 @@
 				<!-- Reload controls -->
 				<!--------------------->
 				<p class="control">
-					<button class="button" on:click={reload} disabled={autoPlay}>
+					<button class="button is-small" on:click={reload} disabled={autoPlay}>
 						<IconReload stroke={1} />
 					</button>
 				</p>
@@ -135,7 +139,7 @@
 		<div class="column">
 			<div class="dropdown is-right" class:is-hoverable={!autoPlay}>
 				<div class="dropdown-trigger">
-					<button class="button" disabled={autoPlay}>
+					<button class="button is-small" disabled={autoPlay}>
 						<IconSettings stroke={1} />
 					</button>
 				</div>
@@ -160,7 +164,7 @@
 		<!------------------->
 		<div class="column">
 			<button
-				class="button is-outlined"
+				class="button is-small is-outlined"
 				style="--animation-time: {autoPlayMs}ms;"
 				class:blink={autoPlay}
 				on:click={() => {

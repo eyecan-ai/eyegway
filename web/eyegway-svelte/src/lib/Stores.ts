@@ -1,10 +1,15 @@
-import { persisted } from 'svelte-persisted-store'
-import { Parameters } from './Parameters.js'
+import { persisted } from 'svelte-persisted-store';
+import { Parameters } from './Parameters.js';
+import type { Writable } from 'svelte/store';
 
 export const ServerPreferences = persisted('ServerPreferences', {
-    host: Parameters.host,
-})
+	host: Parameters.host
+});
 
-export const HubsPreferences = persisted('HubsPreferences', {
-    activeHub: null,
-})
+export interface HubsPreferences {
+	activeHub: string | null;
+}
+
+export const HubsPreferences: Writable<HubsPreferences> = persisted('HubsPreferences', {
+	activeHub: null
+});
