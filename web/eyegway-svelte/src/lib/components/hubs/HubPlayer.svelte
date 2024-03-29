@@ -7,13 +7,16 @@
 		IconReload,
 		IconSettings,
 		IconPlayerPlay,
-		IconPlayerStop
+		IconPlayerStop,
+		IconIceCream,
+		IconDotsVertical
 	} from '@tabler/icons-svelte';
 	import { onDestroy } from 'svelte';
 
 	export let hubName: string | null = null;
 	export let data: any | null = null;
 	let hubClient: EyegwayHubClient | null = null;
+	let historyFrozen: boolean = false;
 	let historySize: number = -1;
 	let bufferSize: number = -1;
 	let dataPointer: number = 0;
@@ -26,6 +29,10 @@
 		try {
 			historySize = await hubClient.historySize();
 			bufferSize = await hubClient.bufferSize();
+			historyFrozen = await hubClient.isHistoryFrozen();
+			if (historyFrozen) {
+				autoPlay = false;
+			}
 		} catch (e) {
 			console.log(e);
 		}
@@ -36,12 +43,24 @@
 		try {
 			historySize = await hubClient.historySize();
 			bufferSize = await hubClient.bufferSize();
+			historyFrozen = await hubClient.isHistoryFrozen();
 			data = await hubClient.last(dataPointer);
 		} catch (e) {
 			console.log(e);
 			data = null;
 		}
 		console.log('Reloading ...');
+	}
+
+	export async function reloadData() {
+		if (hubClient === null) return;
+		try {
+			console.log('reloadin datapointer', dataPointer);
+			data = await hubClient.last(dataPointer);
+		} catch (e) {
+			console.log(e);
+			data = null;
+		}
 	}
 
 	async function setDataPointer(delta: number | null) {
@@ -60,6 +79,20 @@
 		autoPlayTimeout = setInterval(async () => {
 			await reload();
 		}, autoPlayMs);
+	}
+
+	async function toggleFreeze() {
+		if (hubClient === null) return;
+		try {
+			if (historyFrozen) await hubClient.unfreezeHistory();
+			else await hubClient.freezeHistory();
+
+			dataPointer = 0;
+			await reloadInfo();
+			await reloadData();
+		} catch (e) {
+			console.log(e);
+		}
 	}
 
 	onDestroy(() => {
@@ -87,94 +120,127 @@
 	}
 </script>
 
-<div class="columns is-vcentered is-variable is-1">
+<div class="columns is-vcentered is-variable is-0">
 	{#if hubClient}
-		<div class="column is-narrow">
-			<div class="field has-addons">
-				<!----------------------------->
-				<!-- History offset controls -->
-				<!----------------------------->
-				<p class="control">
-					<button
-						class="button is-small p-0"
-						on:click={() => setDataPointer(-1)}
-						disabled={autoPlay || dataPointer == 0}
-					>
-						<IconChevronLeft size={24} />
-					</button>
-				</p>
-				<p class="control">
-					<button
-						class="button is-small p-2"
-						on:click={() => setDataPointer(null)}
-						disabled={autoPlay}
-					>
-						{dataPointer + 1} / {historySize}
-					</button>
-				</p>
-				<p class="control">
-					<button
-						class="button is-small p-0"
-						on:click={() => setDataPointer(1)}
-						disabled={autoPlay || dataPointer == historySize - 1}
-					>
-						<IconChevronRight size={24} />
-					</button>
-				</p>
-
-				<!--------------------->
-				<!-- Reload controls -->
-				<!--------------------->
-				<p class="control">
-					<button class="button is-small" on:click={reload} disabled={autoPlay}>
-						<IconReload stroke={1} />
-					</button>
-				</p>
-			</div>
-		</div>
-
-		<!------------------------>
-		<!-- Settings -->
-		<!------------------------>
-		<div class="column">
-			<div class="dropdown is-right" class:is-hoverable={!autoPlay}>
-				<div class="dropdown-trigger">
-					<button class="button is-small" disabled={autoPlay}>
-						<IconSettings stroke={1} />
-					</button>
+		{#if historyFrozen}
+			<div class="column is-narrow">
+				<div class="field has-addons">
+					<!----------------------------->
+					<!-- History offset controls -->
+					<!----------------------------->
+					<p class="control">
+						<button
+							class="button is-small p-0"
+							on:click={() => setDataPointer(-1)}
+							disabled={!historyFrozen || dataPointer == 0}
+						>
+							<IconChevronLeft size={24} />
+						</button>
+					</p>
+					<p class="control">
+						<button
+							class="button is-small p-2"
+							on:click={() => setDataPointer(null)}
+							disabled={!historyFrozen}
+						>
+							{dataPointer + 1} / {historySize}
+						</button>
+					</p>
+					<p class="control">
+						<button
+							class="button is-small p-0"
+							on:click={() => setDataPointer(1)}
+							disabled={!historyFrozen || dataPointer == historySize - 1}
+						>
+							<IconChevronRight size={24} />
+						</button>
+					</p>
 				</div>
-				<div class="dropdown-menu" id="dropdown-menu4" role="menu">
-					<div class="dropdown-content settings">
-						<div class="dropdown-item">
-							<div class="field">
-								<!-- svelte-ignore a11y-label-has-associated-control -->
-								<label class="label">Auto Play Delay (ms):</label>
-								<div class="control">
-									<input class="input" type="number" bind:value={autoPlayMs} />
+			</div>
+		{:else}
+			<!------------------->
+			<!-- Play controls -->
+			<!------------------->
+			<div class="column">
+				<!--------------------->
+				<!-- Play settings -->
+				<!--------------------->
+				<div class="field has-addons">
+					<div class="dropdown is-right" class:is-hoverable={!historyFrozen}>
+						<div class="dropdown-trigger">
+							<button class="button is-small" disabled={historyFrozen}>
+								<IconSettings stroke={1} />
+							</button>
+						</div>
+						<div class="dropdown-menu" id="dropdown-menu4" role="menu">
+							<div class="dropdown-content settings">
+								<div class="dropdown-item">
+									<div class="field">
+										<!-- svelte-ignore a11y-label-has-associated-control -->
+										<label class="label">Auto Play Delay (ms):</label>
+										<div class="control">
+											<input class="input" type="number" bind:value={autoPlayMs} />
+										</div>
+									</div>
 								</div>
 							</div>
 						</div>
 					</div>
+					<!--------------------->
+					<!-- Reload current -->
+					<!--------------------->
+					<p class="control">
+						<button
+							class="button is-small"
+							on:click={reload}
+							disabled={historyFrozen}
+							title="Click to trigger a single update"
+						>
+							<IconReload stroke={1} />
+						</button>
+					</p>
+
+					<!--------------------->
+					<!-- Play  -->
+					<!--------------------->
+					<p class="control">
+						<button
+							class="button is-small is-outlined"
+							style="--animation-time: {autoPlayMs}ms;"
+							class:blink={autoPlay}
+							disabled={historyFrozen}
+							on:click={() => {
+								autoPlay = !autoPlay;
+							}}
+							title="Click to auto update every {autoPlayMs}ms"
+						>
+							{#if !autoPlay}
+								<IconPlayerPlay stroke={1} />
+							{:else}
+								<IconPlayerStop stroke={1} />
+							{/if}
+						</button>
+					</p>
 				</div>
 			</div>
-		</div>
+		{/if}
 
-		<!------------------->
-		<!-- Play controls -->
-		<!------------------->
+		<div class="column is-narrow is-flex">
+			<IconDotsVertical stroke={1} />
+		</div>
 		<div class="column">
 			<button
 				class="button is-small is-outlined"
 				style="--animation-time: {autoPlayMs}ms;"
-				class:blink={autoPlay}
-				on:click={() => {
-					autoPlay = !autoPlay;
-				}}
+				class:is-info={historyFrozen}
+				class:is-primary={!historyFrozen}
+				on:click={toggleFreeze}
+				title={!historyFrozen ? 'Click to freeze History' : 'Click to unfreeze History'}
 			>
-				{#if !autoPlay}
-					<IconPlayerPlay stroke={1} />
+				{#if historyFrozen}
+					Frozen
 				{:else}
-					<IconPlayerStop stroke={1} />
+					Running
 				{/if}
 			</button>
 		</div>

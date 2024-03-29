@@ -1,5 +1,6 @@
 import redis.asyncio as aioredis
 import eyegway.communication.async_channels as ecom
+import eyegway.communication.async_variables as ecov
 import pytest
 
 
@@ -114,3 +115,27 @@ class TestChannels:
         await channel.clear()
 
         assert await channel.size() == 0
+
+
+class TestVariables:
+
+    @pytest.mark.asyncio
+    async def test_variables(self, redis_test_mock_async: aioredis.Redis):
+
+        values = [
+            True,
+            False,
+            2,
+            2.2,
+            b"hello",
+            "test_value",
+            [1, 2, 3],
+            {"a": 1, "b": 2},
+        ]
+
+        for value in values:
+            variable = ecov.AsyncSharedVariable(
+                redis_test_mock_async, f"_test_variable_{type(value).__name__}"
+            )
+            await variable.set(value)
+            assert await variable.get() == value

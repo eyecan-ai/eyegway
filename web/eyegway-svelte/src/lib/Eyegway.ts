@@ -355,6 +355,65 @@ export class EyegwayHubClient {
 
 		return hubs;
 	}
+
+	async freezeHistory() {
+		await fetch(this.buildUrl(`/hubs/${this.hubName}/freeze_history`), {
+			method: 'POST'
+		});
+	}
+
+	async unfreezeHistory() {
+		await fetch(this.buildUrl(`/hubs/${this.hubName}/unfreeze_history`), {
+			method: 'POST'
+		});
+	}
+
+	async isHistoryFrozen(): Promise<boolean> {
+		const response = await fetch(this.buildUrl(`/hubs/${this.hubName}/history_frozen`));
+		return response.json();
+	}
+
+	/**
+	 * Return a list of all available variables in the hub
+	 * @returns <Promise<Array<string>>>
+	 */
+	async listVariables(): Promise<Array<string>> {
+		const response = await fetch(this.buildUrl(`/hubs/${this.hubName}/variables`));
+		return response.json();
+	}
+
+	/**
+	 * Gets the value of a variable in the hub
+	 * @param variableName the name of the variable
+	 * @returns the value of the variable
+	 */
+	async getVariableValue(variableName: string): Promise<any> {
+		const response = await fetch(this.buildUrl(`/hubs/${this.hubName}/variables/${variableName}`));
+		return await response.json();
+	}
+
+	/**
+	 * Sets the value of a variable in the hub
+	 * @param variableName the name of the variable
+	 * @param value the new value of the variable
+	 */
+	async setVariableValue(variableName: string, value: any): Promise<any> {
+		await fetch(this.buildUrl(`/hubs/${this.hubName}/variables/${variableName}`), {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ value: value })
+		});
+	}
+
+	/**
+	 * Deletes a variable in the hub
+	 * @param variableName the name of the variable
+	 */
+	async deleteVariable(variableName: string): Promise<any> {
+		await fetch(this.buildUrl(`/hubs/${this.hubName}/variables/${variableName}`), {
+			method: 'DELETE'
+		});
+	}
 }
 
 // ====================================================================================

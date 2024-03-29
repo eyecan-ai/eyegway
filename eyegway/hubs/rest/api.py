@@ -5,8 +5,13 @@ import fastapi.responses as far
 import fastapi.requests as farq
 import typing as t
 import fastapi.middleware.cors as fa_cors
+import pydantic as pyd
 
 HUBS_REST_API_DEFAULT_PORT = 55221
+
+
+class VariableValue(pyd.BaseModel):
+    value: t.Any
 
 
 class HubsRestAPI(fa.FastAPI):
@@ -29,9 +34,19 @@ class HubsRestAPI(fa.FastAPI):
         self.get("/hubs/{name}/buffer_size")(self.buffer_size)
         self.get("/hubs/{name}/pop", response_model=bytes)(self.pop)
         self.get("/hubs/{name}/last", response_model=bytes)(self.last)
+        self.get("/hubs/{name}/history_frozen")(self.history_frozen)
+        self.get("/hubs/{name}/buffer_frozen")(self.buffer_frozen)
         self.post("/hubs/{name}/clear_buffer")(self.clear_buffer)
         self.post("/hubs/{name}/clear_history")(self.clear_history)
         self.post("/hubs/{name}/push")(self.push)
+        self.post("/hubs/{name}/freeze_buffer")(self.freeze_buffer)
+        self.post("/hubs/{name}/freeze_history")(self.freeze_history)
+        self.post("/hubs/{name}/unfreeze_buffer")(self.unfreeze_buffer)
+        self.post("/hubs/{name}/unfreeze_history")(self.unfreeze_history)
+        self.get("/hubs/{name}/variables/{variable}")(self.get_variable_value)
+        self.post("/hubs/{name}/variables/{variable}")(self.set_variable_value)
+        self.delete("/hubs/{name}/variables/{variable}")(self.delete_variable)
+        self.get("/hubs/{name}/variables")(self.list_variables)
 
     def get_hub(self, name: str) -> eha.AsyncMessageHub:
         if name not in self._message_hubs_map:
@@ -81,3 +96,48 @@ class HubsRestAPI(fa.FastAPI):
         hub = self.get_hub(name)
         data = await request.body()
         await hub.push_raw(data)
+
+    async def history_frozen(self, name: str) -> bool:
+        hub = self.get_hub(name)
+        return await hub.is_history_frozen()
+
+    async def buffer_frozen(self, name: str) -> bool:
+        hub = self.get_hub(name)
+        return await hub.is_buffer_frozen()
+
+    async def freeze_buffer(self, name: str) -> None:
+        hub = self.get_hub(name)
+        await hub.freeze_buffer()
+
+    async def freeze_history(self, name: str) -> None:
+        hub = self.get_hub(name)
+        await hub.freeze_history()
+
+    async def unfreeze_buffer(self, name: str) -> None:
+        hub = self.get_hub(name)
+        await hub.freeze_buffer(False)
+
+    async def unfreeze_history(self, name: str) -> None:
+        hub = self.get_hub(name)
+        await hub.freeze_history(False)
+
+    async def get_variable_value(self, name: str, variable: str) -> t.Any:
+        hub = self.get_hub(name)
+        return await hub.get_variable_value(variable)
+
+    async def set_variable_value(
+        self,
+        name: str,
+        variable: str,
+        value: VariableValue,
+    ) -> None:
+        hub = self.get_hub(name)
+        await hub.set_variable_value(variable, value.value)
+
+    async def delete_variable(self, name: str, variable: str) -> None:
+        hub = self.get_hub(name)
+        await hub.delete_variable(variable)
+
+    async def list_variables(self, name: str) -> t.List[str]:
+        hub = self.get_hub(name)
+        return await hub.list_variables(include_privates=False)
