@@ -15,6 +15,7 @@
 		IconUpload,
 		IconHistory
 	} from '@tabler/icons-svelte';
+	import StyleSettingsButton from '../settings/StyleSettingsButton.svelte';
 
 	export let defaultSize: [number, number] = [64, 64];
 	export let controls: boolean = true;
@@ -168,6 +169,9 @@
 	{#if controls}
 		<div class="controls p-2" class:controls-hidden={!editableMode}>
 			<div class="columns is-vcentered is-variable is-1">
+				<div class="column is-narrow">
+					<StyleSettingsButton />
+				</div>
 				<div class="column is-narrow">
 					<button
 						class="button is-warning is-small"
