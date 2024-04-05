@@ -1,6 +1,7 @@
 from __future__ import annotations
 import eyegway.packers as ecm
 import eyegway.communication.async_channels as ecom
+import eyegway.communication.async_variables as ecov
 import eyegway.packers.factory as ecp
 import eyegway.utils as eut
 import eyegway.hubs as eh
@@ -45,6 +46,10 @@ class AsyncMessageHub:
             max_history_size,
         )
 
+        self._variables: t.Mapping[str, ecov.AsyncSharedVariable] = {}
+        self._history_frozen = self._create_variable("history_frozen", True)
+        self._buffer_frozen = self._create_variable("buffer_frozen", True)
+
     def world_to_hub(self, data: t.Any) -> t.Any:
         input_data = data
         for connector in self.connectors:
@@ -60,8 +65,10 @@ class AsyncMessageHub:
     async def push_raw(self, data: bytes) -> None:
         with eut.LoguruTimer("HUB Pushing"):
             pipe = self.redis.pipeline()
-            await self.buffer.push(data, pipe)
-            await self.history.push(data, pipe)
+            if not await self.is_buffer_frozen():
+                await self.buffer.push(data, pipe)
+            if not await self.is_history_frozen():
+                await self.history.push(data, pipe)
             await pipe.execute()
 
     async def push(self, obj: t.Any) -> None:
@@ -115,6 +122,71 @@ class AsyncMessageHub:
     async def clear(self) -> None:
         await self.clear_buffer()
         await self.clear_history()
+
+    async def freeze_history(self, status: bool = True) -> None:
+        await self._history_frozen.set(status)
+
+    async def freeze_buffer(self, status: bool = True) -> None:
+        await self._buffer_frozen.set(status)
+
+    async def freeze(self, status: bool = True) -> None:
+        await self.freeze_buffer(status)
+        await self.freeze_history(status)
+
+    async def is_history_frozen(self) -> bool:
+        return (await self._history_frozen.get()) is True
+
+    async def is_buffer_frozen(self) -> bool:
+        return (await self._buffer_frozen.get()) is True
+
+    async def list_variables(self, include_privates: bool = False) -> t.List[str]:
+        variables = await self.redis.keys(
+            f"{eh.HubsParametrization.variable_name(self.name, '*')}"
+        )
+        variables = [variable.decode() for variable in variables]
+        variables = eh.HubsParametrization.retrieve_variables_names_from_list(variables)
+        if not include_privates:
+            variables = [
+                variable
+                for variable in variables
+                if not variable.startswith(
+                    eh.HubsParametrization.PRIVATE_VARIABLE_PREFIX
+                )
+            ]
+        return variables
+
+    def _create_variable(
+        self,
+        name: str,
+        private: bool = False,
+    ) -> ecov.AsyncSharedVariable:
+        variable_name = eh.HubsParametrization.variable_name(self.name, name, private)
+        variable = ecov.AsyncSharedVariable(self.redis, variable_name)
+        self._variables[name] = variable
+        return variable
+
+    def _get_variable(self, name: str) -> t.Optional[ecov.AsyncSharedVariable]:
+        if name not in self._variables:
+            return None
+        return self._variables[name]
+
+    async def set_variable_value(self, name: str, value: t.Any) -> None:
+        variable = self._get_variable(name)
+        if variable is None:
+            variable = self._create_variable(name, False)
+        await variable.set(value)
+
+    async def get_variable_value(self, name: str) -> t.Optional[t.Any]:
+        variable = self._get_variable(name)
+        if variable is None:
+            variable = self._create_variable(name, False)
+        return await variable.get()
+
+    async def delete_variable(self, name: str) -> None:
+        variable = self._create_variable(name, False)
+        await variable.delete()
+        if name in self._variables:
+            del self._variables[name]
 
     @staticmethod
     def create(

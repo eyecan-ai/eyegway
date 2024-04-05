@@ -5,13 +5,15 @@
 </script>
 
 {#if userData}
-	<img class="item-image" src={userData.url} alt="thumbnail" draggable="false" />
+	<div class="image-container" style="background-image: url({userData.url})"></div>
 {/if}
 
 <style>
-	img {
+	.image-container {
+		background-size: contain;
+		background-repeat: no-repeat;
+		background-position: center;
 		width: 100%;
 		height: 100%;
-		object-fit: contain;
 	}
 </style>

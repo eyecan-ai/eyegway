@@ -1,5 +1,6 @@
 import redis
 import eyegway.communication.channels as ecom
+import eyegway.communication.variables as ecov
 import pytest
 
 
@@ -110,3 +111,26 @@ class TestChannels:
         channel.clear()
 
         assert channel.size() == 0
+
+
+class TestVariables:
+
+    def test_variables(self, redis_test_mock_sync: redis.Redis):
+
+        values = [
+            True,
+            False,
+            2,
+            2.2,
+            b"hello",
+            "test_value",
+            [1, 2, 3],
+            {"a": 1, "b": 2},
+        ]
+
+        for value in values:
+            variable = ecov.SharedVariable(
+                redis_test_mock_sync, f"_test_variable_{type(value).__name__}"
+            )
+            variable.set(value)
+            assert variable.get() == value

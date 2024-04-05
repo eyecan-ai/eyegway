@@ -76,6 +76,69 @@ class TestMessageHub:
         await hub.clear_history()
 
     @pytest.mark.asyncio
+    async def test_freeze(self, redis_test_mock_async: aioredis.Redis):
+
+        max_buffer_size = 10
+        max_history_size = max_buffer_size
+
+        def _hub():
+            return eha.AsyncMessageHub(
+                redis=redis_test_mock_async,
+                name="test",
+                packer=ecm.PicklePacker(),
+                max_buffer_size=max_buffer_size,
+                max_history_size=max_history_size,
+            )
+
+        async def _clear_and_push(hub: eha.AsyncMessageHub):
+            await hub.clear_buffer()
+            await hub.clear_history()
+            data_size = max_buffer_size
+            datas = []
+            for idx in range(data_size):
+                datas.append({'idx': idx, 'data': f"data-{idx}"})
+
+            # Push all messages
+            for data in datas:
+                await hub.push(data)
+
+        await _hub().freeze_history()
+        await _clear_and_push(_hub())
+
+        assert await _hub().history_size() == 0
+        assert await _hub().buffer_size() == max_buffer_size
+
+        await _hub().freeze_history(False)
+        await _clear_and_push(_hub())
+
+        assert await _hub().history_size() == max_buffer_size
+        assert await _hub().buffer_size() == max_buffer_size
+
+        await _hub().freeze_buffer()
+        await _clear_and_push(_hub())
+
+        assert await _hub().history_size() == max_buffer_size
+        assert await _hub().buffer_size() == 0
+
+        await _hub().freeze_buffer(False)
+        await _clear_and_push(_hub())
+
+        assert await _hub().history_size() == max_buffer_size
+        assert await _hub().buffer_size() == max_buffer_size
+
+        await _hub().freeze()
+        await _clear_and_push(_hub())
+
+        assert await _hub().history_size() == 0
+        assert await _hub().buffer_size() == 0
+
+        await _hub().freeze(False)
+        await _clear_and_push(_hub())
+
+        assert await _hub().history_size() == max_buffer_size
+        assert await _hub().buffer_size() == max_buffer_size
+
+    @pytest.mark.asyncio
     async def test_max_payload(self, redis_test_mock_async: aioredis.Redis):
 
         max_buffer_size = 10
@@ -101,6 +164,56 @@ class TestMessageHub:
 
         await hub.clear_buffer()
         await hub.clear_history()
+
+    @pytest.mark.asyncio
+    async def test_variables(self, redis_test_mock_async: aioredis.Redis):
+
+        max_buffer_size = 10
+        max_history_size = max_buffer_size
+
+        # create hub each time to avoid variables conflicts
+        def _hub():
+            return eha.AsyncMessageHub(
+                redis=redis_test_mock_async,
+                name="test",
+                packer=ecm.PicklePacker(),
+                max_buffer_size=max_buffer_size,
+                max_history_size=max_history_size,
+            )
+
+        assert len(await _hub().list_variables()) == 0
+
+        variables = {'alpha': 1, 'beta': False, 'gamma': 3.14}
+        for key, value in variables.items():
+            assert await _hub().get_variable_value(key) is None
+
+        for key, value in variables.items():
+            await _hub().set_variable_value(key, value)
+
+        # test fixed hub to avoid side effects
+        hub = _hub()
+        for key, value in variables.items():
+            await hub.set_variable_value(key, value)
+            await hub.set_variable_value(key, value)
+            await hub.get_variable_value(key)
+            await hub.get_variable_value(key)
+        #######################################
+
+        assert len(await _hub().list_variables()) == len(variables)
+
+        for key in variables.keys():
+            assert await _hub().get_variable_value(key) == variables[key]
+
+        assert len(await _hub().list_variables()) == len(variables)
+
+        for key in variables.keys():
+            assert await _hub().get_variable_value(key) == variables[key]
+
+        for key in variables.keys():
+            await _hub().delete_variable(key)
+
+        for key in variables.keys():
+            assert await _hub().get_variable_value(key) is None
 
     @pytest.mark.asyncio
     async def test_factory_only_creation(self):
@@ -158,6 +271,7 @@ class TestMessageHubManager:
                 config=config,
                 redis=redis_test_mock_async,
             )
+            await hub.freeze(False)
             hubs[hub_name] = hub
             await hub.clear()
             await hub.push("data".encode('utf-8'))
