@@ -33,7 +33,7 @@
 <div class="">
 	<div class="dropdown is-right" class:is-active={isOpen}>
 		<div class="dropdown-trigger">
-			<button class="button" on:click={toggle}>
+			<button class="button is-small" on:click={toggle}>
 				<span class="mr-2">
 					{#if hubName}
 						{hubName}

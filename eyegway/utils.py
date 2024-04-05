@@ -26,6 +26,47 @@ class DemoDataGenerator:
     def __init__(self) -> None:
         self.counter = 0
 
+    def generate_text_image_with_opencv(
+        self,
+        text: str,
+        size: t.Sequence = (512, 512),
+        background_color: t.Sequence = (0, 0, 0),
+        foreground_color: t.Sequence = (255, 255, 255),
+        font_scale: int = 4,
+        font_thickness: int = 4,
+    ) -> np.ndarray:
+
+        # Get the current time in local format
+        current_text = text
+
+        # Calculate the position to write the text in the middle
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        text_size = cv2.getTextSize(current_text, font, font_scale, font_thickness)[0]
+
+        width = int(text_size[0] * 1.2)
+        height = width
+
+        # Create background image
+        image = np.ones((height, width, 3), dtype=np.uint8)
+        image[:, :] = background_color
+
+        # Draw the current time in the middle of the image
+        x = (width - text_size[0]) // 2
+        y = (height + text_size[1]) // 2
+        cv2.putText(
+            image,
+            current_text,
+            (x, y),
+            font,
+            font_scale,
+            foreground_color,
+            font_thickness,
+        )
+
+        # Resize
+        image = cv2.resize(image, size)
+        return image
+
     def generate_image_with_opencv(
         self,
         size: t.Sequence = (512, 512),
@@ -76,6 +117,24 @@ class DemoDataGenerator:
             ),
             'image_2': self.generate_image_with_opencv(
                 background_color=(74, 20, 140), foreground_color=(244, 255, 129)
+            ),
+            'image_counter_squared': self.generate_text_image_with_opencv(
+                text=f"{self.counter}",
+                size=(512, 512),
+                background_color=(100, 100, 100),
+                foreground_color=(255, 255, 255),
+            ),
+            'image_counter_letterbox': self.generate_text_image_with_opencv(
+                text=f"{self.counter}",
+                size=(512, 256),
+                background_color=(100, 100, 100),
+                foreground_color=(255, 255, 255),
+            ),
+            'image_counter_pillarbox': self.generate_text_image_with_opencv(
+                text=f"{self.counter}",
+                size=(256, 512),
+                background_color=(100, 100, 100),
+                foreground_color=(255, 255, 255),
             ),
             'metadata': {
                 'timestamp': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),

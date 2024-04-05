@@ -2,9 +2,10 @@
 	import { Canvas, T } from '@threlte/core';
 	import { Grid, OrbitControls } from '@threlte/extras';
 	import type { DataPointCloud } from '../MosaicModel.js';
+	import { styleSettings } from '$lib/components/settings/StyleSettingsStore.js';
 
 	export let userData: DataPointCloud | null = null;
-	export let pointSize: number = 0.01;
+	export let pointSize: number = 0.00001;
 	export let width: number = 100;
 	export let height: number = 100;
 	let maxDistance = 1;
@@ -23,14 +24,26 @@
 			}
 		}
 	}
+
+	$: if ($styleSettings.pcd.distance) {
+		console.log('DIsTANCE', $styleSettings.pcd.distance);
+	}
 </script>
 
 {#if userData}
-	<div class="canvas-container" bind:this={container}>
+	<div
+		class="canvas-container"
+		bind:this={container}
+		style={'background-color: ' + $styleSettings.pcd.background}
+	>
 		<Canvas size={{ width, height }}>
 			<T.PerspectiveCamera
 				makeDefault
-				position={[maxDistance, maxDistance, maxDistance]}
+				position={[
+					$styleSettings.pcd.distance,
+					$styleSettings.pcd.distance,
+					$styleSettings.pcd.distance
+				]}
 				up={[0, 0, 1]}
 				on:create={({ ref }) => {
 					ref.lookAt(0, 0, 0);
@@ -70,17 +83,18 @@
 					{/if}
 				</T.BufferGeometry>
 
-				<T.PointsMaterial size={pointSize} vertexColors={true} />
+				<T.PointsMaterial size={$styleSettings.pcd.point_size} vertexColors={true} />
 			</T.Points>
 
 			<Grid
 				type={'grid'}
 				plane={'xy'}
-				cellSize={0.1}
-				gridSize={[1, 1]}
-				cellThickness={0.5}
+				cellSize={$styleSettings.pcd.grid_tile}
+				gridSize={[$styleSettings.pcd.grid_size, $styleSettings.pcd.grid_size]}
+				cellThickness={1}
 				sectionColor={'#aaa'}
 				sectionSize={0}
+				cellColor={$styleSettings.pcd.grid_color}
 			/>
 			<T.AxesHelper />
 		</Canvas>

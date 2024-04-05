@@ -15,23 +15,28 @@
 		IconUpload,
 		IconHistory
 	} from '@tabler/icons-svelte';
+	import StyleSettingsButton from '../settings/StyleSettingsButton.svelte';
 
-	export let size: [number, number] = [32, 32];
+	export let defaultSize: [number, number] = [64, 64];
 	export let controls: boolean = true;
 	export let autoLoadDefault: boolean = true;
 	export let editableMode: boolean = true;
+	export let defaultHeight: number = 600;
 	export let defaultKey: string = '[placeholder]';
 	export let items: MosaicItem[] = [];
-	export let height: number = 600;
 	export let data: any = {};
+	let size: [number, number] = defaultSize;
+	let height: number = defaultHeight;
 	let newItemSize: [number, number] = [5, 5];
 	let gridController: GridController;
+	let disabled: boolean = false;
 
 	/**
 	 * Add a new item to the grid. It can be called from the parent component.
 	 */
 	export function newItem() {
 		const pos = gridController.getFirstAvailablePosition(newItemSize[0], newItemSize[1]);
+		console.log(newItemSize, size);
 		if (pos == null) {
 			return;
 		} else {
@@ -43,7 +48,7 @@
 	 * Export the current configuration. It can be called from the parent component.
 	 */
 	export function exportConfiguration(): MosaicConfiguration {
-		const configuration = new MosaicConfiguration(items, size);
+		const configuration = new MosaicConfiguration(items, size, height);
 		return configuration;
 	}
 
@@ -83,15 +88,26 @@
 	 * Reload the configuration. It can be called from the parent component.
 	 */
 	export function reloadConfiguration(configuration: MosaicConfiguration) {
+		disabled = true;
 		items = configuration.items;
 		size = configuration.size;
+		height = configuration.height ? configuration.height : defaultHeight;
+		setTimeout(() => {
+			disabled = false;
+		}, 100);
 	}
 
 	/**
 	 * Clear the grid. It can be called from the parent component.
 	 */
 	export function clear() {
+		disabled = true;
 		items = [];
+		size = defaultSize;
+		height = defaultHeight;
+		setTimeout(() => {
+			disabled = false;
+		}, 100);
 	}
 
 	/**
@@ -136,21 +152,26 @@
 		{#if items.length == 0}
 			<div class="notification m-4 no-items">No items, add one ...</div>
 		{/if}
-		<Grid cols={size[1]} rows={size[0]} bind:controller={gridController} readOnly={!editableMode}>
-			{#each items as item}
-				<MosaicTile
-					bind:item
-					tips={data ? Object.keys(data) : []}
-					editable={editableMode}
-					dataStream={data}
-					on:delete={onDeleteItem}
-				/>
-			{/each}
-		</Grid>
+		{#if !disabled}
+			<Grid cols={size[0]} rows={size[1]} bind:controller={gridController} readOnly={!editableMode}>
+				{#each items as item}
+					<MosaicTile
+						bind:item
+						tips={data ? Object.keys(data) : []}
+						editable={editableMode}
+						dataStream={data}
+						on:delete={onDeleteItem}
+					/>
+				{/each}
+			</Grid>
+		{/if}
 	</div>
 	{#if controls}
 		<div class="controls p-2" class:controls-hidden={!editableMode}>
 			<div class="columns is-vcentered is-variable is-1">
+				<div class="column is-narrow">
+					<StyleSettingsButton />
+				</div>
 				<div class="column is-narrow">
 					<button
 						class="button is-warning is-small"
@@ -226,6 +247,21 @@
 							<IconHistory stroke={1} size={18} />
 						</button>
 					</div>
+					<div class="column is-narrow">
+						<IconDotsVertical size={16} />
+					</div>
+					<div class="column is-narrow">
+						<input
+							class="input is-small"
+							type="number"
+							orient="vertical"
+							placeholder="Height"
+							min="400"
+							max="1000"
+							bind:value={height}
+							title="Grid Height in Pixels"
+						/>
+					</div>
 				{/if}
 			</div>
 		</div>
@@ -246,6 +282,7 @@
 	.controls {
 		border-top: 1px dashed #eee;
 	}
+
 	/** add global */
 
 	:global(.float-container .float) {

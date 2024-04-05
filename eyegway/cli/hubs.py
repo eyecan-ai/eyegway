@@ -67,16 +67,59 @@ def info(
         "--name",
         "-n",
         help="Hub name",
-    )
+    ),
+    tick: float = tp.Option(
+        -1,
+        "--tick",
+        "-t",
+        help="Tick time (-1 for single print, >1 for live update)",
+    ),
 ):
     import eyegway.hubs.sync as ehs
     import rich
+    from rich.live import Live
+    from rich.panel import Panel
+    from rich.console import Group
+    from rich.table import Table
+    from rich.pretty import Pretty
+
+    import time
 
     hub = ehs.MessageHub.create(name=hub_name)
 
-    rich.print(f"Hub |[red]{hub_name}[/red]| info:")
-    rich.print("- Buffer size:", hub.buffer_size())
-    rich.print("- History size:", hub.history_size())
+    with Live(auto_refresh=True) as live:
+        console = rich.get_console()
+        while True:
+            if tick > 0:
+                console.clear()
+
+            frozen_token = '[[blue]FROZEN[/]]'
+            history_frozen = frozen_token if hub.is_history_frozen() else ''
+            buffer_frozen = frozen_token if hub.is_buffer_frozen() else ''
+            history_size = f'{hub.history_size()}/{hub.max_history_size}'
+            buffer_size = f'{hub.buffer_size()}/{hub.max_buffer_size}'
+            elements = [
+                '',
+                f'History[[red]{history_size}[/]]' + history_frozen,
+                f'Buffer[[red]{buffer_size}[/]]' + buffer_frozen,
+                '',
+            ]
+
+            variables = hub.list_variables(include_privates=False)
+            if len(variables) > 0:
+                variables_table = Table(title="variables", show_header=False)
+                for variable in variables:
+                    value = hub.get_variable_value(variable)
+                    variables_table.add_row(*[variable, Pretty(value)])
+
+                elements.append(variables_table)
+
+            panel = Panel.fit(Group(*elements), title=f"Hub [green]{hub_name}[/] Info")
+            console.print(panel)
+
+            if tick < 0:
+                break
+            time.sleep(tick)
 
 
 # ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
@@ -111,7 +154,7 @@ def clear(
 @cli_hubs.command(
     short_help="Clear HUB History",
 )
-def clear_history(
+def history_clear(
     hub_name: str = tp.Option(
         ...,
         "--name",
@@ -133,9 +176,41 @@ def clear_history(
 
 
 @cli_hubs.command(
+    short_help="Freeze HUB History",
+)
+def history_freeze(
+    hub_name: str = tp.Option(
+        ...,
+        "--name",
+        "-n",
+        help="Hub name",
+    ),
+    unfreeze: bool = tp.Option(
+        False,
+        "--unfreeze",
+        "-u",
+        help="Unfreeze",
+    ),
+):
+    import eyegway.hubs.sync as ehs
+    import rich
+
+    hub = ehs.MessageHub.create(name=hub_name)
+    hub.freeze_history(not unfreeze)
+    rich.print(
+        f"Hub |[red]{hub_name}[/red]| history {'frozen' if not unfreeze else 'unfrozen'}!"
+    )
+
+
+# ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+# ░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄
+# ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+
+
+@cli_hubs.command(
     short_help="Clear HUB Buffer",
 )
-def clear_buffer(
+def buffer_clear(
     hub_name: str = tp.Option(
         ...,
         "--name",
@@ -149,6 +224,70 @@ def clear_buffer(
     hub = ehs.MessageHub.create(name=hub_name)
     hub.clear_buffer()
     rich.print(f"Hub |[red]{hub_name}[/red]| buffer cleared!")
+
+
+# ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+# ░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄
+# ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+
+
+@cli_hubs.command(
+    short_help="Freeze HUB Buffer",
+)
+def buffer_freeze(
+    hub_name: str = tp.Option(
+        ...,
+        "--name",
+        "-n",
+        help="Hub name",
+    ),
+    unfreeze: bool = tp.Option(
+        False,
+        "--unfreeze",
+        "-u",
+        help="Unfreeze",
+    ),
+):
+    import eyegway.hubs.sync as ehs
+    import rich
+
+    hub = ehs.MessageHub.create(name=hub_name)
+    hub.freeze_buffer(not unfreeze)
+    rich.print(
+        f"Hub |[red]{hub_name}[/red]| buffer {'frozen' if not unfreeze else 'unfrozen'}!"
+    )
+
+
+# ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+# ░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄
+# ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+
+
+@cli_hubs.command(
+    short_help="Freeze HUB ",
+)
+def freeze(
+    hub_name: str = tp.Option(
+        ...,
+        "--name",
+        "-n",
+        help="Hub name",
+    ),
+    unfreeze: bool = tp.Option(
+        False,
+        "--unfreeze",
+        "-u",
+        help="Unfreeze",
+    ),
+):
+    import eyegway.hubs.sync as ehs
+    import rich
+
+    hub = ehs.MessageHub.create(name=hub_name)
+    hub.freeze(not unfreeze)
+    rich.print(
+        f"Hub |[red]{hub_name}[/red]| {'frozen' if not unfreeze else 'unfrozen'}!"
+    )
 
 
 # ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
@@ -220,6 +359,118 @@ def last(
         rich.print(f"Hub |[red]{hub_name}[/red]| history[{offset}] is empty!")
         return
     ep.MessagePacker.pretty_print(data)
+
+
+# ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+# ░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄
+# ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+
+
+@cli_hubs.command(
+    short_help="Set HUB variable",
+)
+def variable_set(
+    hub_name: str = tp.Option(
+        ...,
+        "--name",
+        "-n",
+        help="Hub name",
+    ),
+    variable_name: str = tp.Option(
+        ...,
+        "--variable-name",
+        "-v",
+        help="Variable name",
+    ),
+    value: str = tp.Option(
+        ...,
+        "--value",
+        "-l",
+        help="Variable value",
+    ),
+):
+    import eyegway.hubs.sync as ehs
+    import eyegway.packers as ep
+    import rich
+    import ast
+
+    hub = ehs.MessageHub.create(name=hub_name)
+    try:
+        value = ast.literal_eval(value)
+    except:
+        pass
+    hub.set_variable_value(variable_name, value)
+    rich.print(
+        f"Hub |[red]{hub_name}[/red]| set variable [red]{variable_name}[/red] to [red]{value}[/red]!"
+    )
+
+
+# ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+# ░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄
+# ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+
+
+@cli_hubs.command(
+    short_help="Set HUB variable",
+)
+def variable_get(
+    hub_name: str = tp.Option(
+        ...,
+        "--name",
+        "-n",
+        help="Hub name",
+    ),
+    variable_name: str = tp.Option(
+        ...,
+        "--variable-name",
+        "-v",
+        help="Variable name",
+    ),
+):
+    import eyegway.hubs.sync as ehs
+    import eyegway.packers as ep
+    import rich
+    import ast
+
+    hub = ehs.MessageHub.create(name=hub_name)
+    value = hub.get_variable_value(variable_name)
+    rich.print(
+        f"Hub |[red]{hub_name}[/red]| variable [red]{variable_name}[/red] = [red]{value}[/red]"
+    )
+
+
+# ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+# ░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄░▄▄▄
+# ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+
+
+@cli_hubs.command(
+    short_help="Set HUB variable",
+)
+def variable_delete(
+    hub_name: str = tp.Option(
+        ...,
+        "--name",
+        "-n",
+        help="Hub name",
+    ),
+    variable_name: str = tp.Option(
+        ...,
+        "--variable-name",
+        "-v",
+        help="Variable name",
+    ),
+):
+    import eyegway.hubs.sync as ehs
+    import eyegway.packers as ep
+    import rich
+    import ast
+
+    hub = ehs.MessageHub.create(name=hub_name)
+    hub.delete_variable(variable_name)
+    rich.print(
+        f"Hub |[red]{hub_name}[/red]| variable [red]{variable_name}[/red] deleted!"
+    )
 
 
 # ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░

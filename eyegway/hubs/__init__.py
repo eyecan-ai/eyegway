@@ -7,8 +7,11 @@ class HubsParametrization:
     FAKE_REDIS_NAME = "fakeredis"
     SEPARATOR = ":"
     HUBS_PREFIX = f"eyegway{SEPARATOR}hubs{SEPARATOR}"
+    HUBS_VARIABLES_PREFIX = f"eyegway{SEPARATOR}hubs_variables{SEPARATOR}"
     BUFFER_NAME = "buffer"
     HISTORY_NAME = "history"
+    VARIABLE_SEPARATOR = "#"
+    PRIVATE_VARIABLE_PREFIX = "_"
 
     @classmethod
     def hub_name(cls, hub_name: str) -> str:
@@ -33,6 +36,23 @@ class HubsParametrization:
         channels = [channel.replace(cls.HUBS_PREFIX, "") for channel in channels]
         channels = [channel.split(cls.SEPARATOR)[0] for channel in channels]
         return list(set(channels))
+
+    @classmethod
+    def variable_name(
+        cls, hub_name: str, variable_name: str, private: bool = False
+    ) -> str:
+        prefix = cls.PRIVATE_VARIABLE_PREFIX if private else ""
+        return f"{cls.HUBS_VARIABLES_PREFIX}{hub_name}{cls.VARIABLE_SEPARATOR}{prefix}{variable_name}"
+
+    @classmethod
+    def retrieve_variables_names_from_list(cls, variables: t.List[str]) -> t.List[str]:
+        variables = [
+            variable.replace(cls.HUBS_VARIABLES_PREFIX, "") for variable in variables
+        ]
+        variables = [
+            variable.split(cls.VARIABLE_SEPARATOR)[1] for variable in variables
+        ]
+        return list(set(variables))
 
 
 class HubsConfig(pyd.BaseSettings):
