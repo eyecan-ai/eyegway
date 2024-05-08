@@ -41,7 +41,11 @@
 				fov={35}
 				near={0.01}
 				far={20000}
-				position={[$styleSettings.pcd.distance / 3, 0, $styleSettings.pcd.distance / 3]}
+				position={[
+					$styleSettings.pcd.distance,
+					$styleSettings.pcd.distance,
+					$styleSettings.pcd.distance
+				]}
 				up={[0, 0, 1]}
 				on:create={({ ref }) => {
 					ref.lookAt(0, 0, 0);
