@@ -18,7 +18,7 @@
 					</span>
 				</div>
 				<div class="column is-narrow">
-					<img src="/images/logo.png" alt="Logo" class="logo" />
+					<img src="images/logo.png" alt="Logo" class="logo" />
 				</div>
 			</div>
 		</div>
