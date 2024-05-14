@@ -608,18 +608,6 @@
     svelte-hmr "^0.15.3"
     vitefu "^0.2.5"
 
-"@tabler/icons-svelte@^2.47.0":
-  version "2.47.0"
-  resolved "https://registry.npmjs.org/@tabler/icons-svelte/-/icons-svelte-2.47.0.tgz"
-  integrity sha512-xL2NyCUUhBQv0lXylgNCpfHtMW4Ihu0hCacaYXeX+NiS1LO0geqXk/0lkrBH+u/ZLX6vyqUYNFjawjzmxthFjw==
-  dependencies:
-    "@tabler/icons" "2.47.0"
-
-"@tabler/icons@2.47.0":
-  version "2.47.0"
-  resolved "https://registry.npmjs.org/@tabler/icons/-/icons-2.47.0.tgz"
-  integrity sha512-4w5evLh+7FUUiA1GucvGj2ReX2TvOjEr4ejXdwL/bsjoSkof6r1gQmzqI+VHrE2CpJpB3al7bCTulOkFa/RcyA==
-
 "@threlte/core@^7.1.0":
   version "7.1.0"
   resolved "https://registry.npmjs.org/@threlte/core/-/core-7.1.0.tgz"
@@ -1820,6 +1808,11 @@ lru-cache@^6.0.0:
   integrity sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA==
   dependencies:
     yallist "^4.0.0"
+
+lucide-svelte@^0.378.0:
+  version "0.378.0"
+  resolved "https://registry.yarnpkg.com/lucide-svelte/-/lucide-svelte-0.378.0.tgz#04624dd092765eafbc18f25e0ea4bd1727a5fa60"
+  integrity sha512-T7hV1sfOc94AWE5GOJ6r9wGEsR4h4TJr8d4Z0sM8O0e3IBcmeIvEGRAA6jCp7NGy4PeGrn5Tju6Y2JwJQntNrQ==
 
 magic-string@^0.30.3, magic-string@^0.30.4, magic-string@^0.30.5:
   version "0.30.7"

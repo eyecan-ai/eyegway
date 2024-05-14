@@ -1,13 +1,7 @@
 <script lang="ts">
 	import HubPanel from '$lib/components/hubs/HubPanel.svelte';
 	import Mosaic from '$lib/components/mosaic/Mosaic.svelte';
-	import { ServerPreferences } from '$lib/Stores.js';
-
-	/** @type {import('./$types').PageData} */
-	export let data;
-
-	$ServerPreferences.host = data.config.host;
-	$ServerPreferences.hubTriggerKey = data.config.hubTriggerKey;
+	import { ServerPreferences, serverPreferencesReset } from '$lib/Stores.js';
 
 	let sharedData: any | null = null;
 	let editableMosaic: boolean = false;
@@ -20,10 +14,13 @@
 			<div class="columns is-vcentered">
 				<div class="column is-narrow">
 					<span class="title is-6">
-						{data.config.title}
+						{$ServerPreferences.title || ''}
+						<!-- The OR '' is used for temporary empty value replacement -->
 					</span>
 				</div>
-				<div class="column is-narrow">
+				<!-- svelte-ignore a11y-click-events-have-key-events -->
+				<!-- svelte-ignore a11y-no-static-element-interactions -->
+				<div class="column is-narrow logo-container">
 					<img src="images/logo.png" alt="Logo" class="logo" />
 				</div>
 			</div>

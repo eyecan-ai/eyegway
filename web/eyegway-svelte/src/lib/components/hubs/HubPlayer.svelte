@@ -1,20 +1,21 @@
 <script lang="ts">
 	import { EyegwayHubClient } from '$lib/Eyegway.js';
 	import { ServerPreferences } from '$lib/Stores.js';
+
 	import {
-		IconChevronLeft,
-		IconChevronRight,
-		IconReload,
-		IconSettings,
-		IconPlayerPlay,
-		IconPlayerStop,
-		IconIceCream,
-		IconDotsVertical
-	} from '@tabler/icons-svelte';
+		CirclePlay,
+		CircleStop,
+		ChevronLeft,
+		ChevronRight,
+		Settings,
+		RotateCw,
+		EllipsisVertical
+	} from 'lucide-svelte';
 	import { onDestroy } from 'svelte';
 
 	export let hubName: string | null = null;
 	export let data: any | null = null;
+	export let iconSize: number = 18;
 	let hubClient: EyegwayHubClient | null = null;
 	let historyFrozen: boolean = false;
 	let historySize: number = -1;
@@ -134,7 +135,7 @@
 							on:click={() => setDataPointer(-1)}
 							disabled={!historyFrozen || dataPointer == 0}
 						>
-							<IconChevronLeft size={24} />
+							<ChevronLeft size={iconSize} />
 						</button>
 					</p>
 					<p class="control">
@@ -152,7 +153,7 @@
 							on:click={() => setDataPointer(1)}
 							disabled={!historyFrozen || dataPointer == historySize - 1}
 						>
-							<IconChevronRight size={24} />
+							<ChevronRight size={iconSize} />
 						</button>
 					</p>
 				</div>
@@ -168,8 +169,8 @@
 				<div class="field has-addons">
 					<div class="dropdown is-right" class:is-hoverable={!historyFrozen}>
 						<div class="dropdown-trigger">
-							<button class="button is-small" disabled={historyFrozen}>
-								<IconSettings stroke={1} />
+							<button class="button is-small is-white" disabled={historyFrozen}>
+								<Settings strokeWidth={1} size={iconSize} />
 							</button>
 						</div>
 						<div class="dropdown-menu" id="dropdown-menu4" role="menu">
@@ -191,12 +192,12 @@
 					<!--------------------->
 					<p class="control">
 						<button
-							class="button is-small"
+							class="button is-small is-white"
 							on:click={reload}
 							disabled={historyFrozen}
 							title="Click to trigger a single update"
 						>
-							<IconReload stroke={1} />
+							<RotateCw strokeWidth={1} size={iconSize} />
 						</button>
 					</p>
 
@@ -205,7 +206,7 @@
 					<!--------------------->
 					<p class="control">
 						<button
-							class="button is-small is-outlined"
+							class="button is-small is-white"
 							style="--animation-time: {autoPlayMs}ms;"
 							class:blink={autoPlay}
 							disabled={historyFrozen}
@@ -215,9 +216,9 @@
 							title="Click to auto update every {autoPlayMs}ms"
 						>
 							{#if !autoPlay}
-								<IconPlayerPlay stroke={1} />
+								<CirclePlay strokeWidth={1} size={iconSize} />
 							{:else}
-								<IconPlayerStop stroke={1} />
+								<CircleStop class="has-text-danger" strokeWidth={1} size={iconSize} />
 							{/if}
 						</button>
 					</p>
@@ -226,7 +227,7 @@
 		{/if}
 
 		<div class="column is-narrow is-flex">
-			<IconDotsVertical stroke={1} />
+			<EllipsisVertical strokeWidth={0.5} />
 		</div>
 		<div class="column">
 			<button

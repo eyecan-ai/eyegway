@@ -2,10 +2,17 @@ import { persisted } from 'svelte-persisted-store';
 import { Parameters } from './Parameters.js';
 import type { Writable } from 'svelte/store';
 
-export const ServerPreferences = persisted('ServerPreferences', {
+const defaultServerPreferences = {
 	host: Parameters.host,
-	hubTriggerKey: Parameters.hubTriggerKey
-});
+	hubTriggerKey: Parameters.hubTriggerKey,
+	title: Parameters.title
+};
+
+export const ServerPreferences = persisted('ServerPreferences', defaultServerPreferences);
+
+export const serverPreferencesReset = () => {
+	ServerPreferences.set(defaultServerPreferences);
+};
 
 export interface HubsPreferences {
 	activeHub: string | null;

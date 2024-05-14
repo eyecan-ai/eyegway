@@ -21,8 +21,11 @@ export class StyleSettings {
 	};
 }
 
-export let styleSettings: Writable<StyleSettings> = persisted('StyleSettings', new StyleSettings());
+export const styleSettings: Writable<StyleSettings> = persisted(
+	'StyleSettings',
+	new StyleSettings()
+);
 
-export let styleSettingsReset = () => {
+export const styleSettingsReset = () => {
 	styleSettings.set(new StyleSettings());
 };
