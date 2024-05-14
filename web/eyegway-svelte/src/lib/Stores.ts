@@ -3,7 +3,8 @@ import { Parameters } from './Parameters.js';
 import type { Writable } from 'svelte/store';
 
 export const ServerPreferences = persisted('ServerPreferences', {
-	host: Parameters.host
+	host: Parameters.host,
+	hubTriggerKey: Parameters.hubTriggerKey
 });
 
 export interface HubsPreferences {

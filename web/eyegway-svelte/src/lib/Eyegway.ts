@@ -346,11 +346,11 @@ export class EyegwayHubClient {
 	 * Return a list of all available hubs
 	 * @returns <Promise<Array<string>>>
 	 */
-	async listHubs(): Promise<Array<string>> {
+	async listHubs(hubTriggerKey: string = Parameters.hubTriggerKey): Promise<Array<string>> {
 		const response = await fetch(this.buildUrl('/hubs'));
 		let hubs: Array<string> = await response.json();
-		if (Parameters.hubTriggerKey) {
-			hubs = hubs.filter((hub) => hub.includes(Parameters.hubTriggerKey));
+		if (hubTriggerKey) {
+			hubs = hubs.filter((hub) => hub.includes(hubTriggerKey));
 		}
 
 		return hubs;
