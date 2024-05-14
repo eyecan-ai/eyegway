@@ -19,7 +19,7 @@
 		isError = false;
 		const client = new EyegwayHubClient('', $ServerPreferences.host);
 		try {
-			hubs = await client.listHubs();
+			hubs = await client.listHubs($ServerPreferences.hubTriggerKey);
 		} catch (e) {
 			isError = true;
 		}

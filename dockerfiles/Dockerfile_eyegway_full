@@ -1,0 +1,42 @@
+ARG EYEGWAY_HOST="http://localhost:55221"
+ARG WEBUI_TITLE="Debug Viewer"
+
+FROM ubuntu:22.04
+
+ENV VITE_EYEGWAY_HOST=${EYEGWAY_HOST}
+ENV VITE_WEBUI_TITLE=${WEBUI_TITLE}
+
+ADD . /eyegway
+WORKDIR /eyegway
+
+# Install eyegway
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Europe/Rome
+
+RUN apt-get update && \
+    apt-get install software-properties-common -y && \
+    add-apt-repository ppa:deadsnakes/ppa -y && \
+    apt-get update && \
+    apt-get install python3.10 python3.10-dev python3.10-venv python3-pip ffmpeg libsm6 libxext6 curl -y && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN python3.10 -m venv /home/venv && \
+    /home/venv/bin/python -m pip install -U pip setuptools && \
+    /home/venv/bin/python -m pip install . -f http://wheels.eyecan.ai:8000 --trusted-host wheels.eyecan.ai --no-cache-dir
+
+ENV PATH "$PATH:/home/venv/bin"
+
+# Install eyegway-webui
+
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash && \
+    export NVM_DIR="$HOME/.nvm" && \
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && \
+    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" && \
+    nvm install 20.13.1 && \
+    npm install --global yarn && \
+    cd web/eyegway-svelte && \
+    yarn install && \
+    yarn build
+
+ENV PATH "$PATH:/root/.nvm/versions/node/v20.13.1/bin"
