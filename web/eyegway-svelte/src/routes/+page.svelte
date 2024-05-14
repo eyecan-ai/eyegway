@@ -1,7 +1,13 @@
 <script lang="ts">
-	import { Parameters } from '$lib/Parameters.js';
 	import HubPanel from '$lib/components/hubs/HubPanel.svelte';
 	import Mosaic from '$lib/components/mosaic/Mosaic.svelte';
+	import { ServerPreferences } from '$lib/Stores.js';
+
+	/** @type {import('./$types').PageData} */
+	export let data;
+
+	$ServerPreferences.host = data.config.host;
+	$ServerPreferences.hubTriggerKey = data.config.hubTriggerKey;
 
 	let sharedData: any | null = null;
 	let editableMosaic: boolean = false;
@@ -14,7 +20,7 @@
 			<div class="columns is-vcentered">
 				<div class="column is-narrow">
 					<span class="title is-6">
-						{Parameters.title}
+						{data.config.title}
 					</span>
 				</div>
 				<div class="column is-narrow">

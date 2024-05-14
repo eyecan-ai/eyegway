@@ -35,7 +35,7 @@ RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | b
     [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" && \
     nvm install 20.13.1 && \
     npm install --global yarn && \
-    cd /eyegway/web/eyegway-svelte && \
+    cd web/eyegway-svelte && \
     yarn install && \
     yarn build
 
