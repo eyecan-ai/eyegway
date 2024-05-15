@@ -5,7 +5,6 @@
 	import type { DataPointCloud } from '../MosaicModel.js';
 
 	export let userData: DataPointCloud | null = null;
-	export let pointSize: number = 0.00001;
 	export let width: number = 100;
 	export let height: number = 100;
 	let container: HTMLElement;

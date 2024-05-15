@@ -2,7 +2,7 @@
 	import { HubsPreferences } from '$lib/Stores.js';
 	import HubPlayer from './HubPlayer.svelte';
 	import HubSelector from './HubSelector.svelte';
-	import { IconDotsVertical } from '@tabler/icons-svelte';
+	import { EllipsisVertical } from 'lucide-svelte';
 
 	export let data: any | null = null;
 	export let hubName: string | null = $HubsPreferences.activeHub;
@@ -13,7 +13,7 @@
 		<HubPlayer bind:data {hubName} />
 	</div>
 	<div class="column is-narrow is-flex">
-		<IconDotsVertical stroke={1} />
+		<EllipsisVertical strokeWidth={0.5} />
 	</div>
 	<div class="column is-narrow">
 		<HubSelector bind:hubName />

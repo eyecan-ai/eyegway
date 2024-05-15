@@ -46,10 +46,10 @@
 	"type": "module",
 	"dependencies": {
 		"@msgpack/msgpack": "^3.0.0-beta2",
-		"@tabler/icons-svelte": "^2.47.0",
 		"@threlte/core": "^7.1.0",
 		"@threlte/extras": "^8.7.5",
 		"@types/three": "^0.161.2",
+		"lucide-svelte": "^0.378.0",
 		"svelte-grid-extended": "^1.1.4",
 		"svelte-jsoneditor": "^0.21.5",
 		"svelte-persisted-store": "^0.9.1",
