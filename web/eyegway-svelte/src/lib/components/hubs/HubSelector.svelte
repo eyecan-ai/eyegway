@@ -2,7 +2,7 @@
 	import { EyegwayHubClient } from '$lib/Eyegway.js';
 	import { HubsPreferences, ServerPreferences } from '$lib/Stores.js';
 	import HubSettings from './HubSettings.svelte';
-	import { IconCube } from '@tabler/icons-svelte';
+	import { Box } from 'lucide-svelte';
 
 	export let hubName: string | null = null;
 	let hubs: string[] = [];
@@ -41,7 +41,7 @@
 						<em>Select a hub ...</em>
 					{/if}
 				</span>
-				<IconCube size={24} stroke={1} />
+				<Box size={18} strokeWidth={1} />
 			</button>
 		</div>
 		<div class="dropdown-menu" id="dropdown-menu4" role="menu">

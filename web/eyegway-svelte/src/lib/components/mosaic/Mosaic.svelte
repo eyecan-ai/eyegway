@@ -4,17 +4,18 @@
 	import MosaicTile from './MosaicTile.svelte';
 	import { MosaicConfigurationsUtils } from './MosaicUtils.js';
 	import { onMount } from 'svelte';
+
 	import {
-		IconPlus,
-		IconEdit,
-		IconEditOff,
-		IconDotsVertical,
-		IconTrash,
-		IconDeviceFloppy,
-		IconDownload,
-		IconUpload,
-		IconHistory
-	} from '@tabler/icons-svelte';
+		EllipsisVertical,
+		Plus,
+		Download,
+		Upload,
+		Edit,
+		SquarePen,
+		Trash,
+		Save,
+		History
+	} from 'lucide-svelte';
 	import StyleSettingsButton from '../settings/StyleSettingsButton.svelte';
 
 	export let defaultSize: [number, number] = [64, 64];
@@ -175,19 +176,16 @@
 				<div class="column is-narrow">
 					<button
 						class="button is-warning is-small"
+						class:is-inverted={editableMode}
 						on:click={toggleEditableMode}
 						title="{editableMode ? 'Disable' : 'Enable'} Edit Mode"
 					>
-						{#if !editableMode}
-							<IconEdit size={16} />
-						{:else}
-							<IconEditOff size={16} />
-						{/if}
+						<Edit size={16} />
 					</button>
 				</div>
 				{#if editableMode}
 					<div class="column is-narrow">
-						<IconDotsVertical size={16} />
+						<EllipsisVertical size={16} />
 					</div>
 					<div class="column is-narrow">
 						<button
@@ -195,18 +193,18 @@
 							on:click={newItem}
 							title="Add new item"
 						>
-							<IconPlus stroke={1} size={18} />
+							<Plus strokeWidth={1} size={18} />
 						</button>
 						<button
 							class="button is-small is-inverted is-danger"
 							on:click={clear}
 							title="Clear all items"
 						>
-							<IconTrash stroke={1} size={18} />
+							<Trash strokeWidth={1} size={18} />
 						</button>
 					</div>
 					<div class="column is-narrow">
-						<IconDotsVertical size={16} />
+						<EllipsisVertical size={16} />
 					</div>
 					<div class="column is-narrow">
 						<!-- SAVE TO FILE-->
@@ -216,7 +214,7 @@
 							on:click={saveConfigurationToFile}
 							title="Download current Configuration to File"
 						>
-							<IconDownload stroke={1} size={18} />
+							<Download strokeWidth={1} size={18} />
 						</button>
 
 						<!-- LOAD FROM FILE-->
@@ -225,7 +223,7 @@
 							on:click={loadConfigurationFromFile}
 							title="Load Configuration from File"
 						>
-							<IconUpload stroke={1} size={18} />
+							<Upload strokeWidth={1} size={18} />
 						</button>
 
 						<!-- SAVE AS DEFAULT-->
@@ -235,7 +233,7 @@
 							on:click={saveConfigurationAsDefault}
 							title="Save as Default Configuration"
 						>
-							<IconDeviceFloppy stroke={1} size={18} />
+							<Save strokeWidth={1} size={18} />
 						</button>
 
 						<!-- LOAD DEFAULT-->
@@ -244,17 +242,16 @@
 							on:click={loadDefaultConfiguration}
 							title="Reload Default Configuration"
 						>
-							<IconHistory stroke={1} size={18} />
+							<History strokeWidth={1} size={18} />
 						</button>
 					</div>
 					<div class="column is-narrow">
-						<IconDotsVertical size={16} />
+						<EllipsisVertical size={16} />
 					</div>
 					<div class="column is-narrow">
 						<input
 							class="input is-small"
 							type="number"
-							orient="vertical"
 							placeholder="Height"
 							min="400"
 							max="1000"

@@ -94,6 +94,7 @@ export class EyegwayPacker {
 	extensionCodec: ExtensionCodec;
 
 	constructor() {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const typeMap: any = {
 			float32: Float32Array,
 			float64: Float64Array,
@@ -107,7 +108,7 @@ export class EyegwayPacker {
 		};
 
 		this.extensionCodec = new ExtensionCodec();
-		let extensionCodec = this.extensionCodec;
+		const extensionCodec = this.extensionCodec;
 
 		/**
 		 * Register TENSOR type encoder and decoder
@@ -132,7 +133,11 @@ export class EyegwayPacker {
 			 * When a ExtType is provided as data to decode, it will create a new EyegwayTensor
 			 */
 			decode: (buff: Uint8Array) => {
-				const decoded = decode(buff, { extensionCodec }) as any;
+				const decoded = decode(buff, { extensionCodec }) as {
+					data: ArrayBufferView;
+					type: string;
+					shape: Array<number>;
+				};
 				const { data, type, shape } = decoded;
 
 				const offset = data.byteOffset;
@@ -171,12 +176,16 @@ export class EyegwayPacker {
 			 * When a ExtType is provided as data to decode, it will create a new EyegwayImage
 			 */
 			decode: (d: Uint8Array) => {
-				const { type, data, shape } = decode(d, { extensionCodec }) as any;
+				const { type, data, shape } = decode(d, { extensionCodec }) as {
+					type: string;
+					data: Uint8Array;
+					shape: Array<number>;
+				};
 
-				var blob = new Blob([data], { type });
-				var urlCreator = window.URL || window.webkitURL;
-				var imageUrl = urlCreator.createObjectURL(blob);
-				var img = new Image();
+				const blob = new Blob([data], { type });
+				const urlCreator = window.URL || window.webkitURL;
+				const imageUrl = urlCreator.createObjectURL(blob);
+				const img = new Image();
 				img.src = imageUrl;
 
 				return new EyegwayImage(imageUrl, type, shape);
@@ -245,7 +254,7 @@ export class EyegwayHubClient {
 	 * @param data the packed data
 	 * @returns <any> The decoded data
 	 */
-	public decodeData(data: ArrayBuffer): any {
+	public decodeData(data: ArrayBuffer): unknown {
 		return this.packer.decode(data);
 	}
 
@@ -254,7 +263,7 @@ export class EyegwayHubClient {
 	 * @param data the plain JavaScript objects
 	 * @returns  <Uint8Array> The packed data
 	 */
-	public encodeData(data: any): Uint8Array {
+	public encodeData(data: unknown): Uint8Array {
 		return this.packer.encode(data);
 	}
 
@@ -294,7 +303,7 @@ export class EyegwayHubClient {
 	 * Clear the history and buffer of the hub
 	 * @returns <Promise<any>>
 	 */
-	async clear(): Promise<any> {
+	async clear(): Promise<void> {
 		await this.clearHistory();
 		await this.clearBuffer();
 	}
@@ -306,7 +315,7 @@ export class EyegwayHubClient {
 	 *
 	 * @returns <Promise<any | null>> The last data from the hub or null if no data is available
 	 */
-	async last(offset: number = 0): Promise<any | null> {
+	async last(offset: number = 0): Promise<unknown | null> {
 		const response = await fetch(this.buildUrl(`/hubs/${this.hubName}/last?offset=${offset}`));
 		if (response.status === 200) {
 			return this.decodeData(await response.arrayBuffer());
@@ -321,7 +330,7 @@ export class EyegwayHubClient {
 	 * @param timeout the timeout in seconds to wait for data to be available
 	 * @returns <Promise<any | null>> The buffered data from the hub or null if no data is available
 	 */
-	async pop(timeout: number = 1): Promise<any | null> {
+	async pop(timeout: number = 1): Promise<unknown | null> {
 		const response = await fetch(this.buildUrl(`/hubs/${this.hubName}/pop?timeout=${timeout}`));
 		if (response.status === 200) {
 			return this.decodeData(await response.arrayBuffer());
@@ -335,7 +344,7 @@ export class EyegwayHubClient {
 	 *
 	 * @param data the data to push to the hub
 	 */
-	async push(data: any): Promise<any> {
+	async push(data: unknown): Promise<void> {
 		await fetch(this.buildUrl(`/hubs/${this.hubName}/push`), {
 			method: 'POST',
 			body: this.encodeData(data)
@@ -387,7 +396,7 @@ export class EyegwayHubClient {
 	 * @param variableName the name of the variable
 	 * @returns the value of the variable
 	 */
-	async getVariableValue(variableName: string): Promise<any> {
+	async getVariableValue(variableName: string): Promise<unknown> {
 		const response = await fetch(this.buildUrl(`/hubs/${this.hubName}/variables/${variableName}`));
 		return await response.json();
 	}
@@ -397,7 +406,7 @@ export class EyegwayHubClient {
 	 * @param variableName the name of the variable
 	 * @param value the new value of the variable
 	 */
-	async setVariableValue(variableName: string, value: any): Promise<any> {
+	async setVariableValue(variableName: string, value: unknown): Promise<void> {
 		await fetch(this.buildUrl(`/hubs/${this.hubName}/variables/${variableName}`), {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -409,7 +418,7 @@ export class EyegwayHubClient {
 	 * Deletes a variable in the hub
 	 * @param variableName the name of the variable
 	 */
-	async deleteVariable(variableName: string): Promise<any> {
+	async deleteVariable(variableName: string): Promise<void> {
 		await fetch(this.buildUrl(`/hubs/${this.hubName}/variables/${variableName}`), {
 			method: 'DELETE'
 		});
