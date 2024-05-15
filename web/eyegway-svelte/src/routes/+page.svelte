@@ -1,7 +1,7 @@
 <script lang="ts">
 	import HubPanel from '$lib/components/hubs/HubPanel.svelte';
 	import Mosaic from '$lib/components/mosaic/Mosaic.svelte';
-	import { ServerPreferences, serverPreferencesReset } from '$lib/Stores.js';
+	import { Parameters } from '$lib/Parameters.js';
 
 	let sharedData: any | null = null;
 	let editableMosaic: boolean = false;
@@ -14,8 +14,7 @@
 			<div class="columns is-vcentered">
 				<div class="column is-narrow">
 					<span class="title is-6">
-						{$ServerPreferences.title || ''}
-						<!-- The OR '' is used for temporary empty value replacement -->
+						{Parameters.title}
 					</span>
 				</div>
 				<!-- svelte-ignore a11y-click-events-have-key-events -->

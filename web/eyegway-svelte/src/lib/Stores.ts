@@ -5,7 +5,6 @@ import type { Writable } from 'svelte/store';
 const defaultServerPreferences = {
 	host: Parameters.host,
 	hubTriggerKey: Parameters.hubTriggerKey,
-	title: Parameters.title
 };
 
 export const ServerPreferences = persisted('ServerPreferences', defaultServerPreferences);
