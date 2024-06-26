@@ -57,11 +57,9 @@ export class EyegwayImage {
 	 * Create a new EyegwayImage with data encoded as Blob
 	 * @returns <Promise<EyegwayImage>> A new EyegwayImage with data encoded as Blob
 	 */
-	async convertoToEyegwayImageBlob(): Promise<EyegwayImage> {
+	async convertoToEyegwayImageUrl(): Promise<EyegwayImage> {
 		if (this.data instanceof Uint8Array) {
-			const blob = new Blob([this.data], { type: this.type });
-			const urlCreator = window.URL || window.webkitURL;
-			const imageUrl = urlCreator.createObjectURL(blob);
+			const imageUrl = Image2UrlDecoder.getInstance().buildUrl(this.data, this.type);
 			return new EyegwayImage(imageUrl, this.type, this.shape);
 		}
 		return this;
@@ -77,11 +75,39 @@ export class EyegwayImage {
 
 	imageUrl(): string {
 		if (this.data instanceof Uint8Array) {
-			const blob = new Blob([this.data], { type: this.type });
-			const urlCreator = window.URL || window.webkitURL;
-			return urlCreator.createObjectURL(blob);
+			return Image2UrlDecoder.getInstance().buildUrl(this.data, this.type);
 		}
 		return this.data;
+	}
+}
+
+/**
+ * Image2UrlDecoder is a class that is used to convert an image encoded as Uint8Array
+ * into a usable URL. It is used to convert the image data from the server into a URL
+ * that can be used in the browser. Old behavior was to use ObjectURLs, but this caused
+ * memory leaks and was not performant. The new behavior is to encode the image data as
+ * base64 and use a data URL.
+ */
+export class Image2UrlDecoder {
+	static instance: Image2UrlDecoder;
+
+	private constructor() {}
+
+	buildUrl(data: Uint8Array, type: string): string {
+		// Old code using ObjectURLs
+		//
+		// const blob = new Blob([data], { type });
+		// const urlCreator = window.URL || window.webkitURL;
+		// const imageUrl = urlCreator.createObjectURL(blob);
+
+		const buffer = String.fromCharCode.apply(null, Array.from(data));
+		const imageUrl = `data:{${type}};base64,` + btoa(buffer);
+		return imageUrl;
+	}
+
+	static getInstance(): Image2UrlDecoder {
+		if (!Image2UrlDecoder.instance) Image2UrlDecoder.instance = new Image2UrlDecoder();
+		return Image2UrlDecoder.instance;
 	}
 }
 
@@ -182,12 +208,7 @@ export class EyegwayPacker {
 					shape: Array<number>;
 				};
 
-				const blob = new Blob([data], { type });
-				const urlCreator = window.URL || window.webkitURL;
-				const imageUrl = urlCreator.createObjectURL(blob);
-				const img = new Image();
-				img.src = imageUrl;
-
+				const imageUrl = Image2UrlDecoder.getInstance().buildUrl(data, type);
 				return new EyegwayImage(imageUrl, type, shape);
 			}
 		});
