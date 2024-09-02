@@ -21,7 +21,7 @@
 	let historySize: number = -1;
 	let bufferSize: number = -1;
 	let dataPointer: number = 0;
-	let autoPlay: boolean = false;
+	let autoPlay: boolean = true;
 	let autoPlayMs: number = 500;
 	let autoPlayTimeout: number | null = null;
 
