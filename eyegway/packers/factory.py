@@ -1,7 +1,10 @@
-import eyegway.packers as ep
-import eyegway.packers.numpy as epn
-import eyegway.packers.images as epi
+import typing as t
+
 import numpy as np
+
+import eyegway.packers as ep
+import eyegway.packers.images as epi
+import eyegway.packers.numpy as epn
 
 
 def message_packer_smart_images() -> ep.MessagePacker:
@@ -56,7 +59,9 @@ class PackersFactory:
     }
 
     @classmethod
-    def create(cls, name: str) -> ep.MessagePacker:
+    def create(cls, name: t.Optional[str] = None) -> ep.MessagePacker:
+        if name is None:
+            name = "default"
         if name not in cls.PACKERS:
             raise ValueError(f"Unknown packer: {name}")  # pragma: no cover
         return cls.PACKERS[name]()

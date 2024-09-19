@@ -46,7 +46,7 @@ class AsyncMessageHub:
             max_history_size,
         )
 
-        self._variables: t.Mapping[str, ecov.AsyncSharedVariable] = {}
+        self._variables: t.Dict[str, ecov.AsyncSharedVariable] = {}
         self._history_frozen = self._create_variable("history_frozen", True)
         self._buffer_frozen = self._create_variable("buffer_frozen", True)
 

@@ -42,7 +42,10 @@ class HubsParametrization:
         cls, hub_name: str, variable_name: str, private: bool = False
     ) -> str:
         prefix = cls.PRIVATE_VARIABLE_PREFIX if private else ""
-        return f"{cls.HUBS_VARIABLES_PREFIX}{hub_name}{cls.VARIABLE_SEPARATOR}{prefix}{variable_name}"
+        return (
+            f"{cls.HUBS_VARIABLES_PREFIX}{hub_name}"
+            f"{cls.VARIABLE_SEPARATOR}{prefix}{variable_name}"
+        )
 
     @classmethod
     def retrieve_variables_names_from_list(cls, variables: t.List[str]) -> t.List[str]:
@@ -61,7 +64,10 @@ class HubsConfig(pyd.BaseSettings):
     max_payload_size: int = 64_000_000
     redis_host: str = "localhost"
     redis_port: int = 6379
-    packer: t.Optional[str] = "default"
+    redis_username: t.Optional[str] = None
+    redis_password: t.Optional[str] = None
+    redis_extra_options: t.Mapping[str, t.Any] = pyd.Field(default_factory=dict)
+    packer: t.Optional[str] = None
 
     class Config:
         env_prefix = "eyegway_hubs_"
@@ -75,7 +81,13 @@ class HubsConfig(pyd.BaseSettings):
         else:
             from redis.asyncio import Redis
 
-            return Redis(host=config.redis_host, port=config.redis_port)
+            return Redis(
+                host=config.redis_host,
+                port=config.redis_port,
+                username=config.redis_username,
+                password=config.redis_password,
+                **config.redis_extra_options,
+            )
 
     @classmethod
     def create_redis_instance(cls, config: HubsConfig) -> t.Any:
@@ -86,4 +98,10 @@ class HubsConfig(pyd.BaseSettings):
         else:
             from redis import Redis
 
-            return Redis(host=config.redis_host, port=config.redis_port)
+            return Redis(
+                host=config.redis_host,
+                port=config.redis_port,
+                username=config.redis_username,
+                password=config.redis_password,
+                **config.redis_extra_options,
+            )
