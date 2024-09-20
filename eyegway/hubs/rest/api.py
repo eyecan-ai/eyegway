@@ -74,7 +74,7 @@ class HubsRestAPI(fa.FastAPI):
         hub = self.get_hub(name)
         return await hub.buffer_size()
 
-    async def pop(self, name: str, timeout: int = 1) -> bytes:
+    async def pop(self, name: str, timeout: int = 1) -> far.Response:
         if timeout < 1:
             timeout = 1
         hub = self.get_hub(name)
@@ -84,7 +84,7 @@ class HubsRestAPI(fa.FastAPI):
 
         return far.Response(data, media_type="application/octet-stream")
 
-    async def last(self, name: str, offset: int = 0) -> bytes:
+    async def last(self, name: str, offset: int = 0) -> far.Response:
         hub = self.get_hub(name)
         data = await hub.last_raw(offset)
         if data is None:

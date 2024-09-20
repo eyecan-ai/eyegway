@@ -24,14 +24,14 @@ classifiers = [
 ]
 dependencies = [
   "pydantic>=1.10.13",
-  "httpx",
+  "httpx[http2]",
   "typer",
-  "redis>=5.0.0",
+  "redis[hiredis]>=5.0.0",
   "msgpack>=1.0.7",
   "pipelime-python>=1.9.0",
-  "fastapi>=0.100.0",
+  "fastapi>=0.115.0",
   "fakeredis",
-  "uvicorn",
+  "uvicorn[standard]>=0.30",
 ]
 
 [project.urls]
@@ -149,3 +149,6 @@ exclude_lines = ["no cov", "if __name__ == .__main__.:", "if TYPE_CHECKING:"]
 
 [project.scripts]
 eyegway = "eyegway.cli.main:cli"
+
+[tool.hatch.build]
+include = ["eyegway/**/*.py"]
