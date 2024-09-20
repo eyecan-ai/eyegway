@@ -1,7 +1,17 @@
-FROM node:21
+ARG nodever=22
 
-ADD . /eyegway
+FROM node:${nodever} AS build
 
-WORKDIR /eyegway/web/eyegway-svelte
+COPY ./web/eyegway-svelte /opt/eyecan.ai/eyegway-web
+WORKDIR /opt/eyecan.ai/eyegway-web
+RUN corepack enable && yarn set version stable && yarn install && yarn build
 
-RUN cd /eyegway/web/eyegway-svelte && yarn install && yarn build
+FROM node:${nodever} AS production
+
+WORKDIR /opt/eyecan.ai/eyegway-web
+COPY --from=build /opt/eyecan.ai/eyegway-web/build ./build
+COPY --from=build /opt/eyecan.ai/eyegway-web/node_modules ./node_modules
+COPY --from=build /opt/eyecan.ai/eyegway-web/package.json ./package.json
+
+ENTRYPOINT [ "node" ]
+CMD [ "build" ]

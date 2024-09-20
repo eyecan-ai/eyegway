@@ -76,9 +76,7 @@ FROM base_stage AS deploy_stage
 # install python requirements
 COPY --from=requirements_stage /eyegway/requirements.txt /tmp/eyegway/
 RUN /venv/bin/python -m pip install --no-cache-dir --upgrade \
-                     -r /tmp/eyegway/requirements.txt \
-                     -f http://wheels.eyecan.ai:8000 \
-                     --trusted-host wheels.eyecan.ai:8000
+                     -r /tmp/eyegway/requirements.txt
 
 # install eyegway
 COPY --from=build_stage /eyegway/dist /tmp/eyegway/

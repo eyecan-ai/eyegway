@@ -32,7 +32,8 @@ COPY --from=requirements_stage /opt/eyecan.ai/requirements.txt /opt/eyecan.ai/
 
 # install dependencies in the virtual environment
 WORKDIR /opt/eyecan.ai
-RUN pip install --no-cache-dir --upgrade pip wheel && pip install --no-cache-dir --upgrade -r requirements.txt -f http://wheels.eyecan.ai:8000 --trusted-host wheels.eyecan.ai:8000
+RUN pip install --no-cache-dir --upgrade pip wheel && \
+    pip install --no-cache-dir --upgrade -r requirements.txt
 
 FROM deps_stage AS install_stage
 
@@ -53,4 +54,4 @@ ENV VIRTUAL_ENV=/opt/venv
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 # set the webserver as the entrypoint
-ENTRYPOINT [ "uvicorn", "eyegway.__main__:app" ]
+ENTRYPOINT [ "uvicorn", "--factory", "eyegway.hubs.rest.api:HubsRestAPI", "--host", "0.0.0.0" ]
