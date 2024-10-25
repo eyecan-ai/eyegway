@@ -1,6 +1,6 @@
 import { EyegwayImage, EyegwayTensor } from '$lib/Eyegway.js';
 
-export class GenericData {}
+export class GenericData { }
 
 export class DataImage extends GenericData {
 	url: string = '';
@@ -38,7 +38,26 @@ export class DataMetadata extends GenericData {
 	}
 }
 
-export type DataGenericType = DataImage | DataTensor | DataPointCloud | DataMetadata;
+export class DataPlot extends GenericData {
+	x: EyegwayTensor;
+	y: EyegwayTensor;
+	options: any = {};
+
+	constructor(x: EyegwayTensor, y: EyegwayTensor, options: any = {}) {
+		super();
+		this.x = x;
+		this.y = y;
+		this.options = options;
+	}
+}
+
+// Update DataGenericType to include DataPlot
+export type DataGenericType =
+	| DataImage
+	| DataTensor
+	| DataPointCloud
+	| DataMetadata
+	| DataPlot;
 
 /**
  * Extract data from a source object
@@ -78,6 +97,8 @@ export class DataExtractor {
 		} else if (value instanceof Object) {
 			if (value.vertices && value.vertices instanceof EyegwayTensor) {
 				return new DataPointCloud(value.vertices, value.colors);
+			} else if (value.x && value.y && value.x instanceof EyegwayTensor && value.y instanceof EyegwayTensor) {
+				return new DataPlot(value.x, value.y, value.options);
 			} else {
 				return new DataMetadata(value);
 			}

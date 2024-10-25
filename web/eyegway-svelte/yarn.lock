@@ -269,6 +269,11 @@
   resolved "https://registry.npmjs.org/@fortawesome/fontawesome-common-types/-/fontawesome-common-types-6.5.1.tgz"
   integrity sha512-GkWzv+L6d2bI5f/Vk6ikJ9xtl7dfXtoRu3YGE6nq0p/FFqA1ebMOAWg3XgRyb0I6LYyYkiAo+3/KrwuBp8xG7A==
 
+"@fortawesome/fontawesome-common-types@^6.6.0":
+  version "6.6.0"
+  resolved "https://registry.yarnpkg.com/@fortawesome/fontawesome-common-types/-/fontawesome-common-types-6.6.0.tgz#31ab07ca6a06358c5de4d295d4711b675006163f"
+  integrity sha512-xyX0X9mc0kyz9plIyryrRbl7ngsA9jz77mCZJsUkLl+ZKs0KWObgaEBoSgQiYWAsSmjz/yjl0F++Got0Mdp4Rw==
+
 "@fortawesome/free-regular-svg-icons@^6.5.1":
   version "6.5.1"
   resolved "https://registry.npmjs.org/@fortawesome/free-regular-svg-icons/-/free-regular-svg-icons-6.5.1.tgz"
@@ -537,13 +542,6 @@
   resolved "https://registry.npmjs.org/@sphinxxxx/color-conversion/-/color-conversion-2.2.2.tgz"
   integrity sha512-XExJS3cLqgrmNBIP3bBw6+1oQ1ksGjFh0+oClDKFYpCCqx/hlqwWO5KO/S63fzUo67SxI9dMrF0y5T/Ey7h8Zw==
 
-"@sveltejs/adapter-auto@^3.0.0":
-  version "3.1.1"
-  resolved "https://registry.npmjs.org/@sveltejs/adapter-auto/-/adapter-auto-3.1.1.tgz"
-  integrity sha512-6LeZft2Fo/4HfmLBi5CucMYmgRxgcETweQl/yQoZo/895K3S9YWYN4Sfm/IhwlIpbJp3QNvhKmwCHbsqQNYQpw==
-  dependencies:
-    import-meta-resolve "^4.0.0"
-
 "@sveltejs/adapter-node@^4.0.1":
   version "4.0.1"
   resolved "https://registry.npmjs.org/@sveltejs/adapter-node/-/adapter-node-4.0.1.tgz"
@@ -553,11 +551,6 @@
     "@rollup/plugin-json" "^6.1.0"
     "@rollup/plugin-node-resolve" "^15.2.3"
     rollup "^4.9.5"
-
-"@sveltejs/adapter-static@^3.0.1":
-  version "3.0.1"
-  resolved "https://registry.npmjs.org/@sveltejs/adapter-static/-/adapter-static-3.0.1.tgz"
-  integrity sha512-6lMvf7xYEJ+oGeR5L8DFJJrowkefTK6ZgA4JiMqoClMkKq0s6yvsd3FZfCFvX1fQ0tpCD7fkuRVHsnUVgsHyNg==
 
 "@sveltejs/kit@^2.0.0":
   version "2.5.0"
@@ -660,6 +653,23 @@
   version "7.0.15"
   resolved "https://registry.npmjs.org/@types/json-schema/-/json-schema-7.0.15.tgz"
   integrity sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==
+
+"@types/lodash-es@^4.17.12":
+  version "4.17.12"
+  resolved "https://registry.yarnpkg.com/@types/lodash-es/-/lodash-es-4.17.12.tgz#65f6d1e5f80539aa7cfbfc962de5def0cf4f341b"
+  integrity sha512-0NgftHUcV4v34VhXm8QBSftKVXtbkBG3ViCjs6+eJ5a6y6Mi/jiFGPc1sC7QK+9BFhWrURE3EOggmWaSxL9OzQ==
+  dependencies:
+    "@types/lodash" "*"
+
+"@types/lodash@*":
+  version "4.17.12"
+  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.17.12.tgz#25d71312bf66512105d71e55d42e22c36bcfc689"
+  integrity sha512-sviUmCE8AYdaF/KIHLDJBQgeYzPBI0vf/17NaYehBJfYD1j6/L95Slh07NlyK2iNyBNaEkb3En2jRt+a8y3xZQ==
+
+"@types/plotly.js@^2.33.3":
+  version "2.33.4"
+  resolved "https://registry.yarnpkg.com/@types/plotly.js/-/plotly.js-2.33.4.tgz#2128af8c90bafd49f556b5cc5a2c8e1b615fc052"
+  integrity sha512-BzAbsJTiUQyALkkYx1D31YZ9YvcU2ag3LlE/iePMo19eDPvM30cbM2EFNIcu31n39EhXj/9G7800XLA8/rfApA==
 
 "@types/pug@^2.0.6":
   version "2.0.10"
@@ -2133,6 +2143,11 @@ playwright@1.41.2:
   optionalDependencies:
     fsevents "2.3.2"
 
+plotly.js-dist@^2.35.2:
+  version "2.35.2"
+  resolved "https://registry.yarnpkg.com/plotly.js-dist/-/plotly.js-dist-2.35.2.tgz#2bda4b53e6cfe264daac25e2e6adaf1aa69d4aa6"
+  integrity sha512-zbKfz7jXGcLGoyPJxjGrKLttPiqvsEjIMHON/dEU/mnOJ+/yYoEctEEQ3qp5zQmvoovw1L47kCsQpq/GTbejBA==
+
 postcss-load-config@^3.1.4:
   version "3.1.4"
   resolved "https://registry.npmjs.org/postcss-load-config/-/postcss-load-config-3.1.4.tgz"
@@ -2528,6 +2543,16 @@ svelte-persisted-store@^0.9.1:
   version "0.9.1"
   resolved "https://registry.yarnpkg.com/svelte-persisted-store/-/svelte-persisted-store-0.9.1.tgz#73bdfdf802520e327ef318752f0db14bd8a999d6"
   integrity sha512-l00I8Dy5GKjdjnE9ZcMeXLLMhvgV0+Iuru0Mue7eU3tB+pHBwBB2RVVqw2uC2Hbrf7cyZtsV/lnPKhjTHIWphQ==
+
+svelte-plotly.js@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/svelte-plotly.js/-/svelte-plotly.js-1.2.0.tgz#959607a4f22e1f7129c771740717403d015a8b6d"
+  integrity sha512-UeMDEB7SJamyJjMv8JvXDOcpdLvu8q+dq2frnicsRm56AOS/awnP75PKVsy0JoprPJC3mR9TjxwE8mHl52Sk/A==
+  dependencies:
+    "@fortawesome/fontawesome-common-types" "^6.6.0"
+    "@types/lodash-es" "^4.17.12"
+    "@types/plotly.js" "^2.33.3"
+    lodash-es "^4.17.21"
 
 svelte-preprocess@^5.1.0:
   version "5.1.3"
