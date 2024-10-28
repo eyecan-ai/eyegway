@@ -1,48 +1,30 @@
 <script lang="ts">
 	import Plot from 'svelte-plotly.js';
+	import type { Layout, Data, Config } from 'plotly.js';
 	import type { DataPlot } from '../MosaicModel.js';
 
 	export let userData: DataPlot | null = null;
 
-	$: if (userData) {
-		console.log(userData);
+	function parseObject<T>(obj: any, template: T): T {
+		const result: Partial<T> = {};
+		for (const key in template) {
+			if (obj.hasOwnProperty(key) && typeof obj[key] === typeof template[key]) {
+				result[key] = obj[key];
+			}
+		}
+		return result as T;
 	}
-	// $: if (userData) {
-	// Extract data from EyegwayTensor
 
-	// data = [
-	// 	{
-	// 		// x: userData.x.data,
-	// 		// y: userData.y.data,
-	// 		x: [1, 2, 3, 4, 5],
-	// 		y: [0.1, 0.15, 0.13, 0.17, 0.22],
-	// 		type: userData.options.type || 'scatter',
-	// 		mode: userData.options.mode || 'lines+markers',
-	// 		marker: userData.options.marker || {},
-	// 		line: userData.options.line || {},
-	// 		name: userData.options.name || ''
-	// 	}
-	// ];
-
-	// layout = {
-	// 	title: userData.options.title || '',
-	// 	xaxis: userData.options.xaxis || {},
-	// 	yaxis: userData.options.yaxis || {},
-	// 	margin: { t: 0 },
-	// 	...userData.options.layout
-	// };
-
-	// console.log('Plot data:', data);
-	// console.log('Plot layout:', layout);
-	// }
+	let data: Data[] = [];
+	let layout: Partial<Layout> = {};
+	let config: Partial<Config> = {};
+	$: if (userData) {
+		data = userData.data;
+		layout = parseObject(userData.layout, layout);
+		config = parseObject(userData.config, config);
+	}
 </script>
 
 {#if userData}
-	<Plot
-		data={userData.data}
-		layout={userData.layout}
-		config={userData.config}
-		fillParent={true}
-		debounce={250}
-	/>
+	<Plot {data} {layout} {config} fillParent={true} debounce={10} />
 {/if}
