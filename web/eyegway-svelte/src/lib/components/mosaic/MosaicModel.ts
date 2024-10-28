@@ -39,15 +39,15 @@ export class DataMetadata extends GenericData {
 }
 
 export class DataPlot extends GenericData {
-	x: EyegwayTensor;
-	y: EyegwayTensor;
-	options: any = {};
+	data: any = {};
+	layout: any = {};
+	config: any = {};
 
-	constructor(x: EyegwayTensor, y: EyegwayTensor, options: any = {}) {
+	constructor(data: any, layout: any, config: any) {
 		super();
-		this.x = x;
-		this.y = y;
-		this.options = options;
+		this.data = data;
+		this.layout = layout;
+		this.config = config;
 	}
 }
 
@@ -97,8 +97,8 @@ export class DataExtractor {
 		} else if (value instanceof Object) {
 			if (value.vertices && value.vertices instanceof EyegwayTensor) {
 				return new DataPointCloud(value.vertices, value.colors);
-			} else if (value.x && value.y && value.x instanceof EyegwayTensor && value.y instanceof EyegwayTensor) {
-				return new DataPlot(value.x, value.y, value.options);
+			} else if (value.data && value.layout && value.config) {
+				return new DataPlot(value.data, value.layout, value.config);
 			} else {
 				return new DataMetadata(value);
 			}
