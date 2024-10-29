@@ -4,6 +4,7 @@ import threading
 import time
 from collections import deque
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any, Deque, Dict, List, Optional, Union
 
 from rich import print
@@ -14,6 +15,8 @@ from eyegway.hubs.sync import MessageHub
 ##########################
 # SAMPLE DATA GENERATORS #
 ##########################
+
+start_time = time.time()
 
 
 class DataGenerator:
@@ -72,7 +75,10 @@ class RandomWalkGenerator(DataGenerator):
             Dict[str, Any]: The generated data point.
         """
         self.current_value += random.uniform(-1, 1)  # noqa: S311
-        return {"x": time.time(), "y": self.current_value}
+        return {
+            "x": time.time() - start_time,
+            "y": self.current_value,
+        }
 
 
 class SineGenerator(DataGenerator):
@@ -93,10 +99,13 @@ class SineGenerator(DataGenerator):
         """
         self.time_step += 0.1
         value = math.sin(self.time_step)
-        return {"x": time.time(), "y": value}
+        return {
+            "x": time.time() - start_time,
+            "y": value,
+        }
 
 
-class Sine3DGenerator(DataGenerator):
+class HelixGenerator(DataGenerator):
     """
     Data generator for simulating a sine wave.
     """
@@ -115,7 +124,12 @@ class Sine3DGenerator(DataGenerator):
         self.time_step += 0.1
         value_y = math.sin(self.time_step)
         value_z = math.cos(self.time_step)
-        return {"x": time.time(), "y": value_y, "z": value_z}
+        return {
+            "x": time.time() - start_time,
+            "y": value_y,
+            "z": value_z,
+            "marker": {"color": time.time() - start_time},
+        }
 
 
 class DailyProductionGenerator(DataGenerator):
@@ -134,7 +148,11 @@ class DailyProductionGenerator(DataGenerator):
             Dict[str, Any]: The generated data point.
         """
         value = random.uniform(80, 120)  # noqa: S311
-        return {"x": time.time(), "y": value}
+        return {
+            "x": time.time() - start_time,
+            "y": value,
+            "marker": {"color": time.time() - start_time},
+        }
 
 
 ###################
@@ -144,21 +162,84 @@ class DailyProductionGenerator(DataGenerator):
 
 class HubAccumulator:
     """
-    Accumulates raw data from hubs and merges data with the same keys into lists.
+    Accumulates raw data from hubs and accumulates values using dot notation keys.
+
+    Attributes:
+        keys (List[str]): List of keys to accumulate, using dot notation for nested keys.
+        max_length (Optional[int]): Maximum length of the deque for each key.
+        data (Dict[str, deque]): Dictionary storing deques for each key.
     """
 
     def __init__(self, keys: List[str], max_length: Optional[int] = None):
-        self.data: Dict[str, Deque[Any]] = {
-            key: deque(maxlen=max_length) for key in keys
-        }
+        """
+        Initializes the HubAccumulator with specified keys and optional maximum length for deques.
+
+        Args:
+            keys (List[str]): List of keys to accumulate, using dot notation for nested keys.
+            max_length (Optional[int]): Maximum length of the deque for each key. If None, deques have no maximum length.
+        """
+        self.keys = keys
+        self.max_length = max_length
+        self.data: Dict[str, deque] = {key: deque(maxlen=max_length) for key in keys}
 
     def add(self, raw_data: Dict[str, Any]) -> None:
-        for key, value in raw_data.items():
-            if key in self.data:
+        """
+        Adds raw data to the accumulator. Values are appended to the corresponding deques based on the keys.
+
+        Args:
+            raw_data (Dict[str, Any]): Raw data to be added, which may contain nested dictionaries.
+        """
+        for key in self.keys:
+            value = self._get_value(raw_data, key)
+            if value is not None:
                 self.data[key].append(value)
 
-    def get_accumulated_data(self) -> Dict[str, List[Any]]:
-        return {key: list(values) for key, values in self.data.items()}
+    def get_accumulated_data(self) -> Dict[str, Any]:
+        """
+        Retrieves the accumulated data, converting deques to lists.
+
+        Returns:
+            Dict[str, Any]: Accumulated data with deques converted to lists.
+        """
+        accumulated_data: Dict[str, Any] = {}
+        for key, values in self.data.items():
+            self._set_value(accumulated_data, key, list(values))
+        return accumulated_data
+
+    def _get_value(self, data: Dict[str, Any], dotted_key: str) -> Any:
+        """
+        Retrieves the value from a nested dictionary using a dot notation key.
+
+        Args:
+            data (Dict[str, Any]): The dictionary to retrieve the value from.
+            dotted_key (str): The dot notation key to access the nested value.
+
+        Returns:
+            Any: The value corresponding to the dotted key, or None if the key does not exist.
+        """
+        keys = dotted_key.split(".")
+        for key in keys:
+            if isinstance(data, dict) and key in data:
+                data = data[key]
+            else:
+                return None
+        return data
+
+    def _set_value(self, data: Dict[str, Any], dotted_key: str, value: Any) -> None:
+        """
+        Sets the value in a nested dictionary using a dot notation key.
+
+        Args:
+            data (Dict[str, Any]): The dictionary to set the value in.
+            dotted_key (str): The dot notation key to access the nested location.
+            value (Any): The value to set at the specified location.
+        """
+        keys = dotted_key.split(".")
+        for key in keys[:-1]:
+            if key not in data or not isinstance(data[key], dict):
+                data[key] = {}
+            data = data[key]
+        data[keys[-1]] = value
 
 
 ###########
@@ -199,13 +280,35 @@ class Plotter:
             return cls.from_dict(name=name, params=params)
 
     @classmethod
-    def from_dict(cls, name: str, params: dict) -> "Plotter":
+    def from_dict(cls, name: str, params: Dict) -> "Plotter":
         return cls(name=name, **params)
 
-    def update(self, params: dict) -> None:
-        self._data = [{**o, **n} for o, n in zip(self._data, params.get("data", []))]
-        self._layout = {**self._layout, **params.get("layout", self._layout)}
-        self._config = {**self._config, **params.get("config", self._config)}
+    @staticmethod
+    def _merge(d1: Dict[str, Any], d2: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Recursively merges two dictionaries.
+        If there are nested dictionaries, they are merged as well.
+
+        Args:
+            d1 (dict): The first dictionary.
+            d2 (dict): The second dictionary.
+
+        Returns:
+            dict: The merged dictionary.
+        """
+        for key, value in d2.items():
+            if key in d1 and isinstance(d1[key], dict) and isinstance(value, dict):
+                d1[key] = Plotter._merge(d1[key], value)
+            else:
+                d1[key] = value
+        return d1
+
+    def update(self, params: Dict) -> None:
+        self._data = [
+            self._merge(o, n) for o, n in zip(self._data, params.get("data", []))
+        ]
+        self._layout = self._merge(self._layout, params.get("layout", self._layout))
+        self._config = self._merge(self._config, params.get("config", self._config))
 
     def pack(self) -> Dict[str, Any]:
         return {
@@ -276,9 +379,16 @@ if __name__ == "__main__":
     ###############
     rand_hub = MessageHub.create("random_walk")
     sine_hub = MessageHub.create("sine")
-    sine3d_hub = MessageHub.create("sine3d")
+    helix_hub = MessageHub.create("helix")
     daily_hub = MessageHub.create("daily_production")
     plt_hub = MessageHub.create("plot_hub")
+
+    # Clear all hubs
+    rand_hub.clear()
+    sine_hub.clear()
+    helix_hub.clear()
+    daily_hub.clear()
+    plt_hub.clear()
 
     ##########################
     # SAMPLE DATA GENERATORS #
@@ -287,7 +397,7 @@ if __name__ == "__main__":
     random_walk_generator = RandomWalkGenerator("random_walk")
     sine_generator = SineGenerator("sine")
     daily_production_generator = DailyProductionGenerator("daily_production")
-    sine3d_generator = Sine3DGenerator("sine3d")
+    helix_generator = HelixGenerator("helix")
 
     ##########################
     # HUB ACCUMULATOR CONFIG #
@@ -295,8 +405,8 @@ if __name__ == "__main__":
 
     rand_acc = HubAccumulator(keys=["x", "y"], max_length=100)
     sine_acc = HubAccumulator(keys=["x", "y"], max_length=100)
-    sine3d_acc = HubAccumulator(keys=["x", "y", "z"], max_length=100)
-    daily_acc = HubAccumulator(keys=["x", "y"], max_length=100)
+    helix_acc = HubAccumulator(keys=["x", "y", "z", "marker.color"], max_length=100)
+    daily_acc = HubAccumulator(keys=["x", "y", "marker.color"], max_length=100)
 
     ######################
     # PLOT CONFIGURATION #
@@ -304,27 +414,27 @@ if __name__ == "__main__":
 
     rand_plt = Plotter.from_file("Random Walk", Path("basic_plots/chart_red.json"))
     sine_plt = Plotter.from_file("Sine Wave", Path("basic_plots/chart_blue.json"))
-    sine3d_plt = Plotter.from_file("Sine 3D Wave", Path("basic_plots/3d_scatter.json"))
+    helix_plt = Plotter.from_file("Helix", Path("basic_plots/3d_scatter.json"))
     daily_plt = Plotter.from_file("Daily Prod", Path("basic_plots/bar_colors.json"))
-
-    generators = [
-        threading.Thread(target=random_walk_generator.run, daemon=True),
-        threading.Thread(target=sine_generator.run, daemon=True),
-        threading.Thread(target=sine3d_generator.run, daemon=True),
-        threading.Thread(target=daily_production_generator.run, daemon=True),
-    ]
 
     ##################
     # LAUNCH THREADS #
     ##################
 
+    generators = [
+        threading.Thread(target=random_walk_generator.run, daemon=True),
+        threading.Thread(target=sine_generator.run, daemon=True),
+        threading.Thread(target=helix_generator.run, daemon=True),
+        threading.Thread(target=daily_production_generator.run, daemon=True),
+    ]
+
     for t in generators:
         t.start()
 
     plot_updater = PlotUpdater(
-        hubs=[rand_hub, sine_hub, daily_hub, sine3d_hub],
-        accumulators=[rand_acc, sine_acc, daily_acc, sine3d_acc],
-        plotters=[rand_plt, sine_plt, daily_plt, sine3d_plt],
+        hubs=[rand_hub, sine_hub, daily_hub, helix_hub],
+        accumulators=[rand_acc, sine_acc, daily_acc, helix_acc],
+        plotters=[rand_plt, sine_plt, daily_plt, helix_plt],
         plot_hub=plt_hub,
     )
 
@@ -335,7 +445,7 @@ if __name__ == "__main__":
         "Data generation and plot updating started...\n"
         f"Plot names: [yellow]{rand_plt.name}[/yellow], "
         f"[yellow]{sine_plt.name}[/yellow], [yellow]{daily_plt.name}[/yellow], "
-        f"[yellow]{sine3d_plt.name}[/yellow] (<-- not working right now!)\n"
+        f"[yellow]{helix_plt.name}[/yellow]\n"
         "[red]Press Ctrl+C to stop the data generation and plot updating[/red]"
     )
 

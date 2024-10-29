@@ -26,5 +26,5 @@
 </script>
 
 {#if userData}
-	<Plot {data} {layout} {config} fillParent={true} debounce={10} />
+	<Plot {data} {layout} {config} fillParent={true} debounce={0} configReactivityStrategy={'none'} />
 {/if}
