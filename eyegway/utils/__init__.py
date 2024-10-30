@@ -1,9 +1,10 @@
-import loguru
-import time
 import datetime
-import numpy as np
-import cv2
+import time
 import typing as t
+
+import cv2
+import loguru
+import numpy as np
 
 
 class LoguruTimer:
@@ -109,40 +110,40 @@ class DemoDataGenerator:
 
     def generate(self) -> dict:
         data = {
-            'image_0': self.generate_image_with_opencv(
+            "image_0": self.generate_image_with_opencv(
                 background_color=(0, 0, 0), foreground_color=(255, 255, 255)
             ),
-            'image_1': self.generate_image_with_opencv(
+            "image_1": self.generate_image_with_opencv(
                 background_color=(255, 255, 255), foreground_color=(0, 0, 0)
             ),
-            'image_2': self.generate_image_with_opencv(
+            "image_2": self.generate_image_with_opencv(
                 background_color=(74, 20, 140), foreground_color=(244, 255, 129)
             ),
-            'image_counter_squared': self.generate_text_image_with_opencv(
+            "image_counter_squared": self.generate_text_image_with_opencv(
                 text=f"{self.counter}",
                 size=(512, 512),
                 background_color=(100, 100, 100),
                 foreground_color=(255, 255, 255),
             ),
-            'image_counter_letterbox': self.generate_text_image_with_opencv(
+            "image_counter_letterbox": self.generate_text_image_with_opencv(
                 text=f"{self.counter}",
                 size=(512, 256),
                 background_color=(100, 100, 100),
                 foreground_color=(255, 255, 255),
             ),
-            'image_counter_pillarbox': self.generate_text_image_with_opencv(
+            "image_counter_pillarbox": self.generate_text_image_with_opencv(
                 text=f"{self.counter}",
                 size=(256, 512),
                 background_color=(100, 100, 100),
                 foreground_color=(255, 255, 255),
             ),
-            'metadata': {
-                'timestamp': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                'author': 'Eyegway',
-                'description': 'This is the demo data generator output',
-                'counter': self.counter,
+            "metadata": {
+                "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "author": "Eyegway",
+                "description": "This is the demo data generator output",
+                "counter": self.counter,
             },
-            'counter': self.counter,
+            "counter": self.counter,
         }
         self.counter += 1
         return data

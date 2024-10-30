@@ -1,15 +1,17 @@
 from __future__ import annotations
-import eyegway.packers as ecm
-import eyegway.communication.async_channels as ecom
-import eyegway.communication.async_variables as ecov
-import eyegway.packers.factory as ecp
-import eyegway.utils as eut
-import eyegway.hubs as eh
-import eyegway.hubs.connectors as ehc
-from redis.asyncio import Redis
-
 
 import typing as t
+
+from redis.asyncio import Redis
+
+import eyegway.communication.async_channels as ecom
+import eyegway.communication.async_variables as ecov
+import eyegway.hubs as eh
+import eyegway.hubs.connectors as ehc
+import eyegway.hubs.viewers as ehv
+import eyegway.packers as ecm
+import eyegway.packers.factory as ecp
+import eyegway.utils as eut
 
 
 class AsyncMessageHub:
@@ -23,6 +25,7 @@ class AsyncMessageHub:
         max_history_size: int = 0,
         max_payload_size: int = 0,
         connectors: t.Optional[t.List[ehc.HubConnector]] = None,
+        viewer: t.Optional[ehv.HubView] = None,
     ):
         self.redis = redis
         self.name = name
@@ -31,6 +34,8 @@ class AsyncMessageHub:
         self.max_payload_size = max_payload_size
         self.packer = packer
         self.connectors = connectors or []
+
+        self.viewer = viewer if viewer is not None else ehv.HubView()
 
         # Buffer channel
         self.buffer = ecom.AsyncFIFOChannel(
@@ -106,6 +111,10 @@ class AsyncMessageHub:
     async def last_multiple(self, start: int, stop: int) -> t.List[t.Any]:
         datas = await self.last_multiple_raw(start, stop)
         return [self.hub_to_world(self.packer.unpack(data)) for data in datas]
+
+    async def view(self) -> t.Any:
+        elements = await self.last_multiple(0, await self.history_size())
+        return self.viewer.view(elements)
 
     async def history_size(self) -> int:
         return await self.history.size()

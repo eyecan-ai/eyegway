@@ -1,13 +1,17 @@
 from __future__ import annotations
-import eyegway.packers as ecm
+
+import typing as t
+
+from redis import Redis
+
 import eyegway.communication.channels as ecom
 import eyegway.communication.variables as ecov
-import eyegway.packers.factory as ecp
-import eyegway.utils as eut
 import eyegway.hubs as eh
 import eyegway.hubs.connectors as ehc
-from redis import Redis
-import typing as t
+import eyegway.hubs.viewers as ehv
+import eyegway.packers as ecm
+import eyegway.packers.factory as ecp
+import eyegway.utils as eut
 
 
 class MessageHub:
@@ -21,6 +25,7 @@ class MessageHub:
         max_history_size: int = 0,
         max_payload_size: int = 0,
         connectors: t.Optional[t.List[ehc.HubConnector]] = None,
+        viewer: t.Optional[ehv.HubView] = None,
     ):
         self.redis = redis
         self.name = name
@@ -29,6 +34,8 @@ class MessageHub:
         self.max_payload_size = max_payload_size
         self.packer = packer
         self.connectors = connectors or []
+
+        self.viewer = viewer if viewer is not None else ehv.HubView()
 
         # Buffer channel
         self.buffer = ecom.FIFOChannel(
@@ -101,6 +108,10 @@ class MessageHub:
     def last_multiple(self, start: int, stop: int) -> t.List[t.Any]:
         datas = self.last_multiple_raw(start, stop)
         return [self.hub_to_world(self.packer.unpack(data)) for data in datas]
+
+    def view(self) -> t.Any:
+        elements = self.last_multiple(0, self.history_size())
+        return self.viewer.view(elements)
 
     def history_size(self) -> int:
         return self.history.size()
