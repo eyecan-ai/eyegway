@@ -11,7 +11,7 @@ import eyegway.hubs.connectors as ehc
 import eyegway.hubs.viewers as ehv
 import eyegway.packers as ecm
 import eyegway.packers.factory as ecp
-import eyegway.utils as eut
+import eyegway.utils.logging as eul
 
 
 class MessageHub:
@@ -35,7 +35,7 @@ class MessageHub:
         self.packer = packer
         self.connectors = connectors or []
 
-        self.viewer = viewer if viewer is not None else ehv.HubView()
+        self.viewer = viewer if viewer is not None else ehv.SequentialDictView()
 
         # Buffer channel
         self.buffer = ecom.FIFOChannel(
@@ -69,13 +69,13 @@ class MessageHub:
 
     def push(self, obj: t.Any) -> None:
         obj = self.world_to_hub(obj)
-        with eut.LoguruTimer("HUB Packing"):
+        with eul.LoguruTimer("HUB Packing"):
             data = self.packer.pack(obj)
 
         if self.max_payload_size > 0 and len(data) > self.max_payload_size:
             raise ValueError(f"Payload too big [Max: {self.max_payload_size}]")
 
-        with eut.LoguruTimer("HUB Pushing"):
+        with eul.LoguruTimer("HUB Pushing"):
             pipe = self.redis.pipeline()
             if not self.is_buffer_frozen():
                 self.buffer.push(data, pipe)
@@ -111,7 +111,7 @@ class MessageHub:
 
     def view(self) -> t.Any:
         elements = self.last_multiple(0, self.history_size())
-        return self.viewer.view(elements)
+        return self.viewer.view(elements[::-1])
 
     def history_size(self) -> int:
         return self.history.size()

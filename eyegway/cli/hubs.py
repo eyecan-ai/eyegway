@@ -29,8 +29,9 @@ def rest_serve(
         help="Port to serve the API",
     ),
 ):
-    import eyegway.hubs.rest.api as erha
     import uvicorn
+
+    import eyegway.hubs.rest.api as erha
 
     api = erha.HubsRestAPI()
     uvicorn.run(api, host=host, port=port)
@@ -45,8 +46,9 @@ def rest_serve(
     short_help="Search HUBs",
 )
 def search():
-    import eyegway.hubs.sync as ehs
     import rich
+
+    import eyegway.hubs.sync as ehs
 
     hub = ehs.MessageHubManager.create()
 
@@ -75,15 +77,16 @@ def info(
         help="Tick time (-1 for single print, >1 for live update)",
     ),
 ):
-    import eyegway.hubs.sync as ehs
+    import time
+
     import rich
+    from rich.console import Group
     from rich.live import Live
     from rich.panel import Panel
-    from rich.console import Group
-    from rich.table import Table
     from rich.pretty import Pretty
+    from rich.table import Table
 
-    import time
+    import eyegway.hubs.sync as ehs
 
     hub = ehs.MessageHub.create(name=hub_name)
 
@@ -93,16 +96,16 @@ def info(
             if tick > 0:
                 console.clear()
 
-            frozen_token = '[[blue]FROZEN[/]]'
-            history_frozen = frozen_token if hub.is_history_frozen() else ''
-            buffer_frozen = frozen_token if hub.is_buffer_frozen() else ''
-            history_size = f'{hub.history_size()}/{hub.max_history_size}'
-            buffer_size = f'{hub.buffer_size()}/{hub.max_buffer_size}'
+            frozen_token = "[[blue]FROZEN[/]]"
+            history_frozen = frozen_token if hub.is_history_frozen() else ""
+            buffer_frozen = frozen_token if hub.is_buffer_frozen() else ""
+            history_size = f"{hub.history_size()}/{hub.max_history_size}"
+            buffer_size = f"{hub.buffer_size()}/{hub.max_buffer_size}"
             elements = [
-                '',
-                f'History[[red]{history_size}[/]]' + history_frozen,
-                f'Buffer[[red]{buffer_size}[/]]' + buffer_frozen,
-                '',
+                "",
+                f"History[[red]{history_size}[/]]" + history_frozen,
+                f"Buffer[[red]{buffer_size}[/]]" + buffer_frozen,
+                "",
             ]
 
             variables = hub.list_variables(include_privates=False)
@@ -138,8 +141,9 @@ def clear(
         help="Hub name",
     )
 ):
-    import eyegway.hubs.sync as ehs
     import rich
+
+    import eyegway.hubs.sync as ehs
 
     hub = ehs.MessageHub.create(name=hub_name)
     hub.clear()
@@ -162,8 +166,9 @@ def history_clear(
         help="Hub name",
     )
 ):
-    import eyegway.hubs.sync as ehs
     import rich
+
+    import eyegway.hubs.sync as ehs
 
     hub = ehs.MessageHub.create(name=hub_name)
     hub.clear_history()
@@ -192,8 +197,9 @@ def history_freeze(
         help="Unfreeze",
     ),
 ):
-    import eyegway.hubs.sync as ehs
     import rich
+
+    import eyegway.hubs.sync as ehs
 
     hub = ehs.MessageHub.create(name=hub_name)
     hub.freeze_history(not unfreeze)
@@ -218,8 +224,9 @@ def buffer_clear(
         help="Hub name",
     )
 ):
-    import eyegway.hubs.sync as ehs
     import rich
+
+    import eyegway.hubs.sync as ehs
 
     hub = ehs.MessageHub.create(name=hub_name)
     hub.clear_buffer()
@@ -248,8 +255,9 @@ def buffer_freeze(
         help="Unfreeze",
     ),
 ):
-    import eyegway.hubs.sync as ehs
     import rich
+
+    import eyegway.hubs.sync as ehs
 
     hub = ehs.MessageHub.create(name=hub_name)
     hub.freeze_buffer(not unfreeze)
@@ -280,8 +288,9 @@ def freeze(
         help="Unfreeze",
     ),
 ):
-    import eyegway.hubs.sync as ehs
     import rich
+
+    import eyegway.hubs.sync as ehs
 
     hub = ehs.MessageHub.create(name=hub_name)
     hub.freeze(not unfreeze)
@@ -312,8 +321,9 @@ def pop(
         help="File to save the data",
     ),
 ):
-    import eyegway.hubs.sync as ehs
     import rich
+
+    import eyegway.hubs.sync as ehs
 
     hub = ehs.MessageHub.create(name=hub_name)
     data = hub.pop(timeout=1)
@@ -349,9 +359,10 @@ def last(
         help="History offset",
     ),
 ):
+    import rich
+
     import eyegway.hubs.sync as ehs
     import eyegway.packers as ep
-    import rich
 
     hub = ehs.MessageHub.create(name=hub_name)
     data = hub.last(offset=offset)
@@ -389,10 +400,12 @@ def variable_set(
         help="Variable value",
     ),
 ):
+    import ast
+
+    import rich
+
     import eyegway.hubs.sync as ehs
     import eyegway.packers as ep
-    import rich
-    import ast
 
     hub = ehs.MessageHub.create(name=hub_name)
     try:
@@ -427,10 +440,12 @@ def variable_get(
         help="Variable name",
     ),
 ):
+    import ast
+
+    import rich
+
     import eyegway.hubs.sync as ehs
     import eyegway.packers as ep
-    import rich
-    import ast
 
     hub = ehs.MessageHub.create(name=hub_name)
     value = hub.get_variable_value(variable_name)
@@ -461,10 +476,12 @@ def variable_delete(
         help="Variable name",
     ),
 ):
+    import ast
+
+    import rich
+
     import eyegway.hubs.sync as ehs
     import eyegway.packers as ep
-    import rich
-    import ast
 
     hub = ehs.MessageHub.create(name=hub_name)
     hub.delete_variable(variable_name)
@@ -489,8 +506,8 @@ def pack_info(
         help="Packed File",
     ),
 ):
-    import eyegway.packers.factory as epf
     import eyegway.packers as ep
+    import eyegway.packers.factory as epf
 
     data = open(filename, "rb").read()
     unpacked = epf.PackersFactory.default().unpack(data)
@@ -537,12 +554,14 @@ def stream_to(
         help="Keys to include in the sequence",
     ),
 ):
+    import asyncio
+
+    import loguru
     import pipelime.sequences as pls
     import pipelime.stages as pst
+
     import eyegway.hubs.asyn as eha
     import eyegway.hubs.connectors.pipelime as ehcp
-    import asyncio
-    import loguru
 
     async def run():
         nonlocal keys
@@ -604,16 +623,18 @@ def stream_from(
         help="Image resize",
     ),
 ):
-    import eyegway.hubs.asyn as eha
-    import eyegway.packers.numpy as epn
-    import eyegway.hubs.connectors.pipelime as ehcp
     import asyncio
-    import loguru
-    import albumentations as A
-    import numpy as np
-    import cv2
-    import rich
     import typing as t
+
+    import albumentations as A
+    import cv2
+    import loguru
+    import numpy as np
+    import rich
+
+    import eyegway.hubs.asyn as eha
+    import eyegway.hubs.connectors.pipelime as ehcp
+    import eyegway.packers.numpy as epn
 
     async def run():
         nonlocal keys
@@ -655,7 +676,7 @@ def stream_from(
         # Helper to display images, creates a colored version of any image and adds
         # borders
         def displayable_image(image: np.ndarray):
-            image = transform(image=image)['image']
+            image = transform(image=image)["image"]
             image = cv2.normalize(image, None, 0, 255, cv2.NORM_MINMAX, cv2.CV_8U)
             if len(image.shape) == 2:
                 image = cv2.applyColorMap(image, cv2.COLORMAP_MAGMA)
@@ -736,19 +757,10 @@ def stream_demo(
     ),
 ):
     import eyegway.hubs.asyn as eha
-    import eyegway.utils as eut
-    import asyncio
-    import loguru
+    import eyegway.utils.generators as eug
 
-    async def run():
-        # Create hub
-        hub = eha.AsyncMessageHub.create(name=hub_name)
+    hub = eha.AsyncMessageHub.create(name=hub_name)
 
-        generator = eut.DemoDataGenerator()
+    generator = eug.DemoDataGenerator()
 
-        while True:
-            await hub.push(generator.generate())
-            loguru.logger.info("Streaming ...")
-            await asyncio.sleep(tick)
-
-    asyncio.get_event_loop().run_until_complete(run())
+    eug.DataPusher(generator, hub, interval=tick).run()
