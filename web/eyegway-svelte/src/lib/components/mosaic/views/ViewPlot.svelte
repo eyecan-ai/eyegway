@@ -36,22 +36,18 @@
 	let layout: Partial<Layout> = {};
 	let config: Partial<Config> = {};
 
-	let relayouting: boolean = false;
-	let relayout: boolean = false;
+	let updating: boolean = false;
+	let update: boolean = false;
 
-	function handleRelayouting(event: CustomEvent) {
+	function handleLocalUpdate(event: CustomEvent) {
 		layout = deepMerge(layout, unflattenObject(event.detail));
-		relayouting = true;
-	}
-	function handleRelayout(event: CustomEvent) {
-		relayouting = false;
-		layout = deepMerge(layout, unflattenObject(event.detail));
-		relayout = true;
+		updating = event.type === 'relayouting';
+		update = !updating;
 	}
 
 	$: if (userData) {
 		data = structuredClone(userData.data);
-		if (!relayouting && !relayout) layout = structuredClone(userData.layout);
+		if (!updating && !update) layout = structuredClone(userData.layout);
 		config = structuredClone(userData.config);
 	}
 </script>
@@ -63,8 +59,8 @@
 	fillParent={true}
 	debounce={0}
 	configReactivityStrategy={'none'}
-	on:relayouting={handleRelayouting}
-	on:restyle={handleRelayout}
-	on:relayout={handleRelayout}
-	on:afterPlot={handleRelayout}
+	on:relayouting={handleLocalUpdate}
+	on:restyle={handleLocalUpdate}
+	on:relayout={handleLocalUpdate}
+	on:afterPlot={handleLocalUpdate}
 />
