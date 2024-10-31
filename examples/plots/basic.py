@@ -5,7 +5,7 @@ from rich import print
 
 import eyegway.utils.generators as eug
 from eyegway.hubs.sync import MessageHub
-from eyegway.hubs.viewers.keys import ValueAccumulatorView
+from eyegway.hubs.viewers import ValueAccumulatorView
 from eyegway.utils.plotting import Dashboard, Plot
 
 if __name__ == "__main__":
@@ -55,10 +55,10 @@ if __name__ == "__main__":
     ##################
 
     generators = [
-        threading.Thread(target=rand_wald_pusher.run, daemon=True),
-        threading.Thread(target=sine_pusher.run, daemon=True),
-        threading.Thread(target=helix_pusher.run, daemon=True),
-        threading.Thread(target=bar_pusher.run, daemon=True),
+        threading.Thread(target=rand_wald_pusher.run_sync, daemon=True),
+        threading.Thread(target=sine_pusher.run_sync, daemon=True),
+        threading.Thread(target=helix_pusher.run_sync, daemon=True),
+        threading.Thread(target=bar_pusher.run_sync, daemon=True),
     ]
 
     for g in generators:

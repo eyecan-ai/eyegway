@@ -14,10 +14,6 @@ from rich import print
 from eyegway.hubs.asyn import AsyncMessageHub
 from eyegway.hubs.sync import MessageHub
 
-##########################
-# SAMPLE DATA GENERATORS #
-##########################
-
 start_time = time.time()
 
 
@@ -58,7 +54,7 @@ class DataPusher:
         self.interval = interval
         self.is_async = inspect.iscoroutinefunction(target_hub.push)
 
-    async def _run_async(self) -> None:
+    async def run_async(self) -> None:
         """
         Start the asynchronous data generation loop.
         """
@@ -67,10 +63,10 @@ class DataPusher:
                 data = self.generator.generate()
                 await self.hub.push(data)  # type: ignore
                 await asyncio.sleep(self.interval)
-        except KeyboardInterrupt:
+        except asyncio.CancelledError:
             print(f"Stopped data generation for {self.hub.name}")
 
-    def _run_sync(self) -> None:
+    def run_sync(self) -> None:
         """
         Start the synchronous data generation loop.
         """
@@ -81,15 +77,6 @@ class DataPusher:
                 time.sleep(self.interval)
         except KeyboardInterrupt:
             print(f"Stopped data generation for {self.hub.name}")
-
-    def run(self) -> None:
-        """
-        Start the data generation loop based on the type of hub.
-        """
-        if self.is_async:
-            asyncio.run(self._run_async())
-        else:
-            self._run_sync()
 
 
 class RandomWalkGenerator(DataGenerator):

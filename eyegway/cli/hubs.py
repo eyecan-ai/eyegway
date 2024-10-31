@@ -756,6 +756,8 @@ def stream_demo(
         help="Tick rate",
     ),
 ):
+    import asyncio
+
     import eyegway.hubs.asyn as eha
     import eyegway.utils.generators as eug
 
@@ -763,4 +765,4 @@ def stream_demo(
 
     generator = eug.DemoDataGenerator()
 
-    eug.DataPusher(generator, hub, interval=tick).run()
+    asyncio.run(eug.DataPusher(generator, hub, interval=tick).run_async())

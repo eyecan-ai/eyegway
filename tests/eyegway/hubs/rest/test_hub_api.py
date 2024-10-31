@@ -1,8 +1,9 @@
+import pytest
+from httpx import AsyncClient
+
+import eyegway.hubs as eh
 import eyegway.hubs.rest.api as erha
 import eyegway.packers.factory as epf
-import eyegway.hubs as eh
-from httpx import AsyncClient
-import pytest
 
 
 class TestHubsRestAPI:
@@ -34,7 +35,7 @@ class TestHubsRestAPI:
             data_to_send = 10
 
             for idx in range(data_to_send):
-                data = {'counter': idx}
+                data = {"counter": idx}
                 packed = packer.pack(data)
                 response = await tc.post(f"/hubs/{hub_name}/push", data=packed)
                 assert response.status_code == 200
@@ -47,21 +48,21 @@ class TestHubsRestAPI:
             assert response.status_code == 200
             assert response.json() == data_to_send
 
-            response = await tc.get(f"/hubs")
+            response = await tc.get("/hubs")
             assert response.status_code == 200
             assert response.json() == [hub_name]
 
             last = await tc.get(f"/hubs/{hub_name}/last")
             assert last.status_code == 200
             unpacked = packer.unpack(last.content)
-            assert unpacked == {'counter': data_to_send - 1}
+            assert unpacked == {"counter": data_to_send - 1}
 
             for idx in range(data_to_send):
                 timeout = idx % 2
                 pop = await tc.get(f"/hubs/{hub_name}/pop?timeout={timeout}")
                 assert pop.status_code == 200
                 unpacked = packer.unpack(pop.content)
-                assert unpacked == {'counter': idx}
+                assert unpacked == {"counter": idx}
 
             pop = await tc.get(f"/hubs/{hub_name}/pop?timeout=0")
             assert pop.status_code == 204
@@ -109,7 +110,7 @@ class TestHubsRestAPI:
 
             data_to_send = 10
             for idx in range(data_to_send):
-                packed = packer.pack({'counter': idx})
+                packed = packer.pack({"counter": idx})
                 response = await tc.post(f"/hubs/{hub_name}/push", data=packed)
 
             response = await tc.get(f"/hubs/{hub_name}/history_size")
@@ -134,7 +135,7 @@ class TestHubsRestAPI:
 
             data_to_send = 10
             for idx in range(data_to_send):
-                packed = packer.pack({'counter': idx})
+                packed = packer.pack({"counter": idx})
                 response = await tc.post(f"/hubs/{hub_name}/push", data=packed)
 
             response = await tc.get(f"/hubs/{hub_name}/buffer_size")
@@ -152,9 +153,9 @@ class TestHubsRestAPI:
 
             # Variables
             variables = {
-                'bool': True,
-                'integer': 1,
-                'float': 1.1,
+                "bool": True,
+                "integer": 1,
+                "float": 1.1,
             }
 
             for key, value in variables.items():
@@ -173,7 +174,7 @@ class TestHubsRestAPI:
             assert response.status_code == 200
             assert set(response.json()) == set(variables.keys())
 
-            for key, value in variables.items():
+            for key in variables:
                 response = await tc.delete(f"/hubs/{hub_name}/variables/{key}")
                 assert response.status_code == 200
 
