@@ -7,6 +7,7 @@ from loguru import logger
 
 from eyegway.hubs.asyn import AsyncMessageHub
 from eyegway.hubs.sync import MessageHub
+from eyegway.hubs.viewers import HubView
 
 
 class Plot:
@@ -125,23 +126,29 @@ class Dashboard:
     Manages and updates multiple plots with data from synchronous message hubs.
 
     Attributes:
-        source_hubs (List[MessageHub]): A list of source message hubs.
+        source_hubs (List[Union[MessageHub, AsyncMessageHub]]): A list of source
+                                                                    message hubs.
+        viewers (Union[HubView, Sequence[HubView]]): A list of viewers or a singleviewer
+                                                        to be used for all source hubs.
         plots (List[Plot]): A list of plots to be updated.
-        target_hub (MessageHub): The target message hub to push updated plots.
+        target_hub (Union[MessageHub, AsyncMessageHub]): The target message hub to push
+                                                            updated plots.
 
     Example:
         source_hubs = [MessageHub(), MessageHub()]
+        viewers = [HubView(), HubView()]
         plots = [Plot(name="plot1"), Plot(name="plot2")]
         target_hub = MessageHub()
-        dashboard = Dashboard(source_hubs, plots, target_hub)
-        dashboard.run(tick_time=0.1)
+        dashboard = Dashboard(source_hubs, viewers, plots, target_hub)
+        dashboard.run_sync(tick_time=0.1)
     """
 
     def __init__(
         self,
-        source_hubs: t.List[MessageHub],
+        source_hubs: t.Sequence[t.Union[MessageHub, AsyncMessageHub]],
+        viewers: t.Union[HubView, t.Sequence[HubView]],
         plots: t.List[Plot],
-        target_hub: MessageHub,
+        target_hub: t.Union[MessageHub, AsyncMessageHub],
     ) -> None:
         if len(source_hubs) != len(plots):
             err = "Number of source hubs and plots must match"
@@ -150,6 +157,15 @@ class Dashboard:
         self.source_hubs = source_hubs
         self.plots = plots
         self.target_hub = target_hub
+
+        if isinstance(viewers, list):
+            if len(viewers) == len(source_hubs):
+                self.viewers = viewers
+            else:
+                err = "Number of viewers and source hubs must match"
+                raise ValueError(err)
+        if isinstance(viewers, HubView):
+            self.viewers = [viewers] * len(source_hubs)
 
     def _pack(self, plot: Plot) -> t.Dict[str, t.Any]:
         """
@@ -165,74 +181,39 @@ class Dashboard:
             plot.name: {"data": plot.data, "layout": plot.layout, "config": plot.config}
         }
 
-    def run(self, tick_time: float = 0.1) -> None:
+    def run_sync(self, tick_time: float = 0.1) -> None:
         """
         Starts the continuous updating of plots.
 
         Args:
             tick_time (float): The time interval between updates in seconds.
         """
+
+        err = """With run_sync only synchronous hubs are supported,
+                    use run_async instead"""
         try:
             while True:
-                for plot, hub in zip(self.plots, self.source_hubs):
-                    data = hub.view()
+                for plot, hub, view in zip(self.plots, self.source_hubs, self.viewers):
+                    if isinstance(hub, MessageHub):
+                        elements = hub.last_multiple(0, hub.history_size())
+                        data = view.view(elements[::-1])
+                    else:
+                        raise ValueError(err)
                     plot.update({"data": [data]})  # TODO: Check this list
                 plots_data = {}
                 for plot in self.plots:
                     plots_data.update(self._pack(plot))
-                self.target_hub.push(plots_data)
+
+                if isinstance(self.target_hub, MessageHub):
+                    self.target_hub.push(plots_data)
+                else:
+                    raise ValueError(err)
+
                 time.sleep(tick_time)
         except KeyboardInterrupt:
             logger.info("Stopped plot updating")
 
-
-class AsyncDashboard:
-    """
-    Manages and updates multiple plots with data from asynchronous message hubs.
-
-    Attributes:
-        source_hubs (List[AsyncMessageHub]): A list of source asynchronous message hubs.
-        plots (List[Plot]): A list of plots to be updated.
-        target_hub (AsyncMessageHub): The target asynchronous message hub to
-                                        push updated plots.
-
-    Example:
-        source_hubs = [AsyncMessageHub(), AsyncMessageHub()]
-        plots = [Plot(name="plot1"), Plot(name="plot2")]
-        target_hub = AsyncMessageHub()
-        dashboard = AsyncDashboard(source_hubs, plots, target_hub)
-        asyncio.run(dashboard.run(tick_time=0.1))
-    """
-
-    def __init__(
-        self,
-        source_hubs: t.List[AsyncMessageHub],
-        plots: t.List[Plot],
-        target_hub: AsyncMessageHub,
-    ) -> None:
-        if len(source_hubs) != len(plots):
-            err = "Number of source hubs and plots must match"
-            raise ValueError(err)
-
-        self.source_hubs = source_hubs
-        self.plots = plots
-        self.target_hub = target_hub
-
-    def _pack(self, plot: Plot) -> t.Dict[str, t.Any]:
-        """
-        Packs the plot data into a dictionary.
-
-        Args:
-            plot (Plot): The plot to be packed.
-
-        Returns:
-            Dict[str, Any]: A dictionary containing the plot data.
-        """
-        return {
-            plot.name: {"data": plot.data, "layout": plot.layout, "config": plot.config}
-        }
-
-    async def run(self, tick_time: float = 0.1) -> None:
+    async def run_async(self, tick_time: float = 0.1) -> None:
         """
         Starts the continuous updating of plots.
 
@@ -241,13 +222,25 @@ class AsyncDashboard:
         """
         try:
             while True:
-                for plot, hub in zip(self.plots, self.source_hubs):
-                    data = await hub.view()
+                for plot, hub, viewr in zip(self.plots, self.source_hubs, self.viewers):
+
+                    if isinstance(hub, MessageHub):
+                        elements = hub.last_multiple(0, hub.history_size())
+                        data = viewr.view(elements[::-1])
+                    else:
+                        elements = await hub.last_multiple(0, await hub.history_size())
+                        data = viewr.view(elements[::-1])
+
                     plot.update({"data": [data]})  # TODO: Check this list
                 plots_data = {}
                 for plot in self.plots:
                     plots_data.update(self._pack(plot))
-                await self.target_hub.push(plots_data)
+
+                if isinstance(self.target_hub, MessageHub):
+                    self.target_hub.push(plots_data)
+                else:
+                    await self.target_hub.push(plots_data)
                 await asyncio.sleep(tick_time)
-        except KeyboardInterrupt:
+
+        except asyncio.CancelledError:
             logger.info("Stopped plot updating")

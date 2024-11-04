@@ -25,7 +25,6 @@ class MessageHub:
         max_history_size: int = 0,
         max_payload_size: int = 0,
         connectors: t.Optional[t.List[ehc.HubConnector]] = None,
-        viewer: t.Optional[ehv.HubView] = None,
     ):
         self.redis = redis
         self.name = name
@@ -34,8 +33,6 @@ class MessageHub:
         self.max_payload_size = max_payload_size
         self.packer = packer
         self.connectors = connectors or []
-
-        self.viewer = viewer if viewer is not None else ehv.SequentialDictView()
 
         # Buffer channel
         self.buffer = ecom.FIFOChannel(
@@ -108,10 +105,6 @@ class MessageHub:
     def last_multiple(self, start: int, stop: int) -> t.List[t.Any]:
         datas = self.last_multiple_raw(start, stop)
         return [self.hub_to_world(self.packer.unpack(data)) for data in datas]
-
-    def view(self) -> t.Any:
-        elements = self.last_multiple(0, self.history_size())
-        return self.viewer.view(elements[::-1])
 
     def history_size(self) -> int:
         return self.history.size()

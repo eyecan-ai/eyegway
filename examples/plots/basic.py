@@ -15,15 +15,15 @@ if __name__ == "__main__":
     ###############
     rand_hub = MessageHub.create("random_walk")
     sine_hub = MessageHub.create("sine")
-    helix_hub = MessageHub.create("helix")
     bar_hub = MessageHub.create("bar_hub")
+    helix_hub = MessageHub.create("helix")
     plt_hub = MessageHub.create("plot_hub")
 
     # Add viewer
-    rand_hub.viewer = ValueAccumulatorView(keys=["x", "y"])
-    sine_hub.viewer = ValueAccumulatorView(keys=["x", "y"])
-    bar_hub.viewer = ValueAccumulatorView(keys=["x", "y", "marker.color"])
-    helix_hub.viewer = ValueAccumulatorView(keys=["x", "y", "z", "marker.color"])
+    rand_viewer = ValueAccumulatorView(keys=["x", "y"])
+    sine_viewer = ValueAccumulatorView(keys=["x", "y"])
+    bar_viewer = ValueAccumulatorView(keys=["x", "y", "z", "marker.color"])
+    helix_viewer = ValueAccumulatorView(keys=["x", "y", "marker.color"])
 
     # Clear all hubs
     rand_hub.clear()
@@ -47,8 +47,8 @@ if __name__ == "__main__":
 
     rand_plt = Plot.from_file("Random Walk", Path("basic_plots/chart_red.json"))
     sine_plt = Plot.from_file("Sine Wave", Path("basic_plots/chart_blue.json"))
-    helix_plt = Plot.from_file("Helix", Path("basic_plots/3d_scatter.json"))
     bar_plt = Plot.from_file("Bars", Path("basic_plots/bar_colors.json"))
+    helix_plt = Plot.from_file("Helix", Path("basic_plots/3d_scatter.json"))
 
     ##################
     # LAUNCH THREADS #
@@ -66,11 +66,12 @@ if __name__ == "__main__":
 
     dashboard = Dashboard(
         [rand_hub, sine_hub, bar_hub, helix_hub],
+        [rand_viewer, sine_viewer, bar_viewer, helix_viewer],
         [rand_plt, sine_plt, bar_plt, helix_plt],
         plt_hub,
     )
 
-    dash_thread = threading.Thread(target=dashboard.run, daemon=True)
+    dash_thread = threading.Thread(target=dashboard.run_sync, daemon=True)
     dash_thread.start()
 
     print(
