@@ -93,7 +93,7 @@ class Packer(ABC):
         pass
 
 
-class MessagePacker(pyd.BaseModel, arbitrary_types_allowed=True):
+class MessagePacker(Packer, pyd.BaseModel, arbitrary_types_allowed=True):
     parser: MessageParserCompose = pyd.Field(...)
     unparser: MessageUnparserCompose = pyd.Field(...)
     _packer: msgpack.Packer = pyd.PrivateAttr()

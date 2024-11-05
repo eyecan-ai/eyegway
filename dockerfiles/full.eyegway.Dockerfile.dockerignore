@@ -1,0 +1,15 @@
+*
+
+!pyproject.toml
+!LICENSE.txt
+!README.md
+!eyegway/*
+
+!web/eyegway-svelte/src
+!web/eyegway-svelte/static
+!web/eyegway-svelte/.npmrc
+!web/eyegway-svelte/package.json
+!web/eyegway-svelte/svelte.config.js
+!web/eyegway-svelte/tsconfig.json
+!web/eyegway-svelte/vite.config.ts
+!web/eyegway-svelte/yarn.lock
