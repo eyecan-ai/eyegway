@@ -4,6 +4,9 @@ from collections import deque
 
 import pydantic as pyd
 
+from eyegway.hubs.asyn import AsyncMessageHub
+from eyegway.hubs.sync import MessageHub
+
 
 class HubView(ABC, pyd.BaseModel):
     """
@@ -30,9 +33,9 @@ class HubView(ABC, pyd.BaseModel):
         """
         pass
 
-    def view(self, elements: list) -> t.Dict[str, t.Any]:
+    def view(self, hub: MessageHub) -> t.Dict[str, t.Any]:
         """
-        Provides a view of the elements by rearranging them.
+        Provides a view of the elements of a sync hub by rearranging them.
 
         Args:
             elements (list): A list of elements to be viewed.
@@ -41,6 +44,23 @@ class HubView(ABC, pyd.BaseModel):
             Dict[str, Any]: A dictionary where keys are string indices and values
                                 are rearrangement of the elements.
         """
+
+        elements = hub.last_multiple(0, hub.history_size())
+        return self._rearrange(elements)
+
+    async def view_async(self, hub: AsyncMessageHub) -> t.Dict[str, t.Any]:
+        """
+        Provides a view of the elements of an async hub by rearranging them.
+
+        Args:
+            elements (list): A list of elements to be viewed.
+
+        Returns:
+            Dict[str, Any]: A dictionary where keys are string indices and values
+                                are rearrangement of the elements.
+        """
+
+        elements = await hub.last_multiple(0, await hub.history_size())
         return self._rearrange(elements)
 
 

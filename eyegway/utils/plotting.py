@@ -107,6 +107,17 @@ class Plot:
                 d1[key] = value
         return d1
 
+    def pack(self) -> t.Dict[str, t.Any]:
+        """
+        Packs the plot data into a dictionary.
+
+        Returns:
+            Dict[str, Any]: A dictionary containing the plot data ready to be pushed.
+        """
+        return {
+            self.name: {"data": self.data, "layout": self.layout, "config": self.config}
+        }
+
     def update(self, params: t.Dict) -> None:
         """
         Updates the plot with new parameters.
@@ -146,9 +157,10 @@ class Dashboard:
     def __init__(
         self,
         source_hubs: t.Sequence[t.Union[MessageHub, AsyncMessageHub]],
-        viewers: t.Union[HubView, t.Sequence[HubView]],
+        viewers: t.Union[t.Optional[HubView], t.Sequence[t.Optional[HubView]]],
         plots: t.List[Plot],
         target_hub: t.Union[MessageHub, AsyncMessageHub],
+        refresh_time: float = 0.1,
     ) -> None:
         if len(source_hubs) != len(plots):
             err = "Number of source hubs and plots must match"
@@ -157,6 +169,7 @@ class Dashboard:
         self.source_hubs = source_hubs
         self.plots = plots
         self.target_hub = target_hub
+        self.refresh_time = refresh_time
 
         if isinstance(viewers, list):
             if len(viewers) == len(source_hubs):
@@ -167,21 +180,7 @@ class Dashboard:
         if isinstance(viewers, HubView):
             self.viewers = [viewers] * len(source_hubs)
 
-    def _pack(self, plot: Plot) -> t.Dict[str, t.Any]:
-        """
-        Packs the plot data into a dictionary.
-
-        Args:
-            plot (Plot): The plot to be packed.
-
-        Returns:
-            Dict[str, Any]: A dictionary containing the plot data.
-        """
-        return {
-            plot.name: {"data": plot.data, "layout": plot.layout, "config": plot.config}
-        }
-
-    def run_sync(self, tick_time: float = 0.1) -> None:
+    def run_sync(self) -> None:
         """
         Starts the continuous updating of plots.
 
@@ -195,25 +194,24 @@ class Dashboard:
             while True:
                 for plot, hub, view in zip(self.plots, self.source_hubs, self.viewers):
                     if isinstance(hub, MessageHub):
-                        elements = hub.last_multiple(0, hub.history_size())
-                        data = view.view(elements[::-1])
+                        data = view.view(hub) if view else hub.last()
                     else:
                         raise ValueError(err)
                     plot.update({"data": [data]})  # TODO: Check this list
                 plots_data = {}
                 for plot in self.plots:
-                    plots_data.update(self._pack(plot))
+                    plots_data.update(plot.pack())
 
                 if isinstance(self.target_hub, MessageHub):
                     self.target_hub.push(plots_data)
                 else:
                     raise ValueError(err)
 
-                time.sleep(tick_time)
+                time.sleep(self.refresh_time)
         except KeyboardInterrupt:
             logger.info("Stopped plot updating")
 
-    async def run_async(self, tick_time: float = 0.1) -> None:
+    async def run_async(self) -> None:
         """
         Starts the continuous updating of plots.
 
@@ -222,25 +220,23 @@ class Dashboard:
         """
         try:
             while True:
-                for plot, hub, viewr in zip(self.plots, self.source_hubs, self.viewers):
+                for plot, hub, view in zip(self.plots, self.source_hubs, self.viewers):
 
                     if isinstance(hub, MessageHub):
-                        elements = hub.last_multiple(0, hub.history_size())
-                        data = viewr.view(elements[::-1])
+                        data = view.view(hub) if view else hub.last()
                     else:
-                        elements = await hub.last_multiple(0, await hub.history_size())
-                        data = viewr.view(elements[::-1])
+                        data = await view.view_async(hub) if view else await hub.last()
 
                     plot.update({"data": [data]})  # TODO: Check this list
                 plots_data = {}
                 for plot in self.plots:
-                    plots_data.update(self._pack(plot))
+                    plots_data.update(plot.pack())
 
                 if isinstance(self.target_hub, MessageHub):
                     self.target_hub.push(plots_data)
                 else:
                     await self.target_hub.push(plots_data)
-                await asyncio.sleep(tick_time)
+                await asyncio.sleep(self.refresh_time)
 
         except asyncio.CancelledError:
             logger.info("Stopped plot updating")

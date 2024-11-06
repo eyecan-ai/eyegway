@@ -107,7 +107,7 @@ class TestDashboard:
 
         with patch("time.sleep", return_value=None) as mock_sleep:
             mock_sleep.side_effect = [None, None, KeyboardInterrupt]
-            dashboard.run_sync(tick_time=0.1)
+            dashboard.run_sync()
 
         assert target_hub.push.called
         assert target_hub.push.call_count == 3
@@ -120,7 +120,7 @@ class TestDashboard:
         dashboard = Dashboard(source_hubs, viewers, plots, target_hub)
 
         with pytest.raises(ValueError):
-            dashboard.run_sync(tick_time=0.1)
+            dashboard.run_sync()
 
         source_hubs = [MagicMock(spec=MessageHub)]
         plots = [Plot(name="plot1")]
@@ -129,7 +129,7 @@ class TestDashboard:
         dashboard = Dashboard(source_hubs, viewers, plots, target_hub)
 
         with pytest.raises(ValueError):
-            dashboard.run_sync(tick_time=0.1)
+            dashboard.run_sync()
 
     @pytest.mark.asyncio
     async def test_dashboard_run_async(self):
@@ -155,8 +155,8 @@ class TestDashboard:
         target_hub_sync = MagicMock(spec=MessageHub)
         dashboard_to_async = Dashboard(source_hubs, viewers, plots, target_hub_sync)
 
-        task_to_sync = asyncio.create_task(dashboard_to_sync.run_async(tick_time=0.1))
-        task_to_async = asyncio.create_task(dashboard_to_async.run_async(tick_time=0.1))
+        task_to_sync = asyncio.create_task(dashboard_to_sync.run_async())
+        task_to_async = asyncio.create_task(dashboard_to_async.run_async())
 
         await asyncio.sleep(0.1)
 

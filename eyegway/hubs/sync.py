@@ -8,7 +8,6 @@ import eyegway.communication.channels as ecom
 import eyegway.communication.variables as ecov
 import eyegway.hubs as eh
 import eyegway.hubs.connectors as ehc
-import eyegway.hubs.viewers as ehv
 import eyegway.packers as ecm
 import eyegway.packers.factory as ecp
 import eyegway.utils.logging as eul
