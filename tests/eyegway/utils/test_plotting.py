@@ -47,6 +47,17 @@ class TestPlot:
         assert plot.layout == params["layout"]
         assert plot.config == params["config"]
 
+    def test_plot_pack(self):
+        plot = Plot(name="test_plot", data=[{"x": [1, 2, 3], "y": [4, 5, 6]}])
+        packed_data = plot.pack()
+        assert packed_data == {
+            "test_plot": {
+                "data": [{"x": [1, 2, 3], "y": [4, 5, 6]}],
+                "layout": {},
+                "config": {},
+            }
+        }
+
     def test_plot_update(self):
         plot = Plot(name="test_plot", data=[{"x": [1, 2, 3], "y": [4, 5, 6]}])
         new_params = {
@@ -82,18 +93,6 @@ class TestDashboard:
         target_hub = MagicMock(spec=MessageHub)
         with pytest.raises(ValueError):
             Dashboard(source_hubs, viewers, plots, target_hub)
-
-    def test_dashboard_pack(self):
-        plot = Plot(name="test_plot", data=[{"x": [1, 2, 3], "y": [4, 5, 6]}])
-        dashboard = Dashboard([], [], [], MagicMock(spec=MessageHub))
-        packed_data = dashboard._pack(plot)
-        assert packed_data == {
-            "test_plot": {
-                "data": [{"x": [1, 2, 3], "y": [4, 5, 6]}],
-                "layout": {},
-                "config": {},
-            }
-        }
 
     def test_dashboard_run_sync(self):
         source_hubs = [MagicMock(spec=MessageHub), MagicMock(spec=MessageHub)]
