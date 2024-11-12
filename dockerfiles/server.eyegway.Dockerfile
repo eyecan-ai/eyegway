@@ -18,13 +18,6 @@ COPY pyproject.toml /opt/eyecan.ai/
 WORKDIR /opt/eyecan.ai
 RUN hatch dep show requirements -p > requirements.txt
 
-FROM requirements_stage AS wheel_stage
-
-# use hatch from the main virtual environment to build the wheel
-COPY README.md /opt/eyecan.ai/
-COPY eyegway /opt/eyecan.ai/eyegway/
-RUN hatch build -t wheel
-
 FROM venv_stage AS deps_stage
 
 # copy requirements.txt
@@ -37,11 +30,9 @@ RUN pip install --no-cache-dir --upgrade pip wheel && \
 
 FROM deps_stage AS install_stage
 
-# copy the wheel
-COPY --from=wheel_stage /opt/eyecan.ai/dist/ /opt/eyecan.ai/dist/
-
-# install the wheel in the virtual environment of the dependencies
-RUN pip install --no-cache-dir --upgrade "$(find dist -name *.whl)"
+# install the package in the virtual environment of the dependencies
+RUN --mount=type=bind,source=.,target=/tmp/eyegway \
+    pip install --no-cache-dir --upgrade /tmp/eyegway
 
 FROM python:${pyver}-${debianver} AS deploy_stage
 
