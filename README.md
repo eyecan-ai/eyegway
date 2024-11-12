@@ -2,7 +2,7 @@
 
 # Eyegway
 
-<img src='https://img.shields.io/badge/version-0.0.1-blueviolet' /> <img src='https://img.shields.io/badge/coverage-99%25-brightgreen' /> <img src='https://img.shields.io/badge/-hatchling%20-critical' />
+<img src='https://img.shields.io/badge/version-0.2.5-blueviolet' /> <img src='https://img.shields.io/badge/coverage-99%25-brightgreen' /> <img src='https://img.shields.io/badge/-hatchling%20-critical' />
 
 ---
 
