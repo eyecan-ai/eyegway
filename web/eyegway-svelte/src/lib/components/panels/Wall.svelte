@@ -17,6 +17,7 @@
 	let rootPane: PaneConfiguration = {
 		id: Date.now(),
 		split: '',
+		size: 100,
 		children: [],
 		item: { name: '' }
 	};
@@ -210,6 +211,7 @@
 	}
 	.mosaic {
 		height: 100%;
+		padding: 5px !important;
 	}
 	.mosaic .controls-hidden {
 		display: none;
@@ -218,6 +220,6 @@
 		display: block;
 	}
 	.controls {
-		border-top: 1px dashed #eee;
+		margin-top: 4px;
 	}
 </style>

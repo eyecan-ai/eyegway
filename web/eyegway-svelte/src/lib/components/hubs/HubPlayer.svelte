@@ -131,7 +131,7 @@
 					<!----------------------------->
 					<p class="control">
 						<button
-							class="button is-small p-0"
+							class="button is-small is-white p-0 is-outlined"
 							on:click={() => setDataPointer(-1)}
 							disabled={!historyFrozen || dataPointer == 0}
 						>
@@ -140,7 +140,7 @@
 					</p>
 					<p class="control">
 						<button
-							class="button is-small p-2"
+							class="button is-small is-white p-2 is-outlined"
 							on:click={() => setDataPointer(null)}
 							disabled={!historyFrozen}
 						>
@@ -149,7 +149,7 @@
 					</p>
 					<p class="control">
 						<button
-							class="button is-small p-0"
+							class="button is-small is-white p-0 is-outlined"
 							on:click={() => setDataPointer(1)}
 							disabled={!historyFrozen || dataPointer == historySize - 1}
 						>
@@ -169,8 +169,8 @@
 				<div class="field has-addons">
 					<div class="dropdown is-right" class:is-hoverable={!historyFrozen}>
 						<div class="dropdown-trigger">
-							<button class="button is-small is-white" disabled={historyFrozen}>
-								<Settings strokeWidth={1} size={iconSize} />
+							<button class="button is-small is-white is-outlined" disabled={historyFrozen}>
+								<Settings strokeWidth={2} size={iconSize} />
 							</button>
 						</div>
 						<div class="dropdown-menu" id="dropdown-menu4" role="menu">
@@ -192,12 +192,12 @@
 					<!--------------------->
 					<p class="control">
 						<button
-							class="button is-small is-white"
+							class="button is-small is-white is-outlined"
 							on:click={reload}
 							disabled={historyFrozen}
 							title="Click to trigger a single update"
 						>
-							<RotateCw strokeWidth={1} size={iconSize} />
+							<RotateCw strokeWidth={2} size={iconSize} />
 						</button>
 					</p>
 
@@ -206,7 +206,7 @@
 					<!--------------------->
 					<p class="control">
 						<button
-							class="button is-small is-white"
+							class="button is-small is-white is-outlined"
 							style="--animation-time: {autoPlayMs}ms;"
 							class:blink={autoPlay}
 							disabled={historyFrozen}
@@ -216,9 +216,9 @@
 							title="Click to auto update every {autoPlayMs}ms"
 						>
 							{#if !autoPlay}
-								<CirclePlay strokeWidth={1} size={iconSize} />
+								<CirclePlay strokeWidth={2} size={iconSize} />
 							{:else}
-								<CircleStop class="has-text-danger" strokeWidth={1} size={iconSize} />
+								<CircleStop strokeWidth={2} size={iconSize} />
 							{/if}
 						</button>
 					</p>
@@ -231,10 +231,10 @@
 		</div>
 		<div class="column">
 			<button
-				class="button is-small is-outlined"
+				class="button is-small is-outlined has-text-weight-semibold"
 				style="--animation-time: {autoPlayMs}ms;"
-				class:is-info={historyFrozen}
-				class:is-primary={!historyFrozen}
+				class:is-white={historyFrozen}
+				class:is-light={!historyFrozen}
 				on:click={toggleFreeze}
 				title={!historyFrozen ? 'Click to freeze History' : 'Click to unfreeze History'}
 			>
@@ -249,6 +249,10 @@
 </div>
 
 <style>
+	.button {
+		color: var(--color-header-buttons) !important;
+		border-color: var(--color-header-buttons) !important;
+	}
 	.button[disabled] {
 		opacity: 0.2;
 	}

@@ -1,41 +1,60 @@
 <script lang="ts">
 	import HubPanel from '$lib/components/hubs/HubPanel.svelte';
 	import Wall from '$lib/components/panels/Wall.svelte';
-	import { Parameters } from '$lib/Parameters.js';
 
-	let sharedData: any[] = [{ name: 'Tile 1' }, { name: 'Tile 2' }];
+	let sharedData: any[] = [];
 	let editableMosaic: boolean = false;
 </script>
 
-<div class="box container mb-1 mt-2">
+<div class="box container mb-1 mt-2 header">
 	<div class="columns is-vcentered">
-		<div class="column is-3">
-			<div class="columns is-vcentered">
-				<div class="column is-narrow">
-					<span class="title is-6">
-						{Parameters.title}
-					</span>
-				</div>
-				<div class="column is-narrow logo-container">
-					<img src="images/logo.png" alt="Logo" class="logo" />
-				</div>
-			</div>
+		<div class="column logo-container">
+			<img src="images/logo.png" alt="Logo" class="logo" />
 		</div>
-		<div class="column is-9">
+		<div class="column">
 			<HubPanel bind:data={sharedData} />
 		</div>
 	</div>
 </div>
 
-<div class="box container p-0 mt-0 wall">
+<div class="card container p-0 mt-4 content">
 	<Wall dataStream={sharedData} editMode={editableMosaic} />
 </div>
 
 <style>
-	.logo {
-		height: 24px;
+	:root {
+		--color-card: #f5f5f5;
+		--color-card-empty: #fdfdfd6c;
+		--color-header: #ffffff;
+		--color-content: #ffffff;
+		--color-background: #ffffff;
+		--color-grad-start: #ffffff;
+		--color-grad-end: #ebebeb;
+		--color-header-buttons: #444444;
 	}
-	.wall {
+	:global(html) {
+		background-color: var(--color-background);
+		background-image: radial-gradient(
+			at center center,
+			var(--color-grad-start) 27%,
+			var(--color-grad-end) 100%
+		);
+	}
+
+	.header {
+		background-color: var(--color-header);
+	}
+	.content {
 		height: 80vh;
+		background-color: var(--color-content);
+	}
+	.card {
+		border-radius: 10px;
+	}
+	.logo {
+		display: flex;
+		height: 30px;
+		align-items: center;
+		padding-left: 25px;
 	}
 </style>

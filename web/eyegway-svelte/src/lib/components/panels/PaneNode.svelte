@@ -1,4 +1,3 @@
-<!-- PaneNode.svelte -->
 <script lang="ts">
 	import { PaneGroup, Pane, PaneResizer } from 'paneforge';
 	import Tile from './Tile.svelte';
@@ -18,12 +17,14 @@
 			{
 				id: Date.now(),
 				split: '',
+				size: 50,
 				children: [],
 				item: { name: pane.item.name } // Clone the item
 			},
 			{
 				id: Date.now() + 1,
 				split: '',
+				size: 50,
 				children: [],
 				item: { name: '' }
 			}
@@ -37,6 +38,9 @@
 	function handleDelete() {
 		dispatch('deletePane', { pane });
 	}
+	function handleResize(child: PaneConfiguration, size: number, prevSize: number | undefined) {
+		child.size = size;
+	}
 </script>
 
 {#if pane.split}
@@ -49,8 +53,14 @@
 		direction={pane.split}
 	>
 		{#each pane.children as child (child.id)}
-			<Pane style={editMode ? 'overflow: visible;' : ''}>
-				<svelte:self pane={child} {editMode} {dataStream} {tips} on:deletePane />
+			<Pane
+				defaultSize={child.size}
+				style={editMode ? 'overflow: visible;' : ''}
+				onResize={(size, prevSize) => {
+					handleResize(child, size, prevSize);
+				}}
+			>
+				<svelte:self pane={child} {editMode} {dataStream} {tips} on:deletePane on:resizePane />
 			</Pane>
 			{#if pane.children.length > 1 && pane.children.indexOf(child) < pane.children.length - 1}
 				<PaneResizer class="dots">
@@ -85,15 +95,11 @@
 		color: #b49e9e;
 	}
 	.dots.vertical {
-		border-top: 2px dotted;
-		border-bottom: 2px dotted;
 		width: 100%;
-		height: 4px;
+		height: 10px;
 	}
 	.dots.horizontal {
-		border-left: 2px dotted;
-		border-right: 2px dotted;
 		height: 100%;
-		width: 4px;
+		width: 10px;
 	}
 </style>

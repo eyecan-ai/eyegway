@@ -64,7 +64,7 @@
 <div class="tile-content">
 	{#if editable}
 		<!-- Editable Mode -->
-		<div class="item-editable">
+		<div class="item-editable {item?.name ? 'card' : 'card-empty'}">
 			<div class="columns">
 				<div class="column content">
 					<div class="dropdown" class:is-active={isDropdownOpen}>
@@ -142,18 +142,23 @@
 		</div>
 	{:else}
 		<!-- Display Mode -->
-		<div class="item">
+		<div class="item {item?.name ? 'card' : ''}">
 			{#if item?.name}
 				<ViewGeneric userData={extractedData} />
-				<div class="banner">
-					{item.name}
-				</div>
 			{/if}
 		</div>
 	{/if}
 </div>
 
 <style>
+	.card {
+		border-radius: 10px;
+		background-color: var(--color-card);
+	}
+	.card-empty {
+		border-radius: 10px;
+		background-color: var(--color-card-empty);
+	}
 	.dropdown-item {
 		padding-right: 10px;
 	}
@@ -167,7 +172,8 @@
 		height: 100%;
 		align-items: center;
 		justify-content: center;
-		padding: 2px;
+		padding: 8px;
+		border-radius: 10px;
 	}
 
 	.item-editable {
@@ -175,7 +181,7 @@
 		flex-direction: column;
 		width: 100%;
 		height: 100%;
-		padding: 10px;
+		padding: 8px;
 		align-items: center;
 		justify-content: center;
 	}
@@ -188,38 +194,10 @@
 		flex-grow: 1;
 	}
 
-	/* .dropdown-content {
-		background-color: #222;
-		color: #fafafa;
-		border-radius: 5px;
-	} */
-
 	.item {
 		display: grid;
 		width: 100%;
 		height: 100%;
-	}
-
-	.banner {
-		position: absolute;
-		bottom: 0;
-		left: 0;
-		color: #222;
-		background-color: #fafafa;
-		padding: 3px;
-		opacity: 0.3;
-		width: 100%;
-		font-size: 0.8em;
-		transition: all 0.3s;
-	}
-
-	.item:hover .banner {
-		opacity: 1;
-		box-shadow: 0px 0px 15px #ddd;
-	}
-
-	.button.is-danger {
-		background-color: #ff3860;
-		color: white;
+		border-radius: 10px;
 	}
 </style>

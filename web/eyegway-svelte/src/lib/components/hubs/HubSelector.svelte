@@ -33,8 +33,8 @@
 <div class="">
 	<div class="dropdown is-right" class:is-active={isOpen}>
 		<div class="dropdown-trigger">
-			<button class="button is-small" on:click={toggle}>
-				<span class="mr-2">
+			<button class="button is-small is-outlined is-white" on:click={toggle}>
+				<span class="mr-2 has-text-weight-bold">
 					{#if hubName}
 						{hubName}
 					{:else}
@@ -78,4 +78,8 @@
 </div>
 
 <style>
+	.button {
+		color: var(--color-header-buttons) !important;
+		border-color: var(--color-header-buttons) !important;
+	}
 </style>
