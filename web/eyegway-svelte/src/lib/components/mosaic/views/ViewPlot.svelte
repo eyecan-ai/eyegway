@@ -52,15 +52,23 @@
 	}
 </script>
 
-<Plot
-	bind:data
-	bind:layout
-	bind:config
-	fillParent={true}
-	debounce={0}
-	configReactivityStrategy={'none'}
-	on:relayouting={handleLocalUpdate}
-	on:restyle={handleLocalUpdate}
-	on:relayout={handleLocalUpdate}
-	on:afterPlot={handleLocalUpdate}
-/>
+<div class="plot_container">
+	<Plot
+		bind:data
+		bind:layout
+		bind:config
+		fillParent={true}
+		debounce={0}
+		configReactivityStrategy={'none'}
+		on:relayouting={handleLocalUpdate}
+		on:restyle={handleLocalUpdate}
+		on:relayout={handleLocalUpdate}
+		on:afterPlot={handleLocalUpdate}
+	/>
+</div>
+
+<style>
+	.plot_container {
+		border-radius: 10px;
+	}
+</style>

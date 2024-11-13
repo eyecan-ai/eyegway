@@ -91,6 +91,8 @@
 	function handleDeletePane(event: CustomEvent) {
 		const paneToDelete = event.detail.pane;
 		removePane(rootPane, paneToDelete);
+		// reassign rootPane to trigger reactivity
+		rootPane = { ...rootPane };
 	}
 
 	// Recursive function to remove a pane from the tree

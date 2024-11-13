@@ -45,7 +45,7 @@
 
 {#if pane.split}
 	<PaneGroup
-		style={editMode ? 'overflow: visible;' : ''}
+		style={editMode ? 'overflow: visible;' : 'overflow: visible;'}
 		{...{
 			...{}
 			/* @ts-ignore */
@@ -55,7 +55,11 @@
 		{#each pane.children as child (child.id)}
 			<Pane
 				defaultSize={child.size}
-				style={editMode ? 'overflow: visible;' : ''}
+				style={editMode ? 'overflow: visible;' : 'overflow: visible;'}
+				{...{
+					...{}
+					/* @ts-ignore */
+				}}
 				onResize={(size, prevSize) => {
 					handleResize(child, size, prevSize);
 				}}
@@ -64,16 +68,14 @@
 			</Pane>
 			{#if pane.children.length > 1 && pane.children.indexOf(child) < pane.children.length - 1}
 				<PaneResizer class="dots">
-					{#if editMode}
-						{#if pane.split == 'vertical'}
-							<div
-								class="is-z-index-1 is-flex is-align-items-center is-justify-content-center dots vertical"
-							/>
-						{:else}
-							<div
-								class="is-z-index-1 is-flex is-align-items-center is-justify-content-center dots horizontal"
-							/>
-						{/if}
+					{#if pane.split == 'vertical'}
+						<div
+							class="is-z-index-1 is-flex is-align-items-center is-justify-content-center dots vertical"
+						/>
+					{:else}
+						<div
+							class="is-z-index-1 is-flex is-align-items-center is-justify-content-center dots horizontal"
+						/>
 					{/if}
 				</PaneResizer>
 			{/if}
@@ -92,7 +94,7 @@
 
 <style>
 	.dots {
-		color: #b49e9e;
+		color: var(--color-header-buttons);
 	}
 	.dots.vertical {
 		width: 100%;
