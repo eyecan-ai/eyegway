@@ -153,11 +153,12 @@
 <style>
 	.card {
 		border-radius: 10px;
-		background-color: var(--color-card);
+		background-color: var(--color-panel);
 	}
 	.card-empty {
 		border-radius: 10px;
-		background-color: var(--color-card-empty);
+		/* border: 2px dashed var(--color-panel-unselected); */
+		background-color: var(--color-panel-unselected);
 	}
 	.dropdown-item {
 		padding-right: 10px;

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import HubPanel from '$lib/components/hubs/HubPanel.svelte';
 	import Wall from '$lib/components/panels/Wall.svelte';
+	import { styleSettings } from '$lib/components/panels/settings/StyleSettingsStore.js';
 
 	let sharedData: any[] = [];
 	let editableMosaic: boolean = false;
@@ -9,7 +10,11 @@
 <div class="box container mb-1 mt-2 header">
 	<div class="columns is-vcentered">
 		<div class="column logo-container">
-			<img src="images/logo.png" alt="Logo" class="logo" />
+			<img
+				src={$styleSettings.color.logo ? $styleSettings.color.logo : 'images/logo.png'}
+				alt="Logo"
+				class="logo"
+			/>
 		</div>
 		<div class="column">
 			<HubPanel bind:data={sharedData} />
@@ -27,17 +32,25 @@
 		--color-card-empty: #fdfdfd6c;
 		--color-header: #ffffff;
 		--color-content: #ffffff;
-		--color-background: #ffffff;
 		--color-grad-start: #ffffff;
 		--color-grad-end: #ebebeb;
 		--color-header-buttons: #444444;
 	}
+	/* :root {
+		--color-card: #611011;
+		--color-card-empty: #6110116c;
+		--color-header: #e1001a;
+		--color-content: #741214;
+		--color-background: #1a0102;
+		--color-grad-start: #d6031c;
+		--color-grad-end: #741214;
+		--color-header-buttons: #fff;
+	} */
 	:global(html) {
-		background-color: var(--color-background);
 		background-image: radial-gradient(
 			at center center,
-			var(--color-grad-start) 27%,
-			var(--color-grad-end) 100%
+			var(--color-internal-gradient) 27%,
+			var(--color-external-gradient) 100%
 		);
 	}
 
@@ -46,7 +59,7 @@
 	}
 	.content {
 		height: 80vh;
-		background-color: var(--color-content);
+		background-color: var(--color-container);
 	}
 	.card {
 		border-radius: 10px;

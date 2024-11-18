@@ -2,7 +2,7 @@ import { browser } from '$app/environment';
 import type { PaneConfiguration } from './PaneModel.js';
 
 export class PaneConfigurationUtils {
-    static DEFAULT_CONFIGURATION_NAME = 'Default';
+    static DEFAULT_CONFIGURATION_NAME = 'DefaultPanels';
 
     /**
      * Save the configuration to a file

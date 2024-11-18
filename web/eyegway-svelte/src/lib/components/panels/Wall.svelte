@@ -1,6 +1,6 @@
 <script lang="ts">
 	import PaneNode from './PaneNode.svelte';
-	import StyleSettingsButton from '../settings/StyleSettingsButton.svelte';
+	import StyleSettingsButton from './settings/StyleSettingsButton.svelte';
 	import { EllipsisVertical, Download, Upload, Edit, Save, History } from 'lucide-svelte';
 	import { PaneConfiguration } from './PaneModel.js';
 	import { PaneConfigurationUtils } from './PaneUtils.js';
@@ -129,7 +129,7 @@
 <div class="mosaic">
 	<div class="is-flex p-0 is-align-items-center is-justify-content-center" style="height: 100%">
 		{#if !editMode}
-			{#if !rootPane || (!rootPane.split && !rootPane.item.name)}
+			{#if !rootPane || (!rootPane.split && !rootPane.item?.name)}
 				<div class="notification m-4 no-items">No items, add one ...</div>
 			{/if}
 		{/if}

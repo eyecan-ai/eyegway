@@ -47,7 +47,11 @@
 
 	$: if (userData) {
 		data = structuredClone(userData.data);
-		if (!updating && !update) layout = structuredClone(userData.layout);
+		if (userData.layout != layout) {
+			layout = structuredClone(userData.layout);
+		} else {
+			if (!updating && !update) layout = structuredClone(userData.layout);
+		}
 		config = structuredClone(userData.config);
 	}
 </script>
