@@ -50,7 +50,7 @@
 			console.log(e);
 			data = null;
 		}
-		console.log('Reloading ...');
+		// console.log('Reloading ...');
 	}
 
 	export async function reloadData() {
