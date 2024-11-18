@@ -36,16 +36,6 @@
 		--color-grad-end: #ebebeb;
 		--color-header-buttons: #444444;
 	}
-	/* :root {
-		--color-card: #611011;
-		--color-card-empty: #6110116c;
-		--color-header: #e1001a;
-		--color-content: #741214;
-		--color-background: #1a0102;
-		--color-grad-start: #d6031c;
-		--color-grad-end: #741214;
-		--color-header-buttons: #fff;
-	} */
 	:global(html) {
 		background-image: radial-gradient(
 			at center center,
