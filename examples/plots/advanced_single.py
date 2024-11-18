@@ -1,4 +1,5 @@
 import threading
+import time
 from pathlib import Path
 
 from rich import print
@@ -6,7 +7,7 @@ from rich import print
 import eyegway.utils.generators as eug
 from eyegway.hubs.sync import MessageHub
 from eyegway.hubs.viewers import ValueAccumulatorView
-from eyegway.utils.plotting import Dashboard, Plot
+from eyegway.utils.plotting import Plot
 
 if __name__ == "__main__":
 
@@ -26,27 +27,19 @@ if __name__ == "__main__":
     rand_pusher = eug.DataPusher(eug.RandomWalkGenerator(), rand_hub, interval=0.01)
 
     # Here we create the plot that will be updated with the data from the hub
-    rand_plt = Plot.from_file("Random Walk", Path("basic_plots/chart_red.json"))
-
-    # Finally we create the dashboard containing the hub, viewer and plot to be
-    # able to have plot groups in sync
-    dashboard = Dashboard([rand_hub], [rand_viewer], [rand_plt], plt_hub)
+    rand_plt = Plot.from_file(Path("basic_plots/chart_red.json"))
 
     # We start the threads for the data generation and plot updating
     rand_thread = threading.Thread(target=rand_pusher.run_sync, daemon=True)
     rand_thread.start()
 
-    dash_thread = threading.Thread(target=dashboard.run_sync, daemon=True)
-    dash_thread.start()
-
     print(
         "Data generation and plot updating started...\n"
-        f"Plot names: [yellow]{rand_plt.name}[/yellow], "
+        "Plot names: [yellow]Random Walk[/yellow], "
         "[red]Press Ctrl+C to stop the data generation and plot updating[/red]"
     )
-
-    try:
-        dash_thread.join()
-        rand_thread.join()
-    except KeyboardInterrupt:
-        print("Stopped all threads")
+    while True:
+        data = rand_viewer._sync_view(rand_hub)
+        rand_plt.update({"data": [{"x": data["x"], "y": data["y"]}]})
+        plt_hub.push({"Random Walk": rand_plt.to_dict()})
+        time.sleep(0.01)

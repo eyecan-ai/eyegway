@@ -1,4 +1,5 @@
 import threading
+import time
 from pathlib import Path
 
 from rich import print
@@ -6,7 +7,7 @@ from rich import print
 import eyegway.utils.generators as eug
 from eyegway.hubs.sync import MessageHub
 from eyegway.hubs.viewers import ValueAccumulatorView
-from eyegway.utils.plotting import Dashboard, Plot
+from eyegway.utils.plotting import Plot
 
 if __name__ == "__main__":
 
@@ -47,20 +48,10 @@ if __name__ == "__main__":
     # PLOT CONFIGURATION #
     ######################
 
-    rand_plt = Plot.from_file("Random Walk", Path("basic_plots/chart_red.json"))
-    sine_plt = Plot.from_file("Sine Wave", Path("basic_plots/chart_blue.json"))
-    bar_plt = Plot.from_file("Bars", Path("basic_plots/bar_colors.json"))
-    helix_plt = Plot.from_file("Helix", Path("basic_plots/3d_scatter.json"))
-
-    ###########################
-    # DASHBOARD CONFIGURATION #
-    ###########################
-    dashboard = Dashboard(
-        [rand_hub, sine_hub, bar_hub, helix_hub],
-        [rand_viewer, sine_viewer, bar_viewer, helix_viewer],
-        [rand_plt, sine_plt, bar_plt, helix_plt],
-        plt_hub,
-    )
+    rand_plt = Plot.from_file(Path("basic_plots/chart_red.json"))
+    sine_plt = Plot.from_file(Path("basic_plots/chart_blue.json"))
+    bar_plt = Plot.from_file(Path("basic_plots/bar_colors.json"))
+    helix_plt = Plot.from_file(Path("basic_plots/3d_scatter.json"))
 
     ##################
     # LAUNCH THREADS #
@@ -76,20 +67,51 @@ if __name__ == "__main__":
     for g in generators:
         g.start()
 
-    dash_thread = threading.Thread(target=dashboard.run_sync, daemon=True)
-    dash_thread.start()
-
     print(
         "Data generation and plot updating started...\n"
-        f"Plot names: [yellow]{rand_plt.name}[/yellow], "
-        f"[yellow]{sine_plt.name}[/yellow], [yellow]{bar_plt.name}[/yellow], "
-        f"[yellow]{helix_plt.name}[/yellow]\n"
+        "Plot names: [yellow]Random Walk[/yellow], "
+        "[yellow]Sine Wave[/yellow], [yellow]Bars[/yellow], "
+        "[yellow]Helix[/yellow]\n"
         "[red]Press Ctrl+C to stop the data generation and plot updating[/red]"
     )
 
-    try:
-        dash_thread.join()
-        for g in generators:
-            g.join()
-    except KeyboardInterrupt:
-        print("Stopped all threads")
+    while True:
+        rand_data = rand_viewer._sync_view(rand_hub)
+        sine_data = sine_viewer._sync_view(sine_hub)
+        bar_data = bar_viewer._sync_view(bar_hub)
+        helix_data = helix_viewer._sync_view(helix_hub)
+
+        rand_plt.update({"data": [{"x": rand_data["x"], "y": rand_data["y"]}]})
+        sine_plt.update({"data": [{"x": sine_data["x"], "y": sine_data["y"]}]})
+        bar_plt.update(
+            {
+                "data": [
+                    {
+                        "x": bar_data["x"],
+                        "y": bar_data["y"],
+                        "marker": {"color": bar_data["marker.color"]},
+                    }
+                ]
+            }
+        )
+        helix_plt.update(
+            {
+                "data": [
+                    {
+                        "x": helix_data["x"],
+                        "y": helix_data["y"],
+                        "marker": {"color": helix_data["marker.color"]},
+                    }
+                ]
+            }
+        )
+
+        plt_hub.push(
+            {
+                "Random Walk": rand_plt.to_dict(),
+                "Sine Wave": sine_plt.to_dict(),
+                "Bars": bar_plt.to_dict(),
+                "Helix": helix_plt.to_dict(),
+            }
+        )
+        time.sleep(0.01)

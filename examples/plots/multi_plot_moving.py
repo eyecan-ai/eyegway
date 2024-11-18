@@ -33,7 +33,7 @@ first_plot_config = {
         },
     },
 }
-first_plot = Plot.from_dict("my_first_plot", first_plot_config)
+first_plot = Plot.from_dict(first_plot_config)
 
 # from single_trace_moving.py
 
@@ -42,7 +42,7 @@ from eyegway.hubs.viewers import ValueAccumulatorView  # noqa
 
 stock_price = {"type": "scatter", "x": [], "y": []}
 second_plot_config = {"data": [stock_price]}
-second_plot = Plot.from_dict("my_second_plot", second_plot_config)
+second_plot = Plot.from_dict(second_plot_config)
 
 # COMMON PART
 
@@ -53,7 +53,12 @@ source_hub = MessageHub.create("stock_price_hub")
 print("Data generation and plot updating started...")  # noqa
 while True:
     accumulator = ValueAccumulatorView(keys=["time", "price"])
-    data = accumulator.view(source_hub)
+    data = accumulator._sync_view(source_hub)
     second_plot.update({"data": [{"x": data["time"], "y": data["price"]}]})
-    hub.push({**first_plot.pack(), **second_plot.pack()})
+    hub.push(
+        {
+            **{"my_first_plot": first_plot.to_dict()},
+            **{"my_second_plot": second_plot.to_dict()},
+        }
+    )
     time.sleep(0.5)

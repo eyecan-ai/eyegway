@@ -26,7 +26,7 @@ To plot this in a scattered line plot we can create a config like this:
 money_spent = {
     "type": "scatter",
     "x": years,
-    "y": value,
+    "y": money,
 }
 plot_config = {
     "data": [money_spent]
@@ -39,7 +39,7 @@ Next step is to create a `Plot` object from a configuration:
 ```python
 from eyegway.utils.plotting import Plot
 
-plot = Plot.from_dict("my_first_plot", plot_config)
+plot = Plot.from_dict(plot_config)
 ```
 
 Now we can push the plot to an `eyegway` hub:
@@ -49,10 +49,10 @@ from eyegway.hubs.sync import MessageHub
 
 hub = MessageHub.create("my_plot_hub")
 hub.clear() # This to clear the hub from any previous plots attempts
-hub.push(plot.pack())
+hub.push({"my_first_plot": plot.to_dict()})
 ```
 
-The full code is available in the [single_trace.py](single_trace.py) file, to run it:
+The full code is available in the [single_trace.py](examples/plots/single_trace.py) file, to run it:
 
 ```bash
 python examples/plots/single_trace.py
@@ -121,7 +121,7 @@ plot_config = {
 }
 ```
 
-Now, you can push the plot to the hub as before, the full code is available in the [multi_trace.py](multi_trace.py) file:
+Now, you can push the plot to the hub as before, the full code is available in the [multi_trace.py](examples/plots/multi_trace.py) file:
 
 ```bash
 python examples/plots/multi_trace.py
@@ -142,10 +142,10 @@ from eyegway.utils.plotting import Plot
 
 stock_price = {"type": "scatter", "x": [], "y": []} # this time starting data is empty
 plot_config = {"data": [stock_price]}
-plot = Plot.from_dict("my_second_plot", plot_config)
+plot = Plot.from_dict(plot_config)
 hub = MessageHub.create("my_plot_hub")
 hub.clear()
-hub.push(plot.pack())
+hub.push({"my_second_plot": plot.to_dict()})
 ```
 
 Our hub is updated with the new data in a separate process we are not aware of, we care
@@ -158,12 +158,12 @@ from eyegway.hubs.viewers import ValueAccumulatorView
 source_hub = MessageHub.create("stock_price_hub")
 while True:
     accumulator = ValueAccumulatorView(keys=["time", "price"])
-    data = accumulator.view(source_hub)
+    data = accumulator._sync_view(source_hub)
     plot.update({"data": [{"x": data["time"], "y": data["price"]}]})
-    hub.push(plot.pack())
+    hub.push({"my_second_plot": plot.to_dict()})
     time.sleep(0.5)
 ```
-The full code is available in the [single_plot_moving.py](single_plot_moving.py) file.
+The full code is available in the [single_plot_moving.py](examples/plots/single_plot_moving.py) file.
 
 ```bash
 python examples/plots/single_plot_moving.py
@@ -178,19 +178,18 @@ Let us imagine that we want to plot simultaneously `my_fist_plot` and `my_second
 We can simply merge them and push them in the same hub, e.g.:
 
 ```python
-hub.push({**first_plot.pack(), **second_plot.pack()})
+hub.push(
+    {
+        **{"my_first_plot": first_plot.to_dict()},
+        **{"my_second_plot": second_plot.to_dict()},
+    }
+)
 ```
 
-The full code is available in the [multi_plot_moving.py](multi_plot_moving.py) file.
+The full code is available in the [multi_plot_moving.py](examples/plots/multi_plot_moving.py) file.
 
 ```bash
 python examples/plots/multi_plot_moving.py
 ```
 
-### Dashboard
-
-To avoid writing the loop manually every time you can also use the `Dashboard`.
-`Dashboard` is an utility to group and update multiple plots at the same time and push
-them to a target hub e.g. `my_plot_hub`.
-
-To check how to use the `Dashboard` object, check the examples starting with `advanced_`.
+If you need other examples check the ones starting with `advanced_`.

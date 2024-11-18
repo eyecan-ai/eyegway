@@ -5,7 +5,7 @@ from rich import print
 import eyegway.utils.generators as eug
 from eyegway.hubs.asyn import AsyncMessageHub
 from eyegway.hubs.viewers import ValueAccumulatorView
-from eyegway.utils.plotting import Dashboard, Plot
+from eyegway.utils.plotting import Plot
 
 if __name__ == "__main__":
 
@@ -28,22 +28,22 @@ if __name__ == "__main__":
         rand_pusher = eug.DataPusher(eug.RandomWalkGenerator(), rand_hub, interval=0.01)
 
         # Here we create the plot that will be updated with the data from the hub
-        rand_plt = Plot.from_file("Random Walk", Path("basic_plots/chart_red.json"))
-
-        # Finally we create the dashboard containing the hub, viewer and plot to be
-        # able to have plot groups in sync
-        dashboard = Dashboard([rand_hub], [rand_viewer], [rand_plt], plt_hub)
+        rand_plt = Plot.from_file(Path("basic_plots/chart_red.json"))
 
         rand_task = asyncio.create_task(rand_pusher.run_async())
-        dash_task = asyncio.create_task(dashboard.run_async())
+        rand_task.add_done_callback(lambda _: print("Data generation stopped"))
 
         # We start the threads for the data generation and plot updating
         print(
             "Data generation and plot updating started...\n"
-            f"Plot names: [yellow]{rand_plt.name}[/yellow], "
+            "Plot names: [yellow]Random Walk[/yellow], "
             "[red]Press Ctrl+C to stop the data generation and plot updating[/red]"
         )
 
-        await asyncio.gather(rand_task, dash_task)
+        while True:
+            data = await rand_viewer.view(rand_hub)
+            rand_plt.update({"data": [{"x": data["x"], "y": data["y"]}]})
+            await plt_hub.push({"Random Walk": rand_plt.to_dict()})
+            await asyncio.sleep(0.01)
 
     asyncio.run(main())

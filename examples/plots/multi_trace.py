@@ -22,7 +22,7 @@ plot_config = {
         },
     },
 }
-plot = Plot.from_dict("my_first_plot", plot_config)
+plot = Plot.from_dict(plot_config)
 hub = MessageHub.create("my_plot_hub")
 hub.clear()
-hub.push(plot.pack())
+hub.push({"my_first_plot": plot.to_dict()})

@@ -18,7 +18,7 @@ class TestSequentialDictView:
         hub = MagicMock(spec=MessageHub)
         hub.last_multiple.return_value = []
         hub.history_size.return_value = 0
-        result = view.view(hub)
+        result = view._sync_view(hub)
         assert result == {}
 
     def test_list_of_elements(self):
@@ -27,7 +27,7 @@ class TestSequentialDictView:
         elements = ["a", "b", "c"]
         hub.last_multiple.return_value = elements
         hub.history_size.return_value = 0
-        result = view.view(hub)
+        result = view._sync_view(hub)
         assert result == {"0": "a", "1": "b", "2": "c"}
 
     def test_nested_data(self):
@@ -36,7 +36,7 @@ class TestSequentialDictView:
         elements = [{"key1": "value1"}, {"key2": "value2"}, {"key3": "value3"}]
         hub.last_multiple.return_value = elements
         hub.history_size.return_value = 0
-        result = view.view(hub)
+        result = view._sync_view(hub)
         assert result == {
             "0": {"key1": "value1"},
             "1": {"key2": "value2"},
@@ -49,7 +49,7 @@ class TestSequentialDictView:
         hub = MagicMock(spec=AsyncMessageHub)
         hub.last_multiple.return_value = []
         hub.history_size.return_value = 0
-        result = await view.view_async(hub)
+        result = await view._async_view(hub)
         assert result == {}
 
     @pytest.mark.asyncio
@@ -59,7 +59,7 @@ class TestSequentialDictView:
         elements = ["a", "b", "c"]
         hub.last_multiple.return_value = elements
         hub.history_size.return_value = 0
-        result = await view.view_async(hub)
+        result = await view._async_view(hub)
         assert result == {"0": "a", "1": "b", "2": "c"}
 
     @pytest.mark.asyncio
@@ -69,7 +69,7 @@ class TestSequentialDictView:
         elements = [{"key1": "value1"}, {"key2": "value2"}, {"key3": "value3"}]
         hub.last_multiple.return_value = elements
         hub.history_size.return_value = 0
-        result = await view.view_async(hub)
+        result = await view._async_view(hub)
         assert result == {
             "0": {"key1": "value1"},
             "1": {"key2": "value2"},
@@ -84,7 +84,7 @@ class TestReverseSequentialDictView:
         hub = MagicMock(spec=MessageHub)
         hub.last_multiple.return_value = []
         hub.history_size.return_value = 0
-        result = view.view(hub)
+        result = view._sync_view(hub)
         assert result == {}
 
     def test_list_of_elements(self):
@@ -93,7 +93,7 @@ class TestReverseSequentialDictView:
         elements = ["a", "b", "c"]
         hub.last_multiple.return_value = elements
         hub.history_size.return_value = 0
-        result = view.view(hub)
+        result = view._sync_view(hub)
         assert result == {"0": "c", "1": "b", "2": "a"}
 
     def test_nested_data(self):
@@ -102,7 +102,7 @@ class TestReverseSequentialDictView:
         elements = [{"key1": "value1"}, {"key2": "value2"}, {"key3": "value3"}]
         hub.last_multiple.return_value = elements
         hub.history_size.return_value = 0
-        result = view.view(hub)
+        result = view._sync_view(hub)
         assert result == {
             "0": {"key3": "value3"},
             "1": {"key2": "value2"},
@@ -115,7 +115,7 @@ class TestReverseSequentialDictView:
         hub = MagicMock(spec=AsyncMessageHub)
         hub.last_multiple.return_value = []
         hub.history_size.return_value = 0
-        result = await view.view_async(hub)
+        result = await view._async_view(hub)
         assert result == {}
 
     @pytest.mark.asyncio
@@ -125,7 +125,7 @@ class TestReverseSequentialDictView:
         elements = ["a", "b", "c"]
         hub.last_multiple.return_value = elements
         hub.history_size.return_value = 0
-        result = await view.view_async(hub)
+        result = await view._async_view(hub)
         assert result == {"0": "c", "1": "b", "2": "a"}
 
     @pytest.mark.asyncio
@@ -135,7 +135,7 @@ class TestReverseSequentialDictView:
         elements = [{"key1": "value1"}, {"key2": "value2"}, {"key3": "value3"}]
         hub.last_multiple.return_value = elements
         hub.history_size.return_value = 0
-        result = await view.view_async(hub)
+        result = await view._async_view(hub)
         assert result == {
             "0": {"key3": "value3"},
             "1": {"key2": "value2"},
