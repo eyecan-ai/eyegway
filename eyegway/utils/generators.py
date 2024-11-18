@@ -84,11 +84,9 @@ class RandomWalkGenerator(DataGenerator):
     Data generator for simulating a random walk.
     """
 
-    def __init__(self, time_key: str = "x", value_key: str = "y") -> None:
+    def __init__(self) -> None:
         super().__init__()
         self.current_value: float = 0.0
-        self.time_key = time_key
-        self.value_key = value_key
 
     def generate(self) -> t.Dict[str, t.Any]:
         """
@@ -99,8 +97,8 @@ class RandomWalkGenerator(DataGenerator):
         """
         self.current_value += random.uniform(-1, 1)  # noqa: S311
         return {
-            self.time_key: time.time() - start_time,
-            self.value_key: self.current_value,
+            "time": time.time() - start_time,
+            "value": self.current_value,
         }
 
 
@@ -112,14 +110,10 @@ class SineGenerator(DataGenerator):
     def __init__(
         self,
         interval: float = 0.1,
-        time_key: str = "x",
-        value_key: str = "y",
     ) -> None:
         super().__init__()
         self.interval = interval
         self.time_step: float = 0.0
-        self.time_key = time_key
-        self.value_key = value_key
 
     def generate(self) -> t.Dict[str, t.Any]:
         """
@@ -130,10 +124,7 @@ class SineGenerator(DataGenerator):
         """
         self.time_step += self.interval
         value = math.sin(self.time_step)
-        return {
-            self.time_key: time.time() - start_time,
-            self.value_key: value,
-        }
+        return {"time": time.time() - start_time, "value": value}
 
 
 class HelixGenerator(DataGenerator):
@@ -156,12 +147,7 @@ class HelixGenerator(DataGenerator):
         self.time_step += self.interval
         value_y = math.sin(self.time_step)
         value_z = math.cos(self.time_step)
-        return {
-            "x": time.time() - start_time,
-            "y": value_y,
-            "z": value_z,
-            "marker": {"color": time.time() - start_time},
-        }
+        return {"time": time.time() - start_time, "value": value_y, "height": value_z}
 
 
 class DailyProductionGenerator(DataGenerator):
@@ -188,11 +174,7 @@ class DailyProductionGenerator(DataGenerator):
             Dict[str, Any]: The generated data point.
         """
         value = random.uniform(self.min_value, self.max_value)  # noqa: S311
-        return {
-            "x": time.time() - start_time,
-            "y": value,
-            "marker": {"color": time.time() - start_time},
-        }
+        return {"time": time.time() - start_time, "value": value}
 
 
 class DemoDataGenerator(DataGenerator):

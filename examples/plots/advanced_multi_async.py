@@ -30,10 +30,10 @@ if __name__ == "__main__":
         await plt_hub.clear()
 
         # Add viewer
-        rand_viewer = ValueAccumulatorView(keys=["x", "y"])
-        sine_viewer = ValueAccumulatorView(keys=["x", "y"])
-        bar_viewer = ValueAccumulatorView(keys=["x", "y", "marker.color"])
-        helix_viewer = ValueAccumulatorView(keys=["x", "y", "z", "marker.color"])
+        rand_viewer = ValueAccumulatorView(keys=["time", "value"])
+        sine_viewer = ValueAccumulatorView(keys=["time", "value"])
+        bar_viewer = ValueAccumulatorView(keys=["time", "value"])
+        helix_viewer = ValueAccumulatorView(keys=["time", "value", "height"])
 
         ##########################
         # SAMPLE DATA GENERATORS #
@@ -72,7 +72,7 @@ if __name__ == "__main__":
             "[red]Press Ctrl+C to stop the data generation and plot updating[/red]"
         )
 
-        await asyncio.gather(*generators)
+        asyncio.gather(*generators)
 
         while True:
             rand_data = await rand_viewer.view(rand_hub)
@@ -80,15 +80,33 @@ if __name__ == "__main__":
             bar_data = await bar_viewer.view(bar_hub)
             helix_data = await helix_viewer.view(helix_hub)
 
-            rand_plt.update({"data": [{"x": rand_data["x"], "y": rand_data["y"]}]})
-            sine_plt.update({"data": [{"x": sine_data["x"], "y": sine_data["y"]}]})
+            rand_plt.update(
+                {
+                    "data": [
+                        {
+                            "x": rand_data["time"],
+                            "y": rand_data["value"],
+                        }
+                    ]
+                }
+            )
+            sine_plt.update(
+                {
+                    "data": [
+                        {
+                            "x": sine_data["time"],
+                            "y": sine_data["value"],
+                        }
+                    ]
+                }
+            )
             bar_plt.update(
                 {
                     "data": [
                         {
-                            "x": bar_data["x"],
-                            "y": bar_data["y"],
-                            "marker": {"color": bar_data["marker.color"]},
+                            "x": bar_data["time"],
+                            "y": bar_data["value"],
+                            "marker": {"color": bar_data["time"]},
                         }
                     ]
                 }
@@ -97,10 +115,10 @@ if __name__ == "__main__":
                 {
                     "data": [
                         {
-                            "x": helix_data["x"],
-                            "y": helix_data["y"],
-                            "z": helix_data["z"],
-                            "marker": {"color": helix_data["marker.color"]},
+                            "x": helix_data["time"],
+                            "y": helix_data["value"],
+                            "z": helix_data["height"],
+                            "marker": {"color": helix_data["time"]},
                         }
                     ]
                 }

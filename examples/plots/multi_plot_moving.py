@@ -5,7 +5,7 @@ from eyegway.hubs.sync import MessageHub
 
 stock_hub = MessageHub.create("stock_price_hub")
 stock_hub.clear()
-rand_pusher = DataPusher(RandomWalkGenerator("time", "price"), stock_hub, interval=0.5)
+rand_pusher = DataPusher(RandomWalkGenerator(), stock_hub, interval=0.5)
 threading.Thread(target=rand_pusher.run_sync, daemon=True).start()
 #######################################################################
 
@@ -52,9 +52,9 @@ hub.clear()
 source_hub = MessageHub.create("stock_price_hub")
 print("Data generation and plot updating started...")  # noqa
 while True:
-    accumulator = ValueAccumulatorView(keys=["time", "price"])
+    accumulator = ValueAccumulatorView(keys=["time", "value"])
     data = accumulator._sync_view(source_hub)
-    second_plot.update({"data": [{"x": data["time"], "y": data["price"]}]})
+    second_plot.update({"data": [{"x": data["time"], "y": data["value"]}]})
     hub.push(
         {
             **{"my_first_plot": first_plot.to_dict()},
