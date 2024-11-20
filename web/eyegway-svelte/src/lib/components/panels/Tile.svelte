@@ -8,27 +8,19 @@
 		ArrowDown,
 		X
 	} from 'lucide-svelte';
-	import ViewGeneric from '../mosaic/views/ViewGeneric.svelte';
-	import { DataExtractor } from '../mosaic/MosaicModel.js';
-	import { TileItem } from './PaneModel.js';
+	import ViewGeneric from './views/ViewGeneric.svelte';
+	import { DataExtractor, TileItem } from './PaneModel.js';
+	import GenericSettingsPanel from './settings/GenericSettingsPanel.svelte';
 
 	export let item: TileItem | null = null;
 	export let dataStream: any | null = null;
 	export let editable: boolean = false;
 	export let tips: string[] = [];
 
-	const dispatch = createEventDispatcher();
-
-	// Extracted data based on item.name
 	let extractedData: any | null = null;
 
-	// Re-compute extractedData when item or dataStream changes
-	$: if (item && dataStream) {
-		if (!isDropdownOpen) selectTip(item.name);
-		extractedData = DataExtractor.pickAndParse(dataStream, item.name);
-	}
+	const dispatch = createEventDispatcher();
 
-	// Functions to handle splitting
 	function splitHorizontal() {
 		dispatch('splitPane', { direction: 'horizontal' });
 	}
@@ -38,25 +30,22 @@
 	}
 
 	function onDelete() {
-		clearTip();
+		selectTip('');
 		dispatch('delete', item);
 	}
 
-	$: if (item && selectedTip) {
-		item.name = selectedTip;
+	$: if (item) {
+		selectedTip = item.name;
+		extractedData = DataExtractor.pickAndParse(dataStream, item.name);
+		item.settings = DataExtractor.getSettingsType(extractedData, item.settings);
 	}
 
 	let isDropdownOpen: boolean = false;
 	let selectedTip: string = '';
 
 	function selectTip(tip: string) {
+		if (item) item.name = tip;
 		selectedTip = tip;
-		isDropdownOpen = false;
-		// Handle the selected tip
-	}
-	function clearTip() {
-		if (item) item.name = '';
-		selectedTip = '';
 		isDropdownOpen = false;
 	}
 </script>
@@ -65,6 +54,13 @@
 	{#if editable}
 		<!-- Editable Mode -->
 		<div class="item-editable {item?.name ? 'card' : 'card-empty'}">
+			<div class="item-preview">
+				<div class="blur-content">
+					{#if item?.name}
+						<ViewGeneric userData={extractedData} userSettings={item.settings} />
+					{/if}
+				</div>
+			</div>
 			<div class="columns">
 				<div class="column content">
 					<div class="dropdown" class:is-active={isDropdownOpen}>
@@ -75,7 +71,7 @@
 								aria-controls="dropdown-menu"
 								on:click={() => (isDropdownOpen = !isDropdownOpen)}
 							>
-								<span>{selectedTip || 'select data'}</span>
+								<span class="ellipsis-text">{selectedTip || 'select data'}</span>
 								<span class="icon is-small">
 									<ArrowDown size={12} />
 								</span>
@@ -83,11 +79,10 @@
 						</div>
 						<div class="dropdown-menu" id="dropdown-menu" role="menu">
 							<div class="dropdown-content has-background-dark">
-								<!--svelte: -->
 								<a
 									href={'#'}
 									class="dropdown-item has-text-danger is-flex is-justify-content-right"
-									on:click={() => clearTip()}
+									on:click={() => selectTip('')}
 								>
 									<X size={12} />
 								</a>
@@ -125,13 +120,25 @@
 					</button>
 				</div>
 				<div class="column control-item is-narrow">
-					<button
-						class="button is-small is-light"
-						on:click={() => console.log('Edit')}
-						title="Settings"
-					>
-						<Cog size={16} />
-					</button>
+					<div class="dropdown is-hoverable is-right is-down">
+						<div class="dropdown-trigger">
+							<button
+								class="button is-small"
+								disabled={item?.name ? false : true}
+								aria-haspopup="true"
+								aria-controls="dropdown-menu4"
+							>
+								<Cog size={16} />
+							</button>
+						</div>
+						<div class="dropdown-menu" id="dropdown-menu4" role="menu">
+							<div class="dropdown-content has-background-dark">
+								{#if item?.name}
+									<GenericSettingsPanel bind:userSettings={item.settings} />
+								{/if}
+							</div>
+						</div>
+					</div>
 				</div>
 				<div class="column control-item is-narrow">
 					<button class="button is-small is-danger" on:click={onDelete} title="Delete Tile">
@@ -144,7 +151,7 @@
 		<!-- Display Mode -->
 		<div class="item {item?.name ? 'card' : ''}">
 			{#if item?.name}
-				<ViewGeneric userData={extractedData} />
+				<ViewGeneric userData={extractedData} userSettings={item.settings} />
 			{/if}
 		</div>
 	{/if}
@@ -157,7 +164,6 @@
 	}
 	.card-empty {
 		border-radius: 10px;
-		/* border: 2px dashed var(--color-panel-unselected); */
 		background-color: var(--color-panel-unselected);
 	}
 	.dropdown-item {
@@ -195,10 +201,33 @@
 		flex-grow: 1;
 	}
 
+	.button {
+		white-space: wrap;
+	}
+
+	.item-preview {
+		display: grid;
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		border-radius: 10px;
+		overflow: hidden;
+	}
+	.item-preview .blur-content {
+		display: grid;
+		filter: blur(5px) contrast(0.5);
+	}
+
 	.item {
 		display: grid;
 		width: 100%;
 		height: 100%;
 		border-radius: 10px;
+	}
+
+	.dropdown-content {
+		position: fixed;
 	}
 </style>

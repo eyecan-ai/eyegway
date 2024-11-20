@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { PaneGroup, Pane, PaneResizer } from 'paneforge';
 	import Tile from './Tile.svelte';
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, onMount } from 'svelte';
 	import type { PaneConfiguration } from './PaneModel.js';
+	import { GripHorizontal, GripVertical } from 'lucide-svelte';
 
 	export let pane: PaneConfiguration;
 	export let editMode;
@@ -19,14 +20,14 @@
 				split: '',
 				size: 50,
 				children: [],
-				item: { name: pane.item.name } // Clone the item
+				item: { name: pane.item.name, settings: pane.item.settings } // Clone the item
 			},
 			{
 				id: Date.now() + 1,
 				split: '',
 				size: 50,
 				children: [],
-				item: { name: '' }
+				item: { name: '', settings: {} }
 			}
 		];
 	}
@@ -38,14 +39,26 @@
 	function handleDelete() {
 		dispatch('deletePane', { pane });
 	}
+
+	let resizing: boolean = false;
+
+	onMount(() => {
+		resizing = false;
+	});
+
 	function handleResize(child: PaneConfiguration, size: number, prevSize: number | undefined) {
-		child.size = size;
+		child.size = Math.round(size);
+		pane = { ...pane }; // Trigger reactivity
+		resizing = true;
+	}
+	function handleDraggingChange() {
+		resizing = false;
 	}
 </script>
 
 {#if pane.split}
 	<PaneGroup
-		style={editMode ? 'overflow: visible;' : 'overflow: visible;'}
+		style="overflow: hidden;"
 		{...{
 			...{}
 			/* @ts-ignore */
@@ -55,7 +68,7 @@
 		{#each pane.children as child (child.id)}
 			<Pane
 				defaultSize={child.size}
-				style={editMode ? 'overflow: visible;' : 'overflow: visible;'}
+				style="overflow: hidden;"
 				{...{
 					...{}
 					/* @ts-ignore */
@@ -66,18 +79,53 @@
 			>
 				<svelte:self pane={child} {editMode} {dataStream} {tips} on:deletePane on:resizePane />
 			</Pane>
-			{#if pane.children.length > 1 && pane.children.indexOf(child) < pane.children.length - 1}
-				<PaneResizer class="dots">
-					{#if pane.split == 'vertical'}
-						<div
-							class="is-z-index-1 is-flex is-align-items-center is-justify-content-center dots vertical"
-						/>
-					{:else}
-						<div
-							class="is-z-index-1 is-flex is-align-items-center is-justify-content-center dots horizontal"
-						/>
-					{/if}
-				</PaneResizer>
+			{#if editMode}
+				{#if pane.children.length > 1 && pane.children.indexOf(child) < pane.children.length - 1}
+					<PaneResizer class="dots" onDraggingChange={handleDraggingChange}>
+						{#if pane.split == 'vertical'}
+							<div
+								class="is-flex is-flex-direction-column is-align-items-center is-justify-content-center dots vertical"
+							>
+								{#if resizing}
+									<span style="z-index: 10; font-size: 0.7em; font-weight: bold; padding: 5px;"
+										>{child.size}%</span
+									>
+								{/if}
+								<div class="is-flex vertical">
+									<GripHorizontal
+										size={20}
+										style="background-color: var(--color-panel); border-radius: 4px;  z-index: 10; border: 2px solid var(--color-header-buttons);"
+									/>
+								</div>
+
+								{#if resizing}
+									<span style="z-index: 10; font-size: 0.7em; font-weight: bold; padding: 5px;"
+										>{100 - child.size}%</span
+									>
+								{/if}
+							</div>
+						{:else}
+							<div class=" is-flex is-align-items-center is-justify-content-center dots horizontal">
+								<div class="is-flex horizontal">
+									{#if resizing}
+										<span style="z-index: 10; font-size: 0.7em; font-weight: bold; padding: 5px;"
+											>{child.size}%</span
+										>
+									{/if}
+									<GripVertical
+										size={20}
+										style="background-color: var(--color-panel); border-radius: 4px;  z-index: 10; border: 2px solid var(--color-header-buttons);"
+									/>
+									{#if resizing}
+										<span style="z-index: 10; font-size: 0.7em; font-weight: bold; padding: 5px;"
+											>{100 - child.size}%</span
+										>
+									{/if}
+								</div>
+							</div>
+						{/if}
+					</PaneResizer>
+				{/if}
 			{/if}
 		{/each}
 	</PaneGroup>
@@ -95,13 +143,31 @@
 <style>
 	.dots {
 		color: var(--color-header-buttons);
+		width: 100%;
+		height: 100%;
 	}
 	.dots.vertical {
-		width: 100%;
-		height: 10px;
+		height: 2px;
+		background: linear-gradient(
+			to right,
+			#ffffff00 0%,
+			#ffffff00 14%,
+			var(--color-header-buttons) 15%,
+			var(--color-header-buttons) 85%,
+			#ffffff00 86%,
+			#ffffff00 100%
+		);
 	}
 	.dots.horizontal {
-		height: 100%;
-		width: 10px;
+		width: 2px;
+		background: linear-gradient(
+			to bottom,
+			#ffffff00 0%,
+			#ffffff00 14%,
+			var(--color-header-buttons) 15%,
+			var(--color-header-buttons) 85%,
+			#ffffff00 86%,
+			#ffffff00 100%
+		);
 	}
 </style>

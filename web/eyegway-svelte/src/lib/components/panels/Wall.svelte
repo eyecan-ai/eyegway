@@ -1,7 +1,7 @@
 <script lang="ts">
 	import PaneNode from './PaneNode.svelte';
 	import StyleSettingsButton from './settings/StyleSettingsButton.svelte';
-	import { EllipsisVertical, Download, Upload, Edit, Save, History } from 'lucide-svelte';
+	import { EllipsisVertical, Download, Upload, Edit, Save, History, Trash } from 'lucide-svelte';
 	import { PaneConfiguration } from './PaneModel.js';
 	import { PaneConfigurationUtils } from './PaneUtils.js';
 	import { onMount } from 'svelte';
@@ -19,7 +19,7 @@
 		split: '',
 		size: 100,
 		children: [],
-		item: { name: '' }
+		item: { name: '', settings: {} }
 	};
 
 	onMount(() => {
@@ -110,7 +110,7 @@
 				parentPane.item = remainingChild.item;
 			} else if (parentPane.children.length === 0) {
 				parentPane.split = '';
-				parentPane.item = { name: '' };
+				parentPane.item = { name: '', settings: {} };
 			}
 			return true;
 		}
@@ -126,7 +126,7 @@
 	}
 </script>
 
-<div class="mosaic">
+<div class="panels">
 	<div class="is-flex p-0 is-align-items-center is-justify-content-center" style="height: 100%">
 		{#if !editMode}
 			{#if !rootPane || (!rootPane.split && !rootPane.item?.name)}
@@ -199,6 +199,21 @@
 						>
 							<History strokeWidth={1} size={18} />
 						</button>
+						<!-- CLEAR LAYOUT -->
+						<button
+							class="button is-small is-danger is-inverted"
+							on:click={() =>
+								(rootPane = {
+									id: Date.now(),
+									split: '',
+									size: 100,
+									children: [],
+									item: { name: '', settings: {} }
+								})}
+							title="Clear Layout"
+						>
+							<Trash strokeWidth={1} size={18} />
+						</button>
 					</div>
 				{/if}
 			</div>
@@ -211,14 +226,14 @@
 		margin-top: 100px;
 		position: absolute;
 	}
-	.mosaic {
+	.panels {
 		height: 100%;
 		padding: 5px !important;
 	}
-	.mosaic .controls-hidden {
+	.panels .controls-hidden {
 		display: none;
 	}
-	.mosaic:hover .controls-hidden {
+	.panels:hover .controls-hidden {
 		display: block;
 	}
 	.controls {
