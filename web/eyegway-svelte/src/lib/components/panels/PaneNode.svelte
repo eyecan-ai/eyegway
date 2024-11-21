@@ -86,41 +86,26 @@
 							<div
 								class="is-flex is-flex-direction-column is-align-items-center is-justify-content-center dots vertical"
 							>
-								{#if resizing}
-									<span style="z-index: 10; font-size: 0.7em; font-weight: bold; padding: 5px;"
-										>{child.size}%</span
-									>
-								{/if}
+								<span class="percent">{resizing ? child.size + '%' : ''}</span>
 								<div class="is-flex vertical">
 									<GripHorizontal
 										size={20}
 										style="background-color: var(--color-panel); border-radius: 4px;  z-index: 10; border: 2px solid var(--color-header-buttons);"
 									/>
 								</div>
-
-								{#if resizing}
-									<span style="z-index: 10; font-size: 0.7em; font-weight: bold; padding: 5px;"
-										>{100 - child.size}%</span
-									>
-								{/if}
+								<span class="percent">{resizing ? 100 - child.size + '%' : ''}</span>
 							</div>
 						{:else}
-							<div class=" is-flex is-align-items-center is-justify-content-center dots horizontal">
+							<div
+								class=" is-flex is-flex-direction-row is-align-items-center is-justify-content-center dots horizontal"
+							>
 								<div class="is-flex horizontal">
-									{#if resizing}
-										<span style="z-index: 10; font-size: 0.7em; font-weight: bold; padding: 5px;"
-											>{child.size}%</span
-										>
-									{/if}
+									<span class="percent">{resizing ? child.size + '%' : ''}</span>
 									<GripVertical
 										size={20}
 										style="background-color: var(--color-panel); border-radius: 4px;  z-index: 10; border: 2px solid var(--color-header-buttons);"
 									/>
-									{#if resizing}
-										<span style="z-index: 10; font-size: 0.7em; font-weight: bold; padding: 5px;"
-											>{100 - child.size}%</span
-										>
-									{/if}
+									<span class="percent">{resizing ? 100 - child.size + '%' : ''}</span>
 								</div>
 							</div>
 						{/if}
@@ -169,5 +154,14 @@
 			#ffffff00 86%,
 			#ffffff00 100%
 		);
+	}
+	.percent {
+		font-size: 0.7em;
+		font-weight: bold;
+		padding-left: 5px;
+		padding-right: 5px;
+		z-index: 10;
+		mix-blend-mode: exclusion;
+		filter: invert();
 	}
 </style>

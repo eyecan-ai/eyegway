@@ -2,7 +2,7 @@
 	import {
 		Button,
 		Color,
-		Folder,
+		Separator,
 		Pane,
 		ThemeUtils,
 		Image,
@@ -38,18 +38,15 @@
 	$: $styleSettings.color.logo = logoImage?.src;
 </script>
 
-<Pane position={'inline'} theme={ThemeUtils.presets.jetblack} width={350}>
-	<Folder title="Global Settings">
-		<Image bind:value={logoImage} fit="contain" label="Image" />
-		<Color bind:value={$styleSettings.color.panel} label="Panel Color" />
-		<Color bind:value={$styleSettings.color.panel_unselected} label="Empty Panel Color" />
-		<Color bind:value={$styleSettings.color.header} label="Header Color" />
-		<Color bind:value={$styleSettings.color.header_buttons} label="Header Buttons Color" />
-		<Color bind:value={$styleSettings.color.container} label="Panels Container Color" />
-		<Color bind:value={$styleSettings.color.internal_gradient} label="Gradient Start Color" />
-		<Color bind:value={$styleSettings.color.external_gradient} label="Gradient End Color" />
-	</Folder>
-	<Folder title="">
-		<Button on:click={styleSettingsReset} title="Reset Defaults" />
-	</Folder>
+<Pane position={'inline'} title="Style Settings" theme={ThemeUtils.presets.jetblack} width={350}>
+	<Image bind:value={logoImage} fit="contain" label="Image" />
+	<Color bind:value={$styleSettings.color.panel} label="Panel Color" />
+	<Color bind:value={$styleSettings.color.panel_unselected} label="Empty Panel Color" />
+	<Color bind:value={$styleSettings.color.header} label="Header Color" />
+	<Color bind:value={$styleSettings.color.header_buttons} label="Header Buttons Color" />
+	<Color bind:value={$styleSettings.color.container} label="Panels Container Color" />
+	<Color bind:value={$styleSettings.color.internal_gradient} label="Gradient Start Color" />
+	<Color bind:value={$styleSettings.color.external_gradient} label="Gradient End Color" />
+	<Separator />
+	<Button on:click={styleSettingsReset} title="Reset Defaults" />
 </Pane>

@@ -1,15 +1,5 @@
 <script lang="ts">
-	import {
-		Button,
-		Color,
-		Folder,
-		Pane,
-		Slider,
-		ThemeUtils,
-		Point,
-		List,
-		type ListOptions
-	} from 'svelte-tweakpane-ui';
+	import { Button, Separator, Pane, ThemeUtils, List, type ListOptions } from 'svelte-tweakpane-ui';
 	import { ImageSettings } from './SettingsModel.js';
 
 	export let userSettings: ImageSettings | null = null;
@@ -18,14 +8,12 @@
 		contain: 'contain',
 		cover: 'cover'
 	};
-	let selection: number = 1;
 </script>
 
 {#if userSettings}
-	<Pane position={'inline'} theme={ThemeUtils.presets.jetblack}>
-		<Folder title="Image Viewer Settings"></Folder>
+	<Pane position={'inline'} title="Image Viewer Settings" theme={ThemeUtils.presets.jetblack}>
 		<List bind:value={userSettings.fit} {options} label="Fit" />
-
+		<Separator />
 		<Button on:click={() => (userSettings = new ImageSettings())} title="Reset Defaults" />
 	</Pane>
 {/if}

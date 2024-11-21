@@ -13,8 +13,8 @@
 			data={userData.data}
 			layout={userData.layout}
 			config={userData.config}
-			fillParent={true}
-			debounce={0}
+			fillParent={userSettings.fillParent}
+			debounce={userSettings.debounce}
 			configReactivityStrategy={'none'}
 		/>
 	</div>

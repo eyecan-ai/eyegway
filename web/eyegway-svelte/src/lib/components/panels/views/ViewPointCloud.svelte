@@ -75,18 +75,18 @@
 					{/if}
 				</T.BufferGeometry>
 
-				<T.PointsMaterial size={userSettings.point_size} vertexColors={true} />
+				<T.PointsMaterial size={userSettings.pointSize} vertexColors={true} />
 			</T.Points>
 
 			<Grid
 				type={'grid'}
 				plane={'xy'}
-				cellSize={userSettings.grid_tile}
-				gridSize={[userSettings.grid_size, userSettings.grid_size]}
+				cellSize={userSettings.gridTile}
+				gridSize={[userSettings.gridSize, userSettings.gridSize]}
 				cellThickness={1}
 				sectionColor={'#aaa'}
 				sectionSize={0}
-				cellColor={userSettings.grid_color}
+				cellColor={userSettings.gridColor}
 			/>
 			<T.AxesHelper />
 		</Canvas>
