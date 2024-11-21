@@ -253,6 +253,16 @@
 		color: var(--color-header-buttons) !important;
 		border-color: var(--color-header-buttons) !important;
 	}
+	.button:hover {
+		color: var(--color-header) !important;
+		border-color: var(--color-header) !important;
+		background-color: var(--color-header-buttons) !important;
+	}
+	.button:focus {
+		color: var(--color-header) !important;
+		border-color: var(--color-header) !important;
+		background-color: var(--color-header-buttons) !important;
+	}
 	.button[disabled] {
 		opacity: 0.2;
 	}

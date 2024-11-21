@@ -12,7 +12,7 @@
 </script>
 
 {#if userSettings}
-	<Pane position={'inline'} title="Metadata Viewer Settings" theme={ThemeUtils.presets.jetblack}>
+	<Pane position={'inline'} title="Metadata Viewer Settings">
 		<List bind:value={userSettings.mode} {options} label="Mode" />
 		<Separator />
 		<Button on:click={() => (userSettings = new MetadataSettings())} title="Reset Defaults" />

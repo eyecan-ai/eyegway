@@ -31,7 +31,10 @@
 	<!-- CLEAR LAYOUT -->
 	<button
 		class="button is-small is-danger is-inverted"
-		on:click={configurationReset}
+		on:click={() => {
+			configurationReset();
+			console.log('Clear Layout');
+		}}
 		title="Clear Layout"
 	>
 		<Trash strokeWidth={1} size={18} />

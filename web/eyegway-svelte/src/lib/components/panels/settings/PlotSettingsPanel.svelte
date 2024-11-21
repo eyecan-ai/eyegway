@@ -6,7 +6,7 @@
 </script>
 
 {#if userSettings}
-	<Pane position={'inline'} title="Plot Viewer Settings" theme={ThemeUtils.presets.jetblack}>
+	<Pane position={'inline'} title="Plot Viewer Settings">
 		<Checkbox bind:value={userSettings.fillParent} label="Fill Parent" />
 		<Slider bind:value={userSettings.debounce} label="Debounce" min={0} max={200} step={10} />
 		<Separator />

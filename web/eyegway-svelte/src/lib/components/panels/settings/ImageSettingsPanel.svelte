@@ -11,7 +11,7 @@
 </script>
 
 {#if userSettings}
-	<Pane position={'inline'} title="Image Viewer Settings" theme={ThemeUtils.presets.jetblack}>
+	<Pane position={'inline'} title="Image Viewer Settings">
 		<List bind:value={userSettings.fit} {options} label="Fit" />
 		<Separator />
 		<Button on:click={() => (userSettings = new ImageSettings())} title="Reset Defaults" />

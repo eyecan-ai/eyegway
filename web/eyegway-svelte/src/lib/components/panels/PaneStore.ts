@@ -5,6 +5,7 @@ const paneUtils = new PaneConfigurationUtils();
 export const paneConfiguration = paneUtils.getStore();
 
 export const paneConfigurationReset = () => {
+    console.log('Resetting pane configuration to default value');
     paneUtils.resetStore();
 };
 

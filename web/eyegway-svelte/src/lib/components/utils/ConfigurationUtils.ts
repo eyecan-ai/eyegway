@@ -4,22 +4,22 @@ import { persisted } from 'svelte-persisted-store';
 
 export class ConfigurationUtils<T> {
     protected configurationName: string;
-    protected defaultValue: T;
+    protected defaultValueType: new () => T;
     protected store: Writable<T>;
 
-    constructor(configurationName: string, defaultValue: T) {
+    constructor(configurationName: string, defaultValue: new () => T) {
         this.configurationName = configurationName;
-        this.defaultValue = defaultValue;
+        this.defaultValueType = defaultValue;
         this.store = this.createPersistedStore();
     }
 
     private createPersistedStore(): Writable<T> {
         // Use svelte-persisted-store for persistence
         if (browser) {
-            return persisted<T>(this.configurationName, this.defaultValue);
+            return persisted<T>(this.configurationName, new this.defaultValueType());
         } else {
             // For SSR, use a regular writable store
-            return writable<T>(this.defaultValue);
+            return writable<T>(new this.defaultValueType());
         }
     }
 
@@ -28,7 +28,10 @@ export class ConfigurationUtils<T> {
     }
 
     resetStore(): void {
-        this.store.set(this.defaultValue);
+        console.log('Resetting configuration to default value');
+        this.store.set(new this.defaultValueType());
+        console.log(this.defaultValueType);
+        console.log(get(this.store));
     }
 
     async saveConfigurationToFile(): Promise<void> {

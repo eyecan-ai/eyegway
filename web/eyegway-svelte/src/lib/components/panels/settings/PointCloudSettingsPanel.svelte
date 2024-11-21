@@ -6,11 +6,7 @@
 </script>
 
 {#if userSettings}
-	<Pane
-		position={'inline'}
-		title="Point Clouds Viewer Settings"
-		theme={ThemeUtils.presets.jetblack}
-	>
+	<Pane position={'inline'} title="Point Clouds Viewer Settings">
 		<Color bind:value={userSettings.background} label="Background Color" />
 
 		<Slider

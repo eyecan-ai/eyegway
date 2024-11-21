@@ -45,7 +45,7 @@
 			</button>
 		</div>
 		<div class="dropdown-menu" id="dropdown-menu4" role="menu">
-			<div class="dropdown-content">
+			<div class="dropdown-content has-background-dark">
 				<div class="dropdown-item">
 					{#if hubs.length == 0}
 						{#if isError}
@@ -60,7 +60,7 @@
 					{/if}
 					{#each hubs as hub}
 						<button
-							class="button is-small is-dark is-fullwidth"
+							class="button is-small is-light is-fullwidth"
 							class:is-outlined={hubName !== hub}
 							on:click={() => {
 								hubName = hub;
@@ -78,8 +78,25 @@
 </div>
 
 <style>
-	.button {
+	.dropdown-trigger .button {
 		color: var(--color-header-buttons) !important;
 		border-color: var(--color-header-buttons) !important;
+	}
+	.dropdown-trigger .button:hover {
+		color: var(--color-header) !important;
+		border-color: var(--color-header) !important;
+		background-color: var(--color-header-buttons) !important;
+	}
+	.dropdown-trigger .button:focus {
+		color: var(--color-header) !important;
+		border-color: var(--color-header) !important;
+		background-color: var(--color-header-buttons) !important;
+	}
+	.dropdown-content {
+		color: var(--color-header) !important;
+		background-color: var(--color-header-buttons) !important;
+	}
+	.dropdown-item .button {
+		border-color: var(--color-header) !important;
 	}
 </style>

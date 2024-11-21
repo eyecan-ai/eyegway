@@ -6,7 +6,7 @@
 </script>
 
 {#if userSettings}
-	<Pane position={'inline'} title="Matrix Viewer Settings" theme={ThemeUtils.presets.jetblack}>
+	<Pane position={'inline'} title="Matrix Viewer Settings">
 		<Slider
 			bind:value={userSettings.numFractionDigits}
 			label="Number of Fraction Digits"

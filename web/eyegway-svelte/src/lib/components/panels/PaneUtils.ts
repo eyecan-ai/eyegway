@@ -5,6 +5,6 @@ const defaultPaneConfiguration = new PaneConfiguration();
 
 export class PaneConfigurationUtils extends ConfigurationUtils<PaneConfiguration> {
     constructor() {
-        super('PaneConfiguration', defaultPaneConfiguration);
+        super('PaneConfiguration', PaneConfiguration);
     }
 }

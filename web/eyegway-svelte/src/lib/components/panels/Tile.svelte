@@ -79,22 +79,38 @@
 						</div>
 						<div class="dropdown-menu" id="dropdown-menu" role="menu">
 							<div class="dropdown-content has-background-dark">
-								<a
+								<!-- <a
 									href={'#'}
 									class="dropdown-item has-text-danger is-flex is-justify-content-right"
 									on:click={() => selectTip('')}
 								>
 									<X size={12} />
-								</a>
-								{#each tips as tip}
-									<a
+								</a> -->
+								<div class="dropdown-item">
+									<button
+										class="button is-small is-light is-fullwidth is-outlined has-text-danger"
+										on:click={() => selectTip('')}
+									>
+										<X size={12} />
+										<!-- {'None'} -->
+									</button>
+									{#each tips as tip}
+										<!-- <a
 										href={'#'}
 										class="dropdown-item has-text-white {tip == selectedTip ? 'is-active' : ''} "
 										on:click={() => selectTip(tip)}
 									>
 										{tip}
-									</a>
-								{/each}
+									</a> -->
+										<button
+											class="button is-small is-light is-fullwidth"
+											class:is-outlined={selectedTip !== tip}
+											on:click={() => selectTip(tip)}
+										>
+											{tip}
+										</button>
+									{/each}
+								</div>
 							</div>
 						</div>
 					</div>
@@ -132,7 +148,7 @@
 							</button>
 						</div>
 						<div class="dropdown-menu" id="dropdown-menu4" role="menu">
-							<div class="dropdown-content has-background-dark">
+							<div class="dropdown-content">
 								{#if item?.name}
 									<GenericSettingsPanel bind:userSettings={item.settings} />
 								{/if}
@@ -166,9 +182,9 @@
 		border-radius: 10px;
 		background-color: 'transparent';
 	}
-	.dropdown-item {
+	/* .dropdown-item {
 		padding-right: 10px;
-	}
+	} */
 	.control-item {
 		padding: 0.1em;
 	}

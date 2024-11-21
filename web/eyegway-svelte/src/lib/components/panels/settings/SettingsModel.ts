@@ -76,6 +76,7 @@ export interface ColorStyle {
     internal_gradient: string;
     external_gradient: string;
     header_buttons: string;
+    settings_theme: 'iceberg' | 'jetblack' | 'light' | 'retro' | 'standard' | 'translucent' | 'vivid'
 }
 
 export class StyleSettings {
@@ -88,6 +89,7 @@ export class StyleSettings {
         background: '#ffffff',
         internal_gradient: '#ffffff',
         external_gradient: '#ebebeb',
-        header_buttons: '#444444'
+        header_buttons: '#444444',
+        settings_theme: 'light'
     };
 }

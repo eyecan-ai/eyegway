@@ -4,6 +4,7 @@
 	import { onMount } from 'svelte';
 	import type { PaneConfiguration } from './PaneModel.js';
 	import { GripHorizontal, GripVertical } from 'lucide-svelte';
+	import { paneConfiguration } from './PaneStore.js';
 
 	export let pane: PaneConfiguration;
 	export let editMode;
@@ -35,8 +36,7 @@
 	}
 
 	function handleDelete(event: CustomEvent) {
-		const paneToDelete = event.detail.pane;
-		removePane(pane, paneToDelete);
+		removePane($paneConfiguration, pane);
 	}
 
 	// Recursive function to remove a pane from the tree

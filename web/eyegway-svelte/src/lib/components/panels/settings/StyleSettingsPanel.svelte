@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Color, Pane, ThemeUtils, Image, type ImageValue } from 'svelte-tweakpane-ui';
+	import { Color, Pane, ThemeUtils, Image, type ImageValue, List } from 'svelte-tweakpane-ui';
 	import { StyleSettings } from './SettingsModel.js';
 	import { styleSettings } from './SettingsStore.js';
 	import { onMount } from 'svelte';
@@ -22,10 +22,13 @@
 
 	function handleLogoImageChange(imageValue: ImageValue) {
 		// @ts-ignore
-		convertBlobToBase64(imageValue?.src).then((value) => {
-			if (value) $styleSettings.color.logo = value;
-			console.log('Logo image changed:', $styleSettings.color.logo);
-		});
+		if (imageValue.src !== new StyleSettings().color.logo) {
+			// @ts-ignore
+			convertBlobToBase64(imageValue?.src).then((value) => {
+				if (value) $styleSettings.color.logo = value;
+				console.log('Logo image changed:', $styleSettings.color.logo);
+			});
+		}
 	}
 
 	async function convertBlobToBase64(blobUrl: string): Promise<string> {
@@ -50,6 +53,7 @@
 	onMount(() => {
 		styleSettings.subscribe((value) => {
 			logoImage = value.color.logo;
+			ThemeUtils.setGlobalDefaultTheme(ThemeUtils.presets[value.color.settings_theme]);
 			updateCSSVariables(value);
 		});
 	});
@@ -69,7 +73,7 @@
 		y={innerHeight / 2 - 200}
 		userExpandable={false}
 		resizable={false}
-		theme={ThemeUtils.presets.jetblack}
+		theme={ThemeUtils.presets[$styleSettings.color.settings_theme]}
 		width={paneWidth}
 	>
 		<Image
@@ -80,11 +84,16 @@
 				handleLogoImageChange(logoImage);
 			}}
 		/>
-		<Color bind:value={$styleSettings.color.panel} label="Panel Color" />
 		<Color bind:value={$styleSettings.color.header} label="Header Color" />
 		<Color bind:value={$styleSettings.color.header_buttons} label="Header Buttons Color" />
+		<Color bind:value={$styleSettings.color.panel} label="Panel Color" />
 		<Color bind:value={$styleSettings.color.container} label="Panels Container Color" />
-		<Color bind:value={$styleSettings.color.internal_gradient} label="Gradient Start Color" />
-		<Color bind:value={$styleSettings.color.external_gradient} label="Gradient End Color" />
+		<Color bind:value={$styleSettings.color.internal_gradient} label="Background Center Color" />
+		<Color bind:value={$styleSettings.color.external_gradient} label="Background Border Color" />
+		<List
+			bind:value={$styleSettings.color.settings_theme}
+			label="Settings Theme"
+			options={Object.keys(ThemeUtils.presets)}
+		/>
 	</Pane>
 {/if}

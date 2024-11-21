@@ -32,11 +32,6 @@
 
 <div class="panels">
 	<div class="is-flex p-0 is-align-items-center is-justify-content-center" style="height: 100%">
-		{#if !editMode}
-			{#if !$paneConfiguration || (!$paneConfiguration.split && !$paneConfiguration.item?.name)}
-				<div class="notification m-4 no-items">No items, add one ...</div>
-			{/if}
-		{/if}
 		<PaneNode
 			bind:pane={$paneConfiguration}
 			{editMode}
