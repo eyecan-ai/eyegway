@@ -1,7 +1,7 @@
 <script lang="ts">
 	import HubPanel from '$lib/components/hubs/HubPanel.svelte';
 	import Wall from '$lib/components/panels/Wall.svelte';
-	import { styleSettings } from '$lib/components/panels/settings/StyleSettingsStore.js';
+	import { styleSettings } from '$lib/components/panels/settings/SettingsStore.js';
 
 	let sharedData: any[] = [];
 	let editableMosaic: boolean = false;

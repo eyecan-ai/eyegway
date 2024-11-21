@@ -1,157 +1,69 @@
 <script lang="ts">
 	import PaneNode from './PaneNode.svelte';
-	import StyleSettingsButton from './settings/StyleSettingsButton.svelte';
-	import { EllipsisVertical, Download, Upload, Edit, Save, History, Trash } from 'lucide-svelte';
-	import { PaneConfiguration } from './PaneModel.js';
-	import { PaneConfigurationUtils } from './PaneUtils.js';
-	import { onMount } from 'svelte';
+	import StyleSettingsPanel from './settings/StyleSettingsPanel.svelte';
+	import { Edit, Palette } from 'lucide-svelte';
+	import {
+		paneConfiguration,
+		savePaneConfigurationToFile,
+		loadPaneConfigurationFromFile,
+		paneConfigurationReset
+	} from './PaneStore.js';
+	import {
+		saveStyleSettingsToFile,
+		loadStyleSettingsFromFile,
+		styleSettingsReset
+	} from './settings/SettingsStore.js';
+	import SerializationControls from '../utils/SerializationControls.svelte';
 
 	// State variables
 	export let editMode: boolean = true;
+	export let styleMode: boolean = false;
 	export let dataStream: any = {};
-	export let autoLoadDefault: boolean = true;
-
-	let disabled = false;
-
-	// Initialize root pane
-	let rootPane: PaneConfiguration = {
-		id: Date.now(),
-		split: '',
-		size: 100,
-		children: [],
-		item: { name: '', settings: {} }
-	};
-
-	onMount(() => {
-		if (autoLoadDefault) {
-			loadDefaultConfiguration();
-		}
-	});
-
-	/**
-	 * Export the current configuration. It can be called from the parent component.
-	 */
-	export function exportConfiguration(): PaneConfiguration {
-		const configuration = rootPane;
-		return configuration;
-	}
-
-	/**
-	 * Save the configuration to a file. It can be called from the parent component.
-	 */
-	export function saveConfigurationToFile() {
-		const configuration = exportConfiguration();
-		PaneConfigurationUtils.saveConfigurationToFile(configuration);
-	}
-
-	/**
-	 * Load the configuration from a file. It can be called from the parent component.
-	 */
-	export async function loadConfigurationFromFile() {
-		const configuration = await PaneConfigurationUtils.loadConfigurationFromFile();
-		reloadConfiguration(configuration);
-	}
-
-	/**
-	 * Save the configuration as default. It can be called from the parent component.
-	 */
-	export function saveConfigurationAsDefault() {
-		const configuration = exportConfiguration();
-		PaneConfigurationUtils.saveConfigurationAsDefault(configuration);
-	}
-
-	/**
-	 * Load the default configuration. It can be called from the parent component.
-	 */
-	export function loadDefaultConfiguration() {
-		const configuration = PaneConfigurationUtils.loadDefaultConfiguration();
-		if (configuration) reloadConfiguration(configuration);
-	}
-
-	/**
-	 * Reload the configuration. It can be called from the parent component.
-	 */
-	export function reloadConfiguration(configuration: PaneConfiguration) {
-		disabled = true;
-		rootPane = configuration;
-		setTimeout(() => {
-			disabled = false;
-		}, 100);
-	}
-
-	// Controls visibility
-	let controls = true;
+	export let controls = true;
 
 	// Functions to manage panes
 	function toggleEditMode() {
 		editMode = !editMode;
 	}
-
-	// Handle deletePane event from PaneNode
-	function handleDeletePane(event: CustomEvent) {
-		const paneToDelete = event.detail.pane;
-		removePane(rootPane, paneToDelete);
-		// reassign rootPane to trigger reactivity
-		rootPane = { ...rootPane };
-	}
-
-	// Recursive function to remove a pane from the tree
-	function removePane(parentPane: PaneConfiguration, paneToDelete: PaneConfiguration) {
-		if (!parentPane.children) return false;
-
-		const index = parentPane.children.findIndex((child) => child.id === paneToDelete.id);
-		if (index !== -1) {
-			parentPane.children.splice(index, 1);
-			if (parentPane.children.length === 1) {
-				// Collapse parent pane if only one child remains
-				const remainingChild = parentPane.children[0];
-				parentPane.split = remainingChild.split;
-				parentPane.children = remainingChild.children;
-				parentPane.item = remainingChild.item;
-			} else if (parentPane.children.length === 0) {
-				parentPane.split = '';
-				parentPane.item = { name: '', settings: {} };
-			}
-			return true;
-		}
-
-		// Recursively search in child panes
-		for (let child of parentPane.children) {
-			if (removePane(child, paneToDelete)) {
-				return true;
-			}
-		}
-
-		return false;
+	function toggleStyleMode() {
+		styleMode = !styleMode;
 	}
 </script>
 
 <div class="panels">
 	<div class="is-flex p-0 is-align-items-center is-justify-content-center" style="height: 100%">
 		{#if !editMode}
-			{#if !rootPane || (!rootPane.split && !rootPane.item?.name)}
+			{#if !$paneConfiguration || (!$paneConfiguration.split && !$paneConfiguration.item?.name)}
 				<div class="notification m-4 no-items">No items, add one ...</div>
 			{/if}
 		{/if}
-		<!-- Render the root pane node -->
 		<PaneNode
-			pane={rootPane}
+			bind:pane={$paneConfiguration}
 			{editMode}
 			{dataStream}
 			tips={dataStream ? Object.keys(dataStream) : []}
-			on:deletePane={handleDeletePane}
 		/>
+		<StyleSettingsPanel isDisabled={!styleMode} />
 	</div>
 
 	{#if controls}
-		<div class="controls p-2" class:controls-hidden={!editMode}>
+		<div class="controls p-2" class:controls-hidden={!editMode && !styleMode}>
 			<div class="columns is-vcentered is-variable is-1">
 				<div class="column is-narrow">
-					<StyleSettingsButton />
+					<button
+						class="button is-warning is-small"
+						disabled={editMode}
+						class:is-inverted={styleMode}
+						on:click={toggleStyleMode}
+						title="{styleMode ? 'Disable' : 'Enable'} Edit Mode"
+					>
+						<Palette size={16} />
+					</button>
 				</div>
 				<div class="column is-narrow">
 					<button
 						class="button is-warning is-small"
+						disabled={styleMode}
 						class:is-inverted={editMode}
 						on:click={toggleEditMode}
 						title="{editMode ? 'Disable' : 'Enable'} Edit Mode"
@@ -159,62 +71,19 @@
 						<Edit size={16} />
 					</button>
 				</div>
+				{#if styleMode}
+					<SerializationControls
+						saveConfigurationToFile={saveStyleSettingsToFile}
+						loadConfigurationFromFile={loadStyleSettingsFromFile}
+						configurationReset={styleSettingsReset}
+					/>
+				{/if}
 				{#if editMode}
-					<div class="column is-narrow">
-						<EllipsisVertical size={16} />
-					</div>
-					<div class="column is-narrow">
-						<!-- SAVE TO FILE-->
-						<button
-							class="button is-small is-info is-inverted"
-							on:click={saveConfigurationToFile}
-							title="Download current Configuration to File"
-						>
-							<Download strokeWidth={1} size={18} />
-						</button>
-
-						<!-- LOAD FROM FILE-->
-						<button
-							class="button is-small is-inverted is-info"
-							on:click={loadConfigurationFromFile}
-							title="Load Configuration from File"
-						>
-							<Upload strokeWidth={1} size={18} />
-						</button>
-
-						<!-- SAVE AS DEFAULT-->
-						<button
-							class="button is-small is-inverted is-info"
-							on:click={saveConfigurationAsDefault}
-							title="Save as Default Configuration"
-						>
-							<Save strokeWidth={1} size={18} />
-						</button>
-
-						<!-- LOAD DEFAULT-->
-						<button
-							class="button is-small is-inverted is-info"
-							on:click={loadDefaultConfiguration}
-							title="Reload Default Configuration"
-						>
-							<History strokeWidth={1} size={18} />
-						</button>
-						<!-- CLEAR LAYOUT -->
-						<button
-							class="button is-small is-danger is-inverted"
-							on:click={() =>
-								(rootPane = {
-									id: Date.now(),
-									split: '',
-									size: 100,
-									children: [],
-									item: { name: '', settings: {} }
-								})}
-							title="Clear Layout"
-						>
-							<Trash strokeWidth={1} size={18} />
-						</button>
-					</div>
+					<SerializationControls
+						saveConfigurationToFile={savePaneConfigurationToFile}
+						loadConfigurationFromFile={loadPaneConfigurationFromFile}
+						configurationReset={paneConfigurationReset}
+					/>
 				{/if}
 			</div>
 		</div>
@@ -222,10 +91,6 @@
 </div>
 
 <style>
-	.no-items {
-		margin-top: 100px;
-		position: absolute;
-	}
 	.panels {
 		height: 100%;
 		padding: 5px !important;

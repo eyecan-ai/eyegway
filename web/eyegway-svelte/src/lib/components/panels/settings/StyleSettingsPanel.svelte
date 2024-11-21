@@ -1,17 +1,11 @@
 <script lang="ts">
-	import {
-		Button,
-		Color,
-		Separator,
-		Pane,
-		ThemeUtils,
-		Image,
-		type ImageValue
-	} from 'svelte-tweakpane-ui';
-	import { styleSettings, styleSettingsReset, StyleSettings } from './StyleSettingsStore.js';
+	import { Color, Pane, ThemeUtils, Image, type ImageValue } from 'svelte-tweakpane-ui';
+	import { StyleSettings } from './SettingsModel.js';
+	import { styleSettings } from './SettingsStore.js';
 	import { onMount } from 'svelte';
 
-	let logoImage: ImageValue = 'images/logo.png';
+	export let isDisabled: boolean = true;
+	export let logoImage: ImageValue = $styleSettings.color.logo;
 
 	export function updateCSSVariables(styles: StyleSettings, prefix = '') {
 		if (typeof document === 'undefined') return;
@@ -26,27 +20,71 @@
 		}
 	}
 
+	function handleLogoImageChange(imageValue: ImageValue) {
+		// @ts-ignore
+		convertBlobToBase64(imageValue?.src).then((value) => {
+			if (value) $styleSettings.color.logo = value;
+			console.log('Logo image changed:', $styleSettings.color.logo);
+		});
+	}
+
+	async function convertBlobToBase64(blobUrl: string): Promise<string> {
+		try {
+			const response = await fetch(blobUrl);
+			if (!response.ok) {
+				throw new Error(`Failed to fetch blob: ${response.statusText}`);
+			}
+			const blob = await response.blob();
+			return new Promise((resolve, reject) => {
+				const reader = new FileReader();
+				reader.onloadend = () => resolve(reader.result as string);
+				reader.onerror = () => reject('Error converting blob to Base64');
+				reader.readAsDataURL(blob);
+			});
+		} catch (error) {
+			console.error(error);
+			return '';
+		}
+	}
+
 	onMount(() => {
-		// Update CSS variables when the style settings change
 		styleSettings.subscribe((value) => {
+			logoImage = value.color.logo;
 			updateCSSVariables(value);
 		});
 	});
 
-	// Continuously update the logo image when it changes
-	// @ts-ignore
-	$: $styleSettings.color.logo = logoImage?.src;
+	let innerWidth: number = 0;
+	let innerHeight: number = 0;
+	let paneWidth: number = 500;
 </script>
 
-<Pane position={'inline'} title="Style Settings" theme={ThemeUtils.presets.jetblack} width={350}>
-	<Image bind:value={logoImage} fit="contain" label="Image" />
-	<Color bind:value={$styleSettings.color.panel} label="Panel Color" />
-	<Color bind:value={$styleSettings.color.panel_unselected} label="Empty Panel Color" />
-	<Color bind:value={$styleSettings.color.header} label="Header Color" />
-	<Color bind:value={$styleSettings.color.header_buttons} label="Header Buttons Color" />
-	<Color bind:value={$styleSettings.color.container} label="Panels Container Color" />
-	<Color bind:value={$styleSettings.color.internal_gradient} label="Gradient Start Color" />
-	<Color bind:value={$styleSettings.color.external_gradient} label="Gradient End Color" />
-	<Separator />
-	<Button on:click={styleSettingsReset} title="Reset Defaults" />
-</Pane>
+<svelte:window bind:innerWidth bind:innerHeight />
+{#if !isDisabled}
+	<Pane
+		position={'draggable'}
+		title="Style Settings"
+		scale={1.2}
+		x={(innerWidth - paneWidth) / 2}
+		y={innerHeight / 2 - 200}
+		userExpandable={false}
+		resizable={false}
+		theme={ThemeUtils.presets.jetblack}
+		width={paneWidth}
+	>
+		<Image
+			bind:value={logoImage}
+			fit="contain"
+			label="Logo Image"
+			on:change={() => {
+				handleLogoImageChange(logoImage);
+			}}
+		/>
+		<Color bind:value={$styleSettings.color.panel} label="Panel Color" />
+		<Color bind:value={$styleSettings.color.header} label="Header Color" />
+		<Color bind:value={$styleSettings.color.header_buttons} label="Header Buttons Color" />
+		<Color bind:value={$styleSettings.color.container} label="Panels Container Color" />
+		<Color bind:value={$styleSettings.color.internal_gradient} label="Gradient Start Color" />
+		<Color bind:value={$styleSettings.color.external_gradient} label="Gradient End Color" />
+	</Pane>
+{/if}

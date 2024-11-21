@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { PaneGroup, Pane, PaneResizer } from 'paneforge';
 	import Tile from './Tile.svelte';
-	import { createEventDispatcher, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import type { PaneConfiguration } from './PaneModel.js';
 	import { GripHorizontal, GripVertical } from 'lucide-svelte';
 
@@ -9,8 +9,6 @@
 	export let editMode;
 	export let dataStream;
 	export let tips;
-
-	const dispatch = createEventDispatcher();
 
 	function splitPane(direction: string) {
 		pane.split = direction;
@@ -32,12 +30,43 @@
 		];
 	}
 
-	function handleSplitPane(event: CustomEvent<{ direction: string }>) {
+	function handleSplit(event: CustomEvent<{ direction: string }>) {
 		splitPane(event.detail.direction);
 	}
 
-	function handleDelete() {
-		dispatch('deletePane', { pane });
+	function handleDelete(event: CustomEvent) {
+		const paneToDelete = event.detail.pane;
+		removePane(pane, paneToDelete);
+	}
+
+	// Recursive function to remove a pane from the tree
+	function removePane(parentPane: PaneConfiguration, paneToDelete: PaneConfiguration) {
+		if (!parentPane.children) return false;
+
+		const index = parentPane.children.findIndex((child) => child.id === paneToDelete.id);
+		if (index !== -1) {
+			parentPane.children.splice(index, 1);
+			if (parentPane.children.length === 1) {
+				// Collapse parent pane if only one child remains
+				const remainingChild = parentPane.children[0];
+				parentPane.split = remainingChild.split;
+				parentPane.children = remainingChild.children;
+				parentPane.item = remainingChild.item;
+			} else if (parentPane.children.length === 0) {
+				parentPane.split = '';
+				parentPane.item = { name: '', settings: {} };
+			}
+			return true;
+		}
+
+		// Recursively search in child panes
+		for (let child of parentPane.children) {
+			if (removePane(child, paneToDelete)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	let resizing: boolean = false;
@@ -77,7 +106,7 @@
 					handleResize(child, size, prevSize);
 				}}
 			>
-				<svelte:self pane={child} {editMode} {dataStream} {tips} on:deletePane on:resizePane />
+				<svelte:self bind:pane={child} {editMode} {dataStream} {tips} on:deletePane on:resizePane />
 			</Pane>
 			{#if editMode}
 				{#if pane.children.length > 1 && pane.children.indexOf(child) < pane.children.length - 1}
@@ -118,9 +147,9 @@
 	<Tile
 		editable={editMode}
 		{dataStream}
-		item={pane.item}
+		bind:item={pane.item}
 		{tips}
-		on:splitPane={handleSplitPane}
+		on:splitPane={handleSplit}
 		on:delete={handleDelete}
 	/>
 {/if}

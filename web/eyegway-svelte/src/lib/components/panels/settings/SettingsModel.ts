@@ -67,4 +67,27 @@ export class PointCloudSettings extends GenericSettings {
     }
 }
 
-export type SettingsType = ImageSettings | MatrixSettings | MetadataSettings | PlotSettings | PointCloudSettings;
+export interface ColorStyle {
+    logo: string;
+    panel: string;
+    header: string;
+    container: string;
+    background: string;
+    internal_gradient: string;
+    external_gradient: string;
+    header_buttons: string;
+}
+
+export class StyleSettings {
+    // Global
+    color: ColorStyle = {
+        logo: 'images/logo.png',
+        panel: '#fff',
+        header: '#ffffff',
+        container: '#ffffff',
+        background: '#ffffff',
+        internal_gradient: '#ffffff',
+        external_gradient: '#ebebeb',
+        header_buttons: '#444444'
+    };
+}

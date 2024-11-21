@@ -148,29 +148,11 @@ export class DataExtractor {
 }
 
 export class PaneConfiguration {
-    id: number;
-    split: string;
-    size: number;
-    children: PaneConfiguration[];
-    item: { name: string, settings: GenericSettings }
-
-    constructor(id: number, split: string, size: number, children: PaneConfiguration[], item: { name: string, settings: GenericSettings }) {
-        this.id = id;
-        this.split = split;
-        this.size = size;
-        this.children = children;
-        this.item = item;
-    }
-
-    static fromJson(json: any): PaneConfiguration {
-        return new PaneConfiguration(
-            json.id,
-            json.split,
-            json.size,
-            json.children.map((child: any) => PaneConfiguration.fromJson(child)),
-            json.item
-        );
-    }
+    id: number = Date.now();
+    split: string = '';
+    size: number = 100;
+    children: PaneConfiguration[] = [];
+    item: TileItem = { name: '', settings: {} }
 }
 
 export class TileItem {

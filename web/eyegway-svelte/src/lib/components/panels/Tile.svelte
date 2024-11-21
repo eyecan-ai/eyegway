@@ -164,7 +164,7 @@
 	}
 	.card-empty {
 		border-radius: 10px;
-		background-color: var(--color-panel-unselected);
+		background-color: 'transparent';
 	}
 	.dropdown-item {
 		padding-right: 10px;
