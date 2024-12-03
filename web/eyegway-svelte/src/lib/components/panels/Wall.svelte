@@ -45,41 +45,47 @@
 		<div class="controls p-2" class:controls-hidden={!editMode && !styleMode}>
 			<div class="columns is-vcentered is-variable is-1">
 				<div class="column is-narrow">
-					<button
-						class="button is-warning is-small"
-						disabled={editMode}
-						class:is-inverted={styleMode}
-						on:click={toggleStyleMode}
-						title="{styleMode ? 'Disable' : 'Enable'} Edit Mode"
-					>
-						<Palette size={16} />
-					</button>
+					<div class="columns is-vcentered is-variable is-1">
+						<div class="column is-narrow">
+							<button
+								class="button is-warning is-small"
+								disabled={editMode}
+								class:is-inverted={styleMode}
+								on:click={toggleStyleMode}
+								title="{styleMode ? 'Disable' : 'Enable'} Edit Mode"
+							>
+								<Palette size={16} />
+							</button>
+						</div>
+						<div class="column is-narrow">
+							<button
+								class="button is-warning is-small"
+								disabled={styleMode}
+								class:is-inverted={editMode}
+								on:click={toggleEditMode}
+								title="{editMode ? 'Disable' : 'Enable'} Edit Mode"
+							>
+								<Edit size={16} />
+							</button>
+						</div>
+					</div>
 				</div>
 				<div class="column is-narrow">
-					<button
-						class="button is-warning is-small"
-						disabled={styleMode}
-						class:is-inverted={editMode}
-						on:click={toggleEditMode}
-						title="{editMode ? 'Disable' : 'Enable'} Edit Mode"
-					>
-						<Edit size={16} />
-					</button>
+					{#if styleMode}
+						<SerializationControls
+							saveConfigurationToFile={saveStyleSettingsToFile}
+							loadConfigurationFromFile={loadStyleSettingsFromFile}
+							configurationReset={styleSettingsReset}
+						/>
+					{/if}
+					{#if editMode}
+						<SerializationControls
+							saveConfigurationToFile={savePaneConfigurationToFile}
+							loadConfigurationFromFile={loadPaneConfigurationFromFile}
+							configurationReset={paneConfigurationReset}
+						/>
+					{/if}
 				</div>
-				{#if styleMode}
-					<SerializationControls
-						saveConfigurationToFile={saveStyleSettingsToFile}
-						loadConfigurationFromFile={loadStyleSettingsFromFile}
-						configurationReset={styleSettingsReset}
-					/>
-				{/if}
-				{#if editMode}
-					<SerializationControls
-						saveConfigurationToFile={savePaneConfigurationToFile}
-						loadConfigurationFromFile={loadPaneConfigurationFromFile}
-						configurationReset={paneConfigurationReset}
-					/>
-				{/if}
 			</div>
 		</div>
 	{/if}

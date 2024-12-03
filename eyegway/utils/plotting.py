@@ -60,6 +60,18 @@ class Plot:
             params = dict(json.load(f))
             return cls.from_dict(params=params)
 
+    def to_file(self, params_path: pl.Path) -> None:
+        """
+        Saves the plot data to a JSON file.
+
+        Args:
+            params_path (Path): The path to the JSON file where the plot parameters will be saved.
+        """
+        import json
+
+        with open(params_path, "w") as f:
+            json.dump(self.to_dict(), f)
+
     @classmethod
     def from_dict(cls, params: t.Dict) -> "Plot":
         """

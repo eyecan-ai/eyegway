@@ -67,29 +67,102 @@ export class PointCloudSettings extends GenericSettings {
     }
 }
 
-export interface ColorStyle {
+export interface EyegwayStyle {
     logo: string;
-    panel: string;
-    header: string;
-    container: string;
-    background: string;
-    internal_gradient: string;
-    external_gradient: string;
-    header_buttons: string;
-    settings_theme: 'iceberg' | 'jetblack' | 'light' | 'retro' | 'standard' | 'translucent' | 'vivid'
+    header: { "background-color": { r: number, g: number, b: number, a: number } };
+    panel: { "background-color": { r: number, g: number, b: number, a: number } };
+    content: { "background-color": { r: number, g: number, b: number, a: number } };
+    background: {
+        "first-color": { r: number, g: number, b: number, a: number },
+        "second-color": { r: number, g: number, b: number, a: number }
+    };
+}
+
+export interface BulmaStyle {
+    scheme: { h: string, s: string, main_l: string };
+    primary: { h: string, s: string, l: string };
+    info: { h: string, s: string, l: string };
+    link: { h: string, s: string, l: string };
+    success: { h: string, s: string, l: string };
+    warning: { h: string, s: string, l: string };
+    danger: { h: string, s: string, l: string };
+    //
+    border_l: string;
+    text_l: string;
+    text_strong_l: string,
+    text_weak_l: string,
+    shadow_l: string;
+    dark_l: string;
+    light_l: string;
+    // primary_h: number;
+    info_h: number;
+    link_h: number;
+    success_h: number;
+    warning_h: number;
+    danger_h: number;
 }
 
 export class StyleSettings {
-    // Global
-    color: ColorStyle = {
+    eyegway: EyegwayStyle = {
         logo: 'images/logo.png',
-        panel: '#fff',
-        header: '#ffffff',
-        container: '#ffffff',
-        background: '#ffffff',
-        internal_gradient: '#ffffff',
-        external_gradient: '#ebebeb',
-        header_buttons: '#444444',
-        settings_theme: 'light'
+        header: { "background-color": { r: 255, g: 255, b: 255, a: 1 } },
+        panel: { "background-color": { r: 255, g: 255, b: 255, a: 1 } },
+        content: { "background-color": { r: 255, g: 255, b: 255, a: 1 } },
+        background: {
+            "first-color": { r: 255, g: 255, b: 255, a: 1 },
+            "second-color": { r: 255, g: 255, b: 255, a: 1 }
+        },
+    };
+
+    bulma: BulmaStyle = {
+        scheme: {
+            h: "221deg",
+            s: "14%",
+            main_l: "100%",
+        },
+        primary: {
+            h: "171deg",
+            s: "100%",
+            l: "41%"
+        },
+        info: {
+            h: "198deg",
+            s: "100%",
+            l: "41%"
+        },
+        link: {
+            h: "233deg",
+            s: "100%",
+            l: "41%"
+        },
+        success: {
+            h: "153deg",
+            s: "100%",
+            l: "41%"
+        },
+        warning: {
+            h: "42deg",
+            s: "100%",
+            l: "41%"
+        },
+        danger: {
+            h: "348deg",
+            s: "100%",
+            l: "41%"
+        },
+
+        border_l: "86%",
+        text_l: "29%",
+        text_strong_l: "48%",
+        text_weak_l: "21%",
+        shadow_l: "4%",
+        dark_l: "20%",
+        light_l: "90%",
+        // primary_h: 171,
+        info_h: 198,
+        link_h: 233,
+        success_h: 153,
+        warning_h: 42,
+        danger_h: 348
     };
 }

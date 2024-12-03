@@ -277,6 +277,7 @@
 		display: block;
 	}
 	.controls {
+		padding: 2;
 		border-top: 1px dashed #eee;
 	}
 

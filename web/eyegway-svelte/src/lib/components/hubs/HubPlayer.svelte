@@ -131,7 +131,7 @@
 					<!----------------------------->
 					<p class="control">
 						<button
-							class="button is-small is-white p-0 is-outlined"
+							class="button is-small pl-0 pr-0"
 							on:click={() => setDataPointer(-1)}
 							disabled={!historyFrozen || dataPointer == 0}
 						>
@@ -140,7 +140,7 @@
 					</p>
 					<p class="control">
 						<button
-							class="button is-small is-white p-2 is-outlined"
+							class="button is-small"
 							on:click={() => setDataPointer(null)}
 							disabled={!historyFrozen}
 						>
@@ -149,7 +149,7 @@
 					</p>
 					<p class="control">
 						<button
-							class="button is-small is-white p-0 is-outlined"
+							class="button is-small pl-0 pr-0"
 							on:click={() => setDataPointer(1)}
 							disabled={!historyFrozen || dataPointer == historySize - 1}
 						>
@@ -169,7 +169,7 @@
 				<div class="field has-addons">
 					<div class="dropdown is-right" class:is-hoverable={!historyFrozen}>
 						<div class="dropdown-trigger">
-							<button class="button is-small is-white is-outlined" disabled={historyFrozen}>
+							<button class="button is-small" disabled={historyFrozen}>
 								<Settings strokeWidth={2} size={iconSize} />
 							</button>
 						</div>
@@ -192,7 +192,7 @@
 					<!--------------------->
 					<p class="control">
 						<button
-							class="button is-small is-white is-outlined"
+							class="button is-small"
 							on:click={reload}
 							disabled={historyFrozen}
 							title="Click to trigger a single update"
@@ -206,7 +206,7 @@
 					<!--------------------->
 					<p class="control">
 						<button
-							class="button is-small is-white is-outlined"
+							class="button is-small"
 							style="--animation-time: {autoPlayMs}ms;"
 							class:blink={autoPlay}
 							disabled={historyFrozen}
@@ -231,10 +231,10 @@
 		</div>
 		<div class="column">
 			<button
-				class="button is-small is-outlined has-text-weight-semibold"
+				class="button is-small has-text-weight-semibold is-outlined"
 				style="--animation-time: {autoPlayMs}ms;"
-				class:is-white={historyFrozen}
-				class:is-light={!historyFrozen}
+				class:is-info={historyFrozen}
+				class:is-primary={!historyFrozen}
 				on:click={toggleFreeze}
 				title={!historyFrozen ? 'Click to freeze History' : 'Click to unfreeze History'}
 			>
@@ -249,23 +249,6 @@
 </div>
 
 <style>
-	.button {
-		color: var(--color-header-buttons) !important;
-		border-color: var(--color-header-buttons) !important;
-	}
-	.button:hover {
-		color: var(--color-header) !important;
-		border-color: var(--color-header) !important;
-		background-color: var(--color-header-buttons) !important;
-	}
-	.button:focus {
-		color: var(--color-header) !important;
-		border-color: var(--color-header) !important;
-		background-color: var(--color-header-buttons) !important;
-	}
-	.button[disabled] {
-		opacity: 0.2;
-	}
 	.settings {
 		width: 300px;
 	}

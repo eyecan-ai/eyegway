@@ -33,7 +33,7 @@
 <div class="">
 	<div class="dropdown is-right" class:is-active={isOpen}>
 		<div class="dropdown-trigger">
-			<button class="button is-small is-outlined is-white" on:click={toggle}>
+			<button class="button is-small" on:click={toggle}>
 				<span class="mr-2 has-text-weight-bold">
 					{#if hubName}
 						{hubName}
@@ -45,8 +45,8 @@
 			</button>
 		</div>
 		<div class="dropdown-menu" id="dropdown-menu4" role="menu">
-			<div class="dropdown-content has-background-dark">
-				<div class="dropdown-item">
+			<div class="dropdown-content">
+				<div class="dropdown-item has-text-weight-bold">
 					{#if hubs.length == 0}
 						{#if isError}
 							<article class="message is-danger">
@@ -58,17 +58,25 @@
 							</article>
 						{/if}
 					{/if}
-					{#each hubs as hub}
-						<button
+				</div>
+				{#each hubs as hub}
+					<!-- <button
 							class="button is-small is-light is-fullwidth"
-							class:is-outlined={hubName !== hub}
 							on:click={() => {
 								hubName = hub;
 								isOpen = false;
 							}}>{hub}</button
-						>
-					{/each}
-				</div>
+						> -->
+					<a
+						href={'#'}
+						class="dropdown-item has-text-weight-bold"
+						class:is-active={hub == hubName}
+						on:click={() => {
+							hubName = hub;
+							isOpen = false;
+						}}>{hub}</a
+					>
+				{/each}
 				<div class="dropdown-item">
 					<HubSettings />
 				</div>
@@ -78,25 +86,4 @@
 </div>
 
 <style>
-	.dropdown-trigger .button {
-		color: var(--color-header-buttons) !important;
-		border-color: var(--color-header-buttons) !important;
-	}
-	.dropdown-trigger .button:hover {
-		color: var(--color-header) !important;
-		border-color: var(--color-header) !important;
-		background-color: var(--color-header-buttons) !important;
-	}
-	.dropdown-trigger .button:focus {
-		color: var(--color-header) !important;
-		border-color: var(--color-header) !important;
-		background-color: var(--color-header-buttons) !important;
-	}
-	.dropdown-content {
-		color: var(--color-header) !important;
-		background-color: var(--color-header-buttons) !important;
-	}
-	.dropdown-item .button {
-		border-color: var(--color-header) !important;
-	}
 </style>

@@ -87,7 +87,7 @@
 
 {#if pane.split}
 	<PaneGroup
-		style="overflow: hidden;"
+		style={editMode ? 'overflow: hidden;' : 'overflow: hidden'}
 		{...{
 			...{}
 			/* @ts-ignore */
@@ -97,7 +97,7 @@
 		{#each pane.children as child (child.id)}
 			<Pane
 				defaultSize={child.size}
-				style="overflow: hidden;"
+				style={editMode ? 'overflow: hidden;' : 'overflow: hidden'}
 				{...{
 					...{}
 					/* @ts-ignore */
@@ -119,7 +119,7 @@
 								<div class="is-flex vertical">
 									<GripHorizontal
 										size={20}
-										style="background-color: var(--color-panel); border-radius: 4px;  z-index: 10; border: 2px solid var(--color-header-buttons);"
+										style="color: var(--bulma-scheme-main); background-color: var(--bulma-text-strong); border-radius: 4px;  z-index: 10; border: 2px solid var(--bulma-text);"
 									/>
 								</div>
 								<span class="percent">{resizing ? 100 - child.size + '%' : ''}</span>
@@ -132,7 +132,7 @@
 									<span class="percent">{resizing ? child.size + '%' : ''}</span>
 									<GripVertical
 										size={20}
-										style="background-color: var(--color-panel); border-radius: 4px;  z-index: 10; border: 2px solid var(--color-header-buttons);"
+										style="color: var(--bulma-scheme-main); background-color: var(--bulma-text-strong); border-radius: 4px;  z-index: 10; border: 2px solid var(--bulma-text);"
 									/>
 									<span class="percent">{resizing ? 100 - child.size + '%' : ''}</span>
 								</div>

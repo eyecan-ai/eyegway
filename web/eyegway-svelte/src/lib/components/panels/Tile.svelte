@@ -53,7 +53,7 @@
 <div class="tile-content">
 	{#if editable}
 		<!-- Editable Mode -->
-		<div class="item-editable {item?.name ? 'card' : 'card-empty'}">
+		<div class="item-editable {item?.name ? 'card panel' : 'panel-empty'}">
 			<div class="item-preview">
 				<div class="blur-content">
 					{#if item?.name}
@@ -66,7 +66,7 @@
 					<div class="dropdown" class:is-active={isDropdownOpen}>
 						<div class="dropdown-trigger">
 							<button
-								class="button is-small is-dark is-fullwidth"
+								class="button is-small is-fullwidth"
 								aria-haspopup="true"
 								aria-controls="dropdown-menu"
 								on:click={() => (isDropdownOpen = !isDropdownOpen)}
@@ -78,39 +78,23 @@
 							</button>
 						</div>
 						<div class="dropdown-menu" id="dropdown-menu" role="menu">
-							<div class="dropdown-content has-background-dark">
-								<!-- <a
+							<div class="dropdown-content">
+								<a
 									href={'#'}
 									class="dropdown-item has-text-danger is-flex is-justify-content-right"
 									on:click={() => selectTip('')}
 								>
 									<X size={12} />
-								</a> -->
-								<div class="dropdown-item">
-									<button
-										class="button is-small is-light is-fullwidth is-outlined has-text-danger"
-										on:click={() => selectTip('')}
-									>
-										<X size={12} />
-										<!-- {'None'} -->
-									</button>
-									{#each tips as tip}
-										<!-- <a
+								</a>
+								{#each tips as tip}
+									<a
 										href={'#'}
-										class="dropdown-item has-text-white {tip == selectedTip ? 'is-active' : ''} "
+										class="dropdown-item {tip == selectedTip ? 'is-active' : ''} "
 										on:click={() => selectTip(tip)}
 									>
 										{tip}
-									</a> -->
-										<button
-											class="button is-small is-light is-fullwidth"
-											class:is-outlined={selectedTip !== tip}
-											on:click={() => selectTip(tip)}
-										>
-											{tip}
-										</button>
-									{/each}
-								</div>
+									</a>
+								{/each}
 							</div>
 						</div>
 					</div>
@@ -119,7 +103,7 @@
 			<div class="columns is-multiline controls is-mobile is-centered">
 				<div class="column control-item is-narrow">
 					<button
-						class="button is-small is-light is-info"
+						class="button is-small is-info"
 						on:click={splitHorizontal}
 						title="Split horizontally"
 					>
@@ -127,11 +111,7 @@
 					</button>
 				</div>
 				<div class="column control-item is-narrow">
-					<button
-						class="button is-small is-light is-info"
-						on:click={splitVertical}
-						title="Split vertically"
-					>
+					<button class="button is-small is-info" on:click={splitVertical} title="Split vertically">
 						<SplitSquareVertical size={16} />
 					</button>
 				</div>
@@ -139,7 +119,7 @@
 					<div class="dropdown is-hoverable is-right is-down">
 						<div class="dropdown-trigger">
 							<button
-								class="button is-small"
+								class="button is-small is-warning"
 								disabled={item?.name ? false : true}
 								aria-haspopup="true"
 								aria-controls="dropdown-menu4"
@@ -165,7 +145,7 @@
 		</div>
 	{:else}
 		<!-- Display Mode -->
-		<div class="item {item?.name ? 'card' : ''}">
+		<div class="item {item?.name ? 'card panel' : ''}">
 			{#if item?.name}
 				<ViewGeneric userData={extractedData} userSettings={item.settings} />
 			{/if}
@@ -174,17 +154,18 @@
 </div>
 
 <style>
-	.card {
-		border-radius: 10px;
-		background-color: var(--color-panel);
+	.panel {
+		background-color: rgba(
+			var(--eyegway-panel-background-color-r),
+			var(--eyegway-panel-background-color-g),
+			var(--eyegway-panel-background-color-b),
+			var(--eyegway-panel-background-color-a)
+		);
 	}
-	.card-empty {
+	.panel-empty {
 		border-radius: 10px;
 		background-color: 'transparent';
 	}
-	/* .dropdown-item {
-		padding-right: 10px;
-	} */
 	.control-item {
 		padding: 0.1em;
 	}
