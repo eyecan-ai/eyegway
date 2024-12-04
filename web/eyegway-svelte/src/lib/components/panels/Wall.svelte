@@ -2,17 +2,8 @@
 	import PaneNode from './PaneNode.svelte';
 	import StyleSettingsPanel from './settings/StyleSettingsPanel.svelte';
 	import { Edit, Palette } from 'lucide-svelte';
-	import {
-		paneConfiguration,
-		savePaneConfigurationToFile,
-		loadPaneConfigurationFromFile,
-		paneConfigurationReset
-	} from './PaneStore.js';
-	import {
-		saveStyleSettingsToFile,
-		loadStyleSettingsFromFile,
-		styleSettingsReset
-	} from './settings/SettingsStore.js';
+	import { paneUtils, paneConfiguration } from './PaneStore.js';
+	import { styleUtils } from './settings/SettingsStore.js';
 	import SerializationControls from '../utils/SerializationControls.svelte';
 
 	// State variables
@@ -72,18 +63,10 @@
 				</div>
 				<div class="column is-narrow">
 					{#if styleMode}
-						<SerializationControls
-							saveConfigurationToFile={saveStyleSettingsToFile}
-							loadConfigurationFromFile={loadStyleSettingsFromFile}
-							configurationReset={styleSettingsReset}
-						/>
+						<SerializationControls config={styleUtils} />
 					{/if}
 					{#if editMode}
-						<SerializationControls
-							saveConfigurationToFile={savePaneConfigurationToFile}
-							loadConfigurationFromFile={loadPaneConfigurationFromFile}
-							configurationReset={paneConfigurationReset}
-						/>
+						<SerializationControls config={paneUtils} />
 					{/if}
 				</div>
 			</div>

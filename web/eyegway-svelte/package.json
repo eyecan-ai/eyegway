@@ -51,6 +51,7 @@
 		"lucide-svelte": "^0.378.0",
 		"paneforge": "^0.0.6",
 		"plotly.js-dist": "^2.35.2",
+		"remeda": "^2.17.4",
 		"svelte-grid-extended": "^1.1.4",
 		"svelte-jsoneditor": "^0.21.5",
 		"svelte-persisted-store": "^0.9.1",

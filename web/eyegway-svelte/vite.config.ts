@@ -1,5 +1,5 @@
 import { sveltekit } from '@sveltejs/kit/vite';
-import { defineConfig } from 'vitest/config';
+import { defineConfig, searchForWorkspaceRoot } from 'vite';
 
 export default defineConfig({
 	plugins: [sveltekit()],
@@ -8,6 +8,16 @@ export default defineConfig({
 	},
 	ssr: {
 		noExternal: ['three']
+	},
+	server: {
+		fs: {
+			allow: [
+				// @ts-ignore
+				searchForWorkspaceRoot(process.cwd()),
+				'/public/themes',
+				'/public/layouts',
+			],
+		},
 	}
 
 });

@@ -92,17 +92,10 @@ export interface BulmaStyle {
     text_strong_l: string,
     text_weak_l: string,
     shadow_l: string;
-    dark_l: string;
-    light_l: string;
-    // primary_h: number;
-    info_h: number;
-    link_h: number;
-    success_h: number;
-    warning_h: number;
-    danger_h: number;
 }
 
 export class StyleSettings {
+    id: number = Date.now();
     eyegway: EyegwayStyle = {
         logo: 'images/logo.png',
         header: { "background-color": { r: 255, g: 255, b: 255, a: 1 } },
@@ -156,13 +149,5 @@ export class StyleSettings {
         text_strong_l: "48%",
         text_weak_l: "21%",
         shadow_l: "4%",
-        dark_l: "20%",
-        light_l: "90%",
-        // primary_h: 171,
-        info_h: 198,
-        link_h: 233,
-        success_h: 153,
-        warning_h: 42,
-        danger_h: 348
     };
 }
