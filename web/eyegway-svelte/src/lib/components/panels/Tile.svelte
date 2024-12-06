@@ -22,11 +22,11 @@
 	const dispatch = createEventDispatcher();
 
 	function splitHorizontal() {
-		dispatch('splitPane', { direction: 'horizontal' });
+		dispatch('split', { direction: 'horizontal' });
 	}
 
 	function splitVertical() {
-		dispatch('splitPane', { direction: 'vertical' });
+		dispatch('split', { direction: 'vertical' });
 	}
 
 	function onDelete() {
@@ -47,6 +47,7 @@
 		if (item) item.name = tip;
 		selectedTip = tip;
 		isDropdownOpen = false;
+		dispatch('update');
 	}
 </script>
 

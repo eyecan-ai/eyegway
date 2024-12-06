@@ -1,196 +1,91 @@
 <script lang="ts">
-	import { PaneGroup, Pane, PaneResizer } from 'paneforge';
+	import { PaneGroup, Pane, PaneResizer, type PaneAPI } from 'paneforge';
 	import Tile from './Tile.svelte';
-	import { onMount } from 'svelte';
-	import type { PaneConfiguration } from './PaneModel.js';
-	import { GripHorizontal, GripVertical } from 'lucide-svelte';
+	import { type PaneConfiguration, splitPane, removePane } from './PaneModel.js';
 	import { paneConfiguration } from './PaneStore.js';
+
+	import { createEventDispatcher, onMount } from 'svelte';
+	import PaneHandle from './PaneHandle.svelte';
+
+	let dispatch = createEventDispatcher();
+
+	export let draggingStep = 1;
 
 	export let pane: PaneConfiguration;
 	export let editMode;
 	export let dataStream;
 	export let tips;
 
-	function splitPane(direction: string) {
-		pane.split = direction;
-		pane.children = [
-			{
-				id: Date.now(),
-				split: '',
-				size: 50,
-				children: [],
-				item: { name: pane.item.name, settings: pane.item.settings } // Clone the item
-			},
-			{
-				id: Date.now() + 1,
-				split: '',
-				size: 50,
-				children: [],
-				item: { name: '', settings: {} }
-			}
-		];
+	let showPercentage: boolean = false;
+
+	function handleUpdate() {
+		pane = { ...pane };
+		dispatch('update');
 	}
 
-	function handleSplit(event: CustomEvent<{ direction: string }>) {
-		splitPane(event.detail.direction);
+	function handleSplit(event: CustomEvent<{ direction: 'horizontal' | 'vertical' }>) {
+		splitPane(pane, event.detail.direction);
+		handleUpdate();
 	}
 
 	function handleDelete(event: CustomEvent) {
 		removePane($paneConfiguration, pane);
+		handleUpdate();
 	}
 
-	// Recursive function to remove a pane from the tree
-	function removePane(parentPane: PaneConfiguration, paneToDelete: PaneConfiguration) {
-		if (!parentPane.children) return false;
+	function handleResize(child: PaneConfiguration, index: number, size: number) {
+		showPercentage = true; // Show percentage while dragging
 
-		const index = parentPane.children.findIndex((child) => child.id === paneToDelete.id);
-		if (index !== -1) {
-			parentPane.children.splice(index, 1);
-			if (parentPane.children.length === 1) {
-				// Collapse parent pane if only one child remains
-				const remainingChild = parentPane.children[0];
-				parentPane.split = remainingChild.split;
-				parentPane.children = remainingChild.children;
-				parentPane.item = remainingChild.item;
-			} else if (parentPane.children.length === 0) {
-				parentPane.split = '';
-				parentPane.item = { name: '', settings: {} };
-			}
-			return true;
-		}
-
-		// Recursively search in child panes
-		for (let child of parentPane.children) {
-			if (removePane(child, paneToDelete)) {
-				return true;
-			}
-		}
-
-		return false;
+		// Round size to nearest multiple of draggingStep
+		child.size = Math.round(size / draggingStep) * draggingStep;
+		if (apis[index]) apis[index].resize(child.size);
+		handleUpdate();
 	}
 
-	let resizing: boolean = false;
+	function handleDraggingChange(child: PaneConfiguration) {
+		showPercentage = false; // Hide percentage when finished dragging
+		handleUpdate();
+	}
 
 	onMount(() => {
-		resizing = false;
+		showPercentage = false; // Hide percentage on mount
 	});
 
-	function handleResize(child: PaneConfiguration, size: number, prevSize: number | undefined) {
-		child.size = Math.round(size);
-		pane = { ...pane }; // Trigger reactivity
-		resizing = true;
-	}
-	function handleDraggingChange() {
-		resizing = false;
-	}
+	let apis: Record<number, PaneAPI | undefined> = {};
 </script>
 
 {#if pane.split}
-	<PaneGroup
-		style={editMode ? 'overflow: hidden;' : 'overflow: hidden'}
-		{...{
-			...{}
-			/* @ts-ignore */
-		}}
-		direction={pane.split}
-	>
-		{#each pane.children as child (child.id)}
+	<PaneGroup style={'overflow: hidden'} direction={pane.split}>
+		{#each pane.children as child, index}
 			<Pane
 				defaultSize={child.size}
-				style={editMode ? 'overflow: hidden;' : 'overflow: hidden'}
-				{...{
-					...{}
-					/* @ts-ignore */
+				style={'overflow: hidden'}
+				onResize={(size, _) => {
+					handleResize(child, index, size);
 				}}
-				onResize={(size, prevSize) => {
-					handleResize(child, size, prevSize);
-				}}
+				bind:pane={apis[index]}
 			>
-				<svelte:self bind:pane={child} {editMode} {dataStream} {tips} on:deletePane on:resizePane />
+				<svelte:self bind:pane={child} {editMode} {dataStream} {tips} on:update={handleUpdate} />
 			</Pane>
 			{#if editMode}
 				{#if pane.children.length > 1 && pane.children.indexOf(child) < pane.children.length - 1}
-					<PaneResizer class="dots" onDraggingChange={handleDraggingChange}>
-						{#if pane.split == 'vertical'}
-							<div
-								class="is-flex is-flex-direction-column is-align-items-center is-justify-content-center dots vertical"
-							>
-								<span class="percent">{resizing ? child.size + '%' : ''}</span>
-								<div class="is-flex vertical">
-									<GripHorizontal
-										size={20}
-										style="color: var(--bulma-scheme-main); background-color: var(--bulma-text-strong); border-radius: 4px;  z-index: 10; border: 2px solid var(--bulma-text);"
-									/>
-								</div>
-								<span class="percent">{resizing ? 100 - child.size + '%' : ''}</span>
-							</div>
-						{:else}
-							<div
-								class=" is-flex is-flex-direction-row is-align-items-center is-justify-content-center dots horizontal"
-							>
-								<div class="is-flex horizontal">
-									<span class="percent">{resizing ? child.size + '%' : ''}</span>
-									<GripVertical
-										size={20}
-										style="color: var(--bulma-scheme-main); background-color: var(--bulma-text-strong); border-radius: 4px;  z-index: 10; border: 2px solid var(--bulma-text);"
-									/>
-									<span class="percent">{resizing ? 100 - child.size + '%' : ''}</span>
-								</div>
-							</div>
-						{/if}
+					<PaneResizer onDraggingChange={() => handleDraggingChange(child)}>
+						<PaneHandle direction={pane.split} percentage={child.size} {showPercentage} />
 					</PaneResizer>
 				{/if}
 			{/if}
 		{/each}
 	</PaneGroup>
 {:else}
-	<Tile
-		editable={editMode}
-		{dataStream}
-		bind:item={pane.item}
-		{tips}
-		on:splitPane={handleSplit}
-		on:delete={handleDelete}
-	/>
+	{#key pane.split}
+		<Tile
+			editable={editMode}
+			{dataStream}
+			bind:item={pane.item}
+			{tips}
+			on:split={handleSplit}
+			on:delete={handleDelete}
+			on:update={handleUpdate}
+		/>
+	{/key}
 {/if}
-
-<style>
-	.dots {
-		color: var(--color-header-buttons);
-		width: 100%;
-		height: 100%;
-	}
-	.dots.vertical {
-		height: 2px;
-		background: linear-gradient(
-			to right,
-			#ffffff00 0%,
-			#ffffff00 14%,
-			var(--color-header-buttons) 15%,
-			var(--color-header-buttons) 85%,
-			#ffffff00 86%,
-			#ffffff00 100%
-		);
-	}
-	.dots.horizontal {
-		width: 2px;
-		background: linear-gradient(
-			to bottom,
-			#ffffff00 0%,
-			#ffffff00 14%,
-			var(--color-header-buttons) 15%,
-			var(--color-header-buttons) 85%,
-			#ffffff00 86%,
-			#ffffff00 100%
-		);
-	}
-	.percent {
-		font-size: 0.7em;
-		font-weight: bold;
-		padding-left: 5px;
-		padding-right: 5px;
-		z-index: 10;
-		mix-blend-mode: exclusion;
-		filter: invert();
-	}
-</style>

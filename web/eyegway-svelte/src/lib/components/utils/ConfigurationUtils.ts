@@ -3,14 +3,18 @@ import { writable, type Writable, get } from 'svelte/store';
 import { persisted } from 'svelte-persisted-store';
 import { isDeepEqual, clone, find, pipe } from 'remeda';
 
-export class ConfigurationUtils<T> {
-    protected configurationName: string;
-    protected defaultValueType: new () => T;
-    protected configOptions?: Record<string, unknown>;
-    protected defaultOption?: string;
-    protected store: Writable<T>;
+export interface ConfigurationModel {
+    id: number
+}
 
-    constructor(configurationName: string, defaultValue: new () => T, configOptions?: Record<string, unknown>, defaultOption?: string) {
+export class ConfigurationUtils<ConfigurationModel> {
+    protected configurationName: string;
+    protected defaultValueType: new () => ConfigurationModel;
+    protected configOptions?: Record<string, ConfigurationModel>;
+    protected defaultOption?: string;
+    protected store: Writable<ConfigurationModel>;
+
+    constructor(configurationName: string, defaultValue: new () => ConfigurationModel, configOptions?: Record<string, ConfigurationModel>, defaultOption?: string) {
         this.configurationName = configurationName;
         this.defaultValueType = defaultValue;
         this.configOptions = configOptions;
@@ -18,25 +22,25 @@ export class ConfigurationUtils<T> {
         this.store = this.createPersistedStore();
     }
 
-    private createPersistedStore(): Writable<T> {
+    private createPersistedStore(): Writable<ConfigurationModel> {
         // Use svelte-persisted-store for persistence
         if (browser) {
-            return persisted<T>(this.configurationName, new this.defaultValueType());
+            return persisted<ConfigurationModel>(this.configurationName, new this.defaultValueType());
         } else {
             // For SSR, use a regular writable store
-            return writable<T>(new this.defaultValueType());
+            return writable<ConfigurationModel>(new this.defaultValueType());
         }
     }
 
-    getStore(): Writable<T> {
+    getStore(): Writable<ConfigurationModel> {
         return this.store;
     }
 
     resetStore(): void {
         if (this.configOptions && this.defaultOption && this.configOptions[this.defaultOption]) {
-            const configuration = this.configOptions[this.defaultOption] as T;
+            const configuration = this.configOptions[this.defaultOption] as ConfigurationModel;
             if (configuration) {
-                this.store.set(configuration);
+                this.store.set(clone(configuration));
             }
         }
         else {
@@ -47,11 +51,14 @@ export class ConfigurationUtils<T> {
     async saveConfigurationToFile(): Promise<void> {
         if (browser) {
             const configuration = get(this.store);
+            // @ts-ignore
+            // Omit the default property from the configuration
+            const { default: _, ...configWithoutDefault } = configuration;
             const configurationName = prompt('Please enter configuration name', this.configurationName + '_' + new Date().toISOString());
             if (configurationName == null) {
                 return;
             }
-            const blob = new Blob([JSON.stringify(configuration)], { type: 'application/json' });
+            const blob = new Blob([JSON.stringify(configWithoutDefault)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
@@ -77,9 +84,8 @@ export class ConfigurationUtils<T> {
         return new Promise((resolve, reject) => {
             if (this.configOptions) {
                 const configuration = get(this.store);
-                console.log("Active Configuration is: ", configuration);
-                console.log("Possible configurations are: ", clone(this.configOptions));
-                const activeOption = pipe(Object.entries(this.configOptions), find(([_, value]) => isDeepEqual(clone(value), configuration)));
+                // @ts-ignore
+                const activeOption = pipe(Object.entries(this.configOptions), find(([_, value]) => value.id === configuration.id));
                 if (activeOption) {
                     resolve(activeOption[0]);
                 } else {
@@ -94,7 +100,7 @@ export class ConfigurationUtils<T> {
     async loadConfigurationFromOptions(optionName: string): Promise<void> {
         return new Promise((resolve, reject) => {
             if (this.configOptions) {
-                const configuration = this.configOptions[optionName] as T;
+                const configuration = this.configOptions[optionName] as ConfigurationModel;
                 if (configuration) {
                     this.store.set(clone(configuration));
                     resolve();
@@ -119,8 +125,8 @@ export class ConfigurationUtils<T> {
                         const reader = new FileReader();
                         reader.onload = () => {
                             try {
-                                const configuration = JSON.parse(reader.result as string) as T;
-                                this.store.set(configuration);
+                                const configuration = JSON.parse(reader.result as string) as ConfigurationModel;
+                                this.store.set(clone(configuration));
                                 resolve();
                             } catch (error) {
                                 reject(error);

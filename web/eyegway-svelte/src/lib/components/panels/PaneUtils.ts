@@ -7,7 +7,7 @@ export class PaneConfigurationUtils extends ConfigurationUtils<PaneConfiguration
             'EyegwayPaneConfiguration',
             PaneConfiguration,
             import.meta.glob("/public/layouts/*.json", { eager: true }),
-            '/public/layouts/default_layout.json'
+            '/public/layouts/default.json'
         );
     }
 }

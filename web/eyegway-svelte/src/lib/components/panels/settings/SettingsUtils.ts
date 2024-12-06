@@ -7,7 +7,7 @@ export class StyleSettingsUtils extends ConfigurationUtils<StyleSettings> {
             'EyegwayStyleSettings',
             StyleSettings,
             import.meta.glob("/public/themes/*.json", { eager: true }),
-            '/public/themes/default_theme.json'
+            '/public/themes/default.json'
         );
     }
 }

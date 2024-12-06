@@ -7,6 +7,7 @@ import {
     PlotSettings,
     type GenericSettings
 } from './settings/SettingsModel.js';
+import { type ConfigurationModel } from '../utils/ConfigurationUtils.js';
 export class GenericData { }
 
 
@@ -147,9 +148,9 @@ export class DataExtractor {
     }
 }
 
-export class PaneConfiguration {
+export class PaneConfiguration implements ConfigurationModel {
     id: number = Date.now();
-    split: string = '';
+    split: '' | 'horizontal' | 'vertical' = '';
     size: number = 100;
     children: PaneConfiguration[] = [];
     item: TileItem = { name: '', settings: {} }
@@ -163,4 +164,54 @@ export class TileItem {
         this.name = name;
         this.settings = settings;
     }
+}
+
+export function splitPane(pane: PaneConfiguration, direction: 'horizontal' | 'vertical') {
+    pane.split = direction;
+    pane.children = [
+        {
+            id: Date.now(),
+            split: '',
+            size: 100,
+            children: [],
+            item: { name: pane.item.name, settings: pane.item.settings }, // Clone the item
+        },
+        {
+            id: Date.now() + 1,
+            split: '',
+            size: 100,
+            children: [],
+            item: { name: '', settings: {} },
+        }
+    ];
+}
+
+// Recursive function to remove a pane from the tree
+export function removePane(parentPane: PaneConfiguration, paneToDelete: PaneConfiguration) {
+    if (!parentPane.children) return false;
+
+    const index = parentPane.children.findIndex((child) => child.id === paneToDelete.id);
+    if (index !== -1) {
+        parentPane.children.splice(index, 1);
+        if (parentPane.children.length === 1) {
+            // Collapse parent pane if only one child remains
+            const remainingChild = parentPane.children[0];
+            parentPane.split = remainingChild.split;
+            parentPane.children = remainingChild.children;
+            parentPane.item = remainingChild.item;
+        } else if (parentPane.children.length === 0) {
+            parentPane.split = '';
+            parentPane.item = { name: '', settings: {} };
+        }
+        return true;
+    }
+
+    // Recursively search in child panes
+    for (let child of parentPane.children) {
+        if (removePane(child, paneToDelete)) {
+            return true;
+        }
+    }
+
+    return false;
 }

@@ -1,3 +1,5 @@
+import { type ConfigurationModel } from "$lib/components/utils/ConfigurationUtils.js";
+
 export class GenericSettings { }
 
 
@@ -94,7 +96,7 @@ export interface BulmaStyle {
     shadow_l: string;
 }
 
-export class StyleSettings {
+export class StyleSettings implements ConfigurationModel {
     id: number = Date.now();
     eyegway: EyegwayStyle = {
         logo: 'images/logo.png',

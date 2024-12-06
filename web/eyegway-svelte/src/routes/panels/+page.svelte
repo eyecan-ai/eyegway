@@ -2,9 +2,48 @@
 	import HubPanel from '$lib/components/hubs/HubPanel.svelte';
 	import Wall from '$lib/components/panels/Wall.svelte';
 	import { styleSettings } from '$lib/components/panels/settings/SettingsStore.js';
+	import { ThemeUtils } from 'svelte-tweakpane-ui';
+	import { onMount } from 'svelte';
 
 	let sharedData: any[] = [];
 	let editableMosaic: boolean = false;
+
+	onMount(() => {
+		const customTheme = {
+			...{
+				baseBackgroundColor: 'var(--bulma-body-background-color)',
+				baseBorderRadius: 'var(--bulma-radius)',
+				baseFontFamily: 'var(--bulma-family-primary)',
+				baseShadowColor: 'var(--bulma-shadow-color)',
+				bladeBorderRadius: 'var(--bulma-radius-small)',
+				bladeHorizontalPadding: 'var(--bulma-block-spacing)',
+				buttonBackgroundColor: 'var(--bulma-button-background-color)',
+				buttonBackgroundColorActive: 'var(--bulma-button-background-color-active)',
+				buttonBackgroundColorFocus: 'var(--bulma-button-background-color-focus)',
+				buttonBackgroundColorHover: 'var(--bulma-button-background-color-hover)',
+				buttonForegroundColor: 'var(--bulma-button-color)',
+				containerBackgroundColor: 'var(--bulma-card-background-color)',
+				containerBackgroundColorActive: 'var(--bulma-card-background-color-active)',
+				containerBackgroundColorFocus: 'var(--bulma-card-background-color-focus)',
+				containerBackgroundColorHover: 'var(--bulma-card-background-color-hover)',
+				containerForegroundColor: 'var(--bulma-card-color)',
+				containerHorizontalPadding: 'var(--bulma-card-padding)',
+				containerVerticalPadding: 'var(--bulma-card-padding)',
+				grooveForegroundColor: 'var(--bulma-border)',
+				inputBackgroundColor: 'var(--bulma-input-background-color)',
+				inputBackgroundColorActive: 'var(--bulma-input-background-color-active)',
+				inputBackgroundColorFocus: 'var(--bulma-input-background-color-focus)',
+				inputBackgroundColorHover: 'var(--bulma-input-background-color-hover)',
+				inputForegroundColor: 'var(--bulma-input-color)',
+				labelForegroundColor: 'var(--bulma-label-color)',
+				monitorBackgroundColor: 'var(--bulma-background)',
+				monitorForegroundColor: 'var(--bulma-text)',
+				pluginImageDraggingColor: 'var(--bulma-background)'
+			}
+		};
+
+		ThemeUtils.setGlobalDefaultTheme(customTheme);
+	});
 </script>
 
 <div class="container is-fluid">
@@ -29,33 +68,6 @@
 </div>
 
 <style>
-	:root {
-		--color-header: rgba(255, 255, 255, 0);
-		--color-content: #ffffff;
-		--color-grad-start: #ffffff;
-		--color-grad-end: #ebebeb;
-		--color-header-buttons: #444444;
-	}
-	:global(html) {
-		background-image: radial-gradient(
-			at center center,
-			rgba(
-					var(--eyegway-background-first-color-r),
-					var(--eyegway-background-first-color-g),
-					var(--eyegway-background-first-color-b),
-					var(--eyegway-background-first-color-a)
-				)
-				27%,
-			rgba(
-					var(--eyegway-background-second-color-r),
-					var(--eyegway-background-second-color-g),
-					var(--eyegway-background-second-color-b),
-					var(--eyegway-background-second-color-a)
-				)
-				100%
-		);
-		overflow: hidden;
-	}
 	.header {
 		background-color: rgba(
 			var(--eyegway-header-background-color-r),
