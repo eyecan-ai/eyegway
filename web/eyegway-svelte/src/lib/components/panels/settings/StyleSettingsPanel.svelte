@@ -93,7 +93,7 @@
 
 	let innerWidth: number = 0;
 	let innerHeight: number = 0;
-	let paneWidth: number = 400;
+	let paneWidth: number = 500;
 </script>
 
 <svelte:window bind:innerWidth bind:innerHeight />
@@ -101,7 +101,7 @@
 	<Pane
 		position={'draggable'}
 		title="Style Settings"
-		scale={1}
+		scale={1.4}
 		x={(innerWidth - paneWidth) / 2}
 		y={innerHeight / 2 - 200}
 		userExpandable={false}
@@ -114,14 +114,18 @@
 					bind:value={logoImage}
 					fit="contain"
 					label="Logo Image"
-					on:change={() => {
-						if (logoImage instanceof HTMLImageElement && logoImage.src) {
-							convertBlobToBase64(logoImage.src).then((value) => {
-								if (value) $styleSettings.eyegway.logo = value;
-							});
-						}
+					on:change={(e) => {
+						if (e.detail.origin === 'internal') {
+							if (logoImage instanceof HTMLImageElement && logoImage.src) {
+								convertBlobToBase64(logoImage.src).then((value) => {
+									if (value) $styleSettings.eyegway.logo = value;
+								});
+							}
 
-						logoImage = $styleSettings.eyegway.logo;
+							logoImage = $styleSettings.eyegway.logo;
+
+							$styleSettings.id = Date.now();
+						}
 					}}
 				/>
 				<Color

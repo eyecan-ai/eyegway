@@ -66,9 +66,9 @@
 
 	{#if controls}
 		<div class="controls p-2" class:controls-hidden={!editMode && !styleMode}>
-			<div class="columns is-vcentered is-variable is-1">
+			<div class="columns is-vcentered is-variable is-1 is-mobile">
 				<div class="column is-narrow">
-					<div class="columns is-vcentered is-variable is-1">
+					<div class="columns is-vcentered is-variable is-1 is-mobile">
 						<div class="column is-narrow">
 							<button
 								class="button is-warning is-small"

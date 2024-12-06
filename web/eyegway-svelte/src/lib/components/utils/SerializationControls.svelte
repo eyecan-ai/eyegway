@@ -46,7 +46,7 @@
 	}
 </script>
 
-<div transition:slide={{ axis: 'x' }} class="columns is-vcentered is-variable is-1">
+<div transition:slide={{ axis: 'x' }} class="columns is-vcentered is-variable is-1 is-mobile">
 	<div class="column is-narrow">
 		<EllipsisVertical size={16} />
 	</div>

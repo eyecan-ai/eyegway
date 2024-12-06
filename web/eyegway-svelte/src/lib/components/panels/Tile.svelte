@@ -41,6 +41,7 @@
 	}
 
 	let isDropdownOpen: boolean = false;
+	let isSettingsOpen: boolean = false;
 	let selectedTip: string = '';
 
 	function selectTip(tip: string) {
@@ -117,23 +118,25 @@
 					</button>
 				</div>
 				<div class="column control-item is-narrow">
-					<div class="dropdown is-hoverable is-right is-down">
+					<div class="dropdown is-right is-down {isSettingsOpen ? 'is-active' : ''}">
 						<div class="dropdown-trigger">
 							<button
 								class="button is-small is-warning"
 								disabled={item?.name ? false : true}
 								aria-haspopup="true"
 								aria-controls="dropdown-menu4"
+								class:is-inverted={isSettingsOpen}
+								on:click={() => (isSettingsOpen = !isSettingsOpen)}
 							>
 								<Cog size={16} />
 							</button>
 						</div>
 						<div class="dropdown-menu" id="dropdown-menu4" role="menu">
-							<div class="dropdown-content">
-								{#if item?.name}
-									<GenericSettingsPanel bind:userSettings={item.settings} />
-								{/if}
-							</div>
+							<!-- <div class="dropdown-content"> -->
+							{#if item?.name}
+								<GenericSettingsPanel bind:userSettings={item.settings} />
+							{/if}
+							<!-- </div> -->
 						</div>
 					</div>
 				</div>
