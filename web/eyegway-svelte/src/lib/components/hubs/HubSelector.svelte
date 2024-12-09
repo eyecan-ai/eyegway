@@ -60,13 +60,6 @@
 					{/if}
 				</div>
 				{#each hubs as hub}
-					<!-- <button
-							class="button is-small is-light is-fullwidth"
-							on:click={() => {
-								hubName = hub;
-								isOpen = false;
-							}}>{hub}</button
-						> -->
 					<a
 						href={'#'}
 						class="dropdown-item has-text-weight-bold"

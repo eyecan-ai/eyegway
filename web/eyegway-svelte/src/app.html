@@ -8,6 +8,17 @@
 	%sveltekit.head%
 	<link rel="stylesheet" href="%sveltekit.assets%/css/bulma.min.css">
 	<link rel="stylesheet" href="%sveltekit.assets%/css/style.css">
+	<script type="module">
+		import "%sveltekit.assets%/js/themeUpdate.js";
+
+		// TODO: Find a way to import this from a file or env var
+		const styleSettingsKey = "EyegwayStyleSettings";
+
+		(function () {
+			const styles = JSON.parse(localStorage.getItem(styleSettingsKey)) || undefined;
+			if (styles) window.updateCSSVariables(styles);
+		})();
+	</script>
 </head>
 
 <body data-sveltekit-preload-data="hover">

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { HubsPreferences } from '$lib/Stores.js';
-	import HubPlayer from './HubPlayer.svelte';
+	import HubPlayer from './_HubPlayer.svelte';
 	import HubSelector from './HubSelector.svelte';
 	import { EllipsisVertical } from 'lucide-svelte';
 

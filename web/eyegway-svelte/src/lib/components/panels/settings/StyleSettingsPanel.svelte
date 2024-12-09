@@ -14,8 +14,7 @@
 		HSLStringToRGB,
 		RGBToHSLString,
 		removePercent,
-		convertBlobToBase64,
-		updateCSSVariables
+		convertBlobToBase64
 	} from './StyleSettingsUtils.js';
 	import { onMount } from 'svelte';
 
@@ -89,8 +88,6 @@
 		refresh = false;
 	}
 
-	$: updateCSSVariables($styleSettings);
-
 	let innerWidth: number = 0;
 	let innerHeight: number = 0;
 	let paneWidth: number = 500;
@@ -116,7 +113,8 @@
 					label="Logo Image"
 					on:change={(e) => {
 						if (e.detail.origin === 'internal') {
-							if (logoImage instanceof HTMLImageElement && logoImage.src) {
+							if (logoImage && typeof logoImage !== 'string') {
+								// @ts-ignore
 								convertBlobToBase64(logoImage.src).then((value) => {
 									if (value) $styleSettings.eyegway.logo = value;
 								});

@@ -2,16 +2,6 @@
 # yarn lockfile v1
 
 
-"@0b5vr/tweakpane-plugin-profiler@0.4.1":
-  version "0.4.1"
-  resolved "https://registry.npmjs.org/@0b5vr/tweakpane-plugin-profiler/-/tweakpane-plugin-profiler-0.4.1.tgz"
-  integrity sha512-jgkPbT24eQ7isj8F7/IsbdqrwvBoWBmwjqxdP35smD2D6xsx+9viR57SKBxi9PxTZDEayicmCzBk++0PTqRnBg==
-
-"@0b5vr/tweakpane-plugin-rotation@0.2.0":
-  version "0.2.0"
-  resolved "https://registry.npmjs.org/@0b5vr/tweakpane-plugin-rotation/-/tweakpane-plugin-rotation-0.2.0.tgz"
-  integrity sha512-LK+84kNTusEepVwiKH6ib/Pd+5RxI3UC4rHxn5c14GO58QS49Hh0ft3hFXt/NDzYEST17Q9qg96BcpclhCzYYQ==
-
 "@aashutoshrathi/word-wrap@^1.2.3":
   version "1.2.6"
   resolved "https://registry.npmjs.org/@aashutoshrathi/word-wrap/-/word-wrap-1.2.6.tgz"
@@ -346,10 +336,68 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@kitschpatrol/tweakpane-image-plugin@2.0.0":
-  version "2.0.0"
-  resolved "https://registry.npmjs.org/@kitschpatrol/tweakpane-image-plugin/-/tweakpane-image-plugin-2.0.0.tgz"
-  integrity sha512-BzEZqIhD/dM7AW0Ebv+309L4k8ZZJ5fC9Zks4sozVK3FwJooviE6JzaFAuB7k0M5oX45Wyn59tQXdHafgsP3YA==
+"@kitschpatrol/tweakpane-plugin-camerakit@0.3.1-beta.2":
+  version "0.3.1-beta.2"
+  resolved "https://registry.yarnpkg.com/@kitschpatrol/tweakpane-plugin-camerakit/-/tweakpane-plugin-camerakit-0.3.1-beta.2.tgz#51ab025c5f80b628c5814e593d07ea453d29970f"
+  integrity sha512-YxsuVQwCeJ02K8AyCD523nDEOgGLaZXcmQi83Lg3bGWKNQle9JDVOhY6NR4raD/moL7QpwJbm4hwNEefH+SfFw==
+  dependencies:
+    "@tweakpane/core" "^2.0.4"
+
+"@kitschpatrol/tweakpane-plugin-essentials@0.2.2-beta.2":
+  version "0.2.2-beta.2"
+  resolved "https://registry.yarnpkg.com/@kitschpatrol/tweakpane-plugin-essentials/-/tweakpane-plugin-essentials-0.2.2-beta.2.tgz#5341bc61cc007cf706770b76198163576b7c16a1"
+  integrity sha512-j2Mgn+Xuy+N4Xu9jAhma+krshrEBjm0qYFssQK8zoQGP2l6C90xJ5CQevxeavaic9qQxMDNqaq2SDetxz0qVVw==
+  dependencies:
+    "@tweakpane/core" "^2.0.4"
+
+"@kitschpatrol/tweakpane-plugin-file-import@1.1.2-beta.1":
+  version "1.1.2-beta.1"
+  resolved "https://registry.yarnpkg.com/@kitschpatrol/tweakpane-plugin-file-import/-/tweakpane-plugin-file-import-1.1.2-beta.1.tgz#7381242ce8d04376166d939db870139b01292cde"
+  integrity sha512-wpKK2i4y0a5K5lnuP3huitcOq+l2cH8k+AY46j6NyNdGRK0aF3m0OuUQeIQYOAT6YuM4rzbbjAM0GaRuQwZDyg==
+  dependencies:
+    "@tweakpane/core" "^2.0.4"
+
+"@kitschpatrol/tweakpane-plugin-image@2.0.1-beta.4":
+  version "2.0.1-beta.4"
+  resolved "https://registry.yarnpkg.com/@kitschpatrol/tweakpane-plugin-image/-/tweakpane-plugin-image-2.0.1-beta.4.tgz#28625b202cf26bc1f5911cbf0f8b30ee1914c735"
+  integrity sha512-/EHrhaBkuLFnIFD9Kpa3TYQFDgseKyTefx5NxRQ8aM47Pi8j/VRfUUrXfCnZy///K8wIQ1C82Q7aFoOYDK3EAw==
+  dependencies:
+    "@tweakpane/core" "^2.0.4"
+
+"@kitschpatrol/tweakpane-plugin-inputs@1.0.4-beta.3":
+  version "1.0.4-beta.3"
+  resolved "https://registry.yarnpkg.com/@kitschpatrol/tweakpane-plugin-inputs/-/tweakpane-plugin-inputs-1.0.4-beta.3.tgz#f735327059304f638c60bc43e7d42f65142af092"
+  integrity sha512-77bvlTg4CjzXwzjnyy7XvNvknLcsJltO5bGSnzTKuhEzRn7ZfO2fbhc4Ejj5Fj6TCD7HbkHOGSPjgyieuXMNlA==
+  dependencies:
+    "@tweakpane/core" "^2.0.4"
+
+"@kitschpatrol/tweakpane-plugin-profiler@0.4.2-beta.2":
+  version "0.4.2-beta.2"
+  resolved "https://registry.yarnpkg.com/@kitschpatrol/tweakpane-plugin-profiler/-/tweakpane-plugin-profiler-0.4.2-beta.2.tgz#7e434d652893f06988d92ff2178344d337394dfb"
+  integrity sha512-rKaR+aVGIDo58JKRpDK7uLHF7JxYXZcIOnMA5UX4LmDRY9oMzzTZZBceqcPGfOAdlj/2VvOnSNWhqqYUsDzQTw==
+  dependencies:
+    "@tweakpane/core" "^2.0.4"
+
+"@kitschpatrol/tweakpane-plugin-rotation@0.2.1-beta.1":
+  version "0.2.1-beta.1"
+  resolved "https://registry.yarnpkg.com/@kitschpatrol/tweakpane-plugin-rotation/-/tweakpane-plugin-rotation-0.2.1-beta.1.tgz#ac52f8a2cb97c65984b3fd931445e52182c4f407"
+  integrity sha512-hWGJe2TWCSgGpadqh2UINbtUgsjbY7YLge+NrTCfmyqpjYEoBwQS3HVWRWSuvBdpILdjZKWBJa15JgrNdMX6Lw==
+  dependencies:
+    "@tweakpane/core" "^2.0.4"
+
+"@kitschpatrol/tweakpane-plugin-textarea@2.0.1-beta.1":
+  version "2.0.1-beta.1"
+  resolved "https://registry.yarnpkg.com/@kitschpatrol/tweakpane-plugin-textarea/-/tweakpane-plugin-textarea-2.0.1-beta.1.tgz#981c976e041f1187483d216d8c24aa23e361cfae"
+  integrity sha512-3bo5iph7d9MGfvRgUAity4uz7Voj4DC5G7aQwVMBvEIpcFqNhUDAZrTCCZdKIOWZ8bz1dSJ06OVaq1pDvVaFuw==
+  dependencies:
+    "@tweakpane/core" "^2.0.4"
+
+"@kitschpatrol/tweakpane-plugin-waveform@1.0.4-beta.2":
+  version "1.0.4-beta.2"
+  resolved "https://registry.yarnpkg.com/@kitschpatrol/tweakpane-plugin-waveform/-/tweakpane-plugin-waveform-1.0.4-beta.2.tgz#aec987a5f0cd6808c5bc7a4ed897b51121363c98"
+  integrity sha512-cyG1zBeJhQiM32cAsY7xfTnrsqoTLA6c5l+TfvXqi/ik3BSP769Ti/YL+nEsdL63Rm0FL0DwqUNF4wZtORJxsw==
+  dependencies:
+    "@tweakpane/core" "^2.0.4"
 
 "@lezer/common@^1.0.0", "@lezer/common@^1.1.0", "@lezer/common@^1.2.0":
   version "1.2.1"
@@ -404,11 +452,6 @@
   dependencies:
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
-
-"@pangenerator/tweakpane-textarea-plugin@2.0.0":
-  version "2.0.0"
-  resolved "https://registry.npmjs.org/@pangenerator/tweakpane-textarea-plugin/-/tweakpane-textarea-plugin-2.0.0.tgz"
-  integrity sha512-BERPuuyJYWvtJzXh4wtgYspza0ihigE2m4qs57ERKtWG59+lI2t/2TOXlwz7Xyx/QEIH25uO1g732YCljgKaUw==
 
 "@playwright/test@^1.28.1":
   version "1.41.2"
@@ -616,20 +659,15 @@
     three-mesh-bvh "^0.7.1"
     troika-three-text "^0.49.0"
 
-"@tweakpane/core@2.0.3":
-  version "2.0.3"
-  resolved "https://registry.npmjs.org/@tweakpane/core/-/core-2.0.3.tgz"
-  integrity sha512-qHci4XA1Wngpwy8IzsLh5JEdscz8aDti/9YhyOaq01si+cgNDaZfwzTtXdn1+xTxSnCM+pW4Zb2/4eqn+K1ATw==
+"@tweakpane/core@2.0.4":
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/@tweakpane/core/-/core-2.0.4.tgz#8c896d49540c522d1bc503d3a2d3fde8715e4e0a"
+  integrity sha512-0P3xcmvjBr8AmqMOEDNYIbkiaPwvQPkj8VeJX+8ZYkpRgWWbNp1HLbld0MDI0WJHdom89osH3MmCDLnWEXKI2w==
 
-"@tweakpane/plugin-camerakit@0.3.0":
-  version "0.3.0"
-  resolved "https://registry.npmjs.org/@tweakpane/plugin-camerakit/-/plugin-camerakit-0.3.0.tgz"
-  integrity sha512-6UwgwDKU+oaAgXJ2D/pOoIpEAZts0RyeLmVzBJGs+VVNqSfkiHzL0i5XD+XnmSL2PaLXBne0dlz0bYOrjmeELw==
-
-"@tweakpane/plugin-essentials@0.2.1":
-  version "0.2.1"
-  resolved "https://registry.npmjs.org/@tweakpane/plugin-essentials/-/plugin-essentials-0.2.1.tgz"
-  integrity sha512-VbFU1/uD+CJNFQdfLXUOLjeG5HyUZH97Ox9CxmyVetg1hqjVun3C83HAGFULyhKzl8tSgii8jr304r8QpdHwzQ==
+"@tweakpane/core@^2.0.4":
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/@tweakpane/core/-/core-2.0.5.tgz#bae776cd530b31f5e5424641411d4b20c3baed8e"
+  integrity sha512-punBgD5rKCF5vcNo6BsSOXiDR/NSs9VM7SG65QSLJIxfRaGgj54ree9zQW6bO3pNFf3AogiGgaNODUVQRk9YqQ==
 
 "@types/cookie@^0.6.0":
   version "0.6.0"
@@ -1354,10 +1392,10 @@ execa@^8.0.1:
     signal-exit "^4.1.0"
     strip-final-newline "^3.0.0"
 
-fast-copy@3.0.1:
-  version "3.0.1"
-  resolved "https://registry.npmjs.org/fast-copy/-/fast-copy-3.0.1.tgz"
-  integrity sha512-Knr7NOtK3HWRYGtHoJrjkaWepqT8thIVGAwt0p0aUs1zqkAzXZV4vo9fFNwyb5fcqK1GKYFYxldQdIDVKhUAfA==
+fast-copy@3.0.2:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/fast-copy/-/fast-copy-3.0.2.tgz#59c68f59ccbcac82050ba992e0d5c389097c9d35"
+  integrity sha512-dl0O9Vhju8IrcLndv2eU4ldt1ftXMqqfgN4H1cpmGV7P6jeB9FwpN9a2c8DPGE1Ys88rNUJVYDHq73CGAGOPfQ==
 
 fast-deep-equal@^3.1.1, fast-deep-equal@^3.1.3:
   version "3.1.3"
@@ -1937,10 +1975,10 @@ ms@2.1.2:
   resolved "https://registry.npmjs.org/ms/-/ms-2.1.2.tgz"
   integrity sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==
 
-nanoid@5.0.6:
-  version "5.0.6"
-  resolved "https://registry.npmjs.org/nanoid/-/nanoid-5.0.6.tgz"
-  integrity sha512-rRq0eMHoGZxlvaFOUdK1Ev83Bd1IgzzR+WJ3IbDJ7QOSdAxYjlurSPqFs9s4lJg29RT6nPwizFtJhQS6V5xgiA==
+nanoid@5.0.7:
+  version "5.0.7"
+  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-5.0.7.tgz#6452e8c5a816861fd9d2b898399f7e5fd6944cc6"
+  integrity sha512-oLxFY2gd2IqnjcYyOXD8XGCftpGtZP2AbHbOkthDkvRywH5ayNtPVy9YlOPcHckXzbLTCHpkb7FB+yuxKV13pQ==
 
 nanoid@^3.3.7:
   version "3.3.7"
@@ -2553,10 +2591,10 @@ svelte-jsoneditor@^0.21.5:
     svelte-simple-modal "^1.6.2"
     vanilla-picker "^2.12.2"
 
-svelte-local-storage-store@0.6.4:
-  version "0.6.4"
-  resolved "https://registry.npmjs.org/svelte-local-storage-store/-/svelte-local-storage-store-0.6.4.tgz"
-  integrity sha512-45WoY2vSGPQM1sIQJ9jTkPPj20hYeqm+af6mUGRFSPP5WglZf36YYoZqwmZZ8Dt/2SU8lem+BTA8/Z/8TkqNLg==
+svelte-persisted-store@0.11.0:
+  version "0.11.0"
+  resolved "https://registry.yarnpkg.com/svelte-persisted-store/-/svelte-persisted-store-0.11.0.tgz#14de610be20c2242d4b551b5e421d9c0ac6219e3"
+  integrity sha512-9RgJ5DrawGyyfK22A80cfu8Jose3CV8YjEZKz9Tn94rQ0tWyEmYr+XI+wrVF6wjRbW99JMDSVcFRiM3XzVJj/w==
 
 svelte-persisted-store@^0.9.1:
   version "0.9.1"
@@ -2596,25 +2634,27 @@ svelte-simple-modal@^1.6.2:
   resolved "https://registry.npmjs.org/svelte-simple-modal/-/svelte-simple-modal-1.6.2.tgz"
   integrity sha512-cRjpqjZTH0rU5G+SRhUDHOV6TISQs6AnEW/Z7D5uXiz5V/3axrBYcBCPnKMI2Z0EyXmpwPXK4q9grroQTL6rhQ==
 
-svelte-tweakpane-ui@^1.2.3:
-  version "1.2.3"
-  resolved "https://registry.npmjs.org/svelte-tweakpane-ui/-/svelte-tweakpane-ui-1.2.3.tgz"
-  integrity sha512-3SEG7ch0lOPG4b2PSnNf1w6Px2/ySTPvBca5vPh1eyW12xEgTFlx0JYWd9Iuuj3PnC+KLoqB+sULbDARSb1LBA==
+svelte-tweakpane-ui@^1.5.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/svelte-tweakpane-ui/-/svelte-tweakpane-ui-1.5.0.tgz#f79a1ba848355d101fdba5296211ea40077aa7b2"
+  integrity sha512-hFDIrq8aLTkAdw32RvjF1HN5d6i3wT72EZ9yrys7uXfwG3fyYmGtt8ByMXY39bYdSA9W9De0YjAsCctoUiQ71g==
   dependencies:
-    "@0b5vr/tweakpane-plugin-profiler" "0.4.1"
-    "@0b5vr/tweakpane-plugin-rotation" "0.2.0"
-    "@kitschpatrol/tweakpane-image-plugin" "2.0.0"
-    "@pangenerator/tweakpane-textarea-plugin" "2.0.0"
-    "@tweakpane/core" "2.0.3"
-    "@tweakpane/plugin-camerakit" "0.3.0"
-    "@tweakpane/plugin-essentials" "0.2.1"
+    "@kitschpatrol/tweakpane-plugin-camerakit" "0.3.1-beta.2"
+    "@kitschpatrol/tweakpane-plugin-essentials" "0.2.2-beta.2"
+    "@kitschpatrol/tweakpane-plugin-file-import" "1.1.2-beta.1"
+    "@kitschpatrol/tweakpane-plugin-image" "2.0.1-beta.4"
+    "@kitschpatrol/tweakpane-plugin-inputs" "1.0.4-beta.3"
+    "@kitschpatrol/tweakpane-plugin-profiler" "0.4.2-beta.2"
+    "@kitschpatrol/tweakpane-plugin-rotation" "0.2.1-beta.1"
+    "@kitschpatrol/tweakpane-plugin-textarea" "2.0.1-beta.1"
+    "@kitschpatrol/tweakpane-plugin-waveform" "1.0.4-beta.2"
+    "@tweakpane/core" "2.0.4"
     esm-env "1.0.0"
-    fast-copy "3.0.1"
+    fast-copy "3.0.2"
     fast-equals "5.0.1"
-    nanoid "5.0.6"
-    svelte-local-storage-store "0.6.4"
-    tweakpane "4.0.3"
-    tweakpane-plugin-waveform "1.0.0"
+    nanoid "5.0.7"
+    svelte-persisted-store "0.11.0"
+    tweakpane "4.0.4"
 
 svelte2tsx@~0.7.0:
   version "0.7.1"
@@ -2724,15 +2764,10 @@ tslib@^2.0.3, tslib@^2.4.1:
   resolved "https://registry.npmjs.org/tslib/-/tslib-2.6.2.tgz"
   integrity sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q==
 
-tweakpane-plugin-waveform@1.0.0:
-  version "1.0.0"
-  resolved "https://registry.npmjs.org/tweakpane-plugin-waveform/-/tweakpane-plugin-waveform-1.0.0.tgz"
-  integrity sha512-fyTRe6Emt7YpgHC5iiTZgk6RHflNm5VIOAsl2+l3mm96+KE8I+7sNPeyADxKcfcQF23c7/R3La5WNhaHNyeJag==
-
-tweakpane@4.0.3:
-  version "4.0.3"
-  resolved "https://registry.npmjs.org/tweakpane/-/tweakpane-4.0.3.tgz"
-  integrity sha512-BlcWOAe8oe4c+k9pmLBARGdWB6MVZMszayekkixQXTgkxTaYoTUpHpwVEp+3HkoamZkomodpbBf0CkguIHTgLg==
+tweakpane@4.0.4:
+  version "4.0.4"
+  resolved "https://registry.yarnpkg.com/tweakpane/-/tweakpane-4.0.4.tgz#db55a54721872b10a698fbf900506d8f4d4840d0"
+  integrity sha512-RkWD54zDlEbnN01wQPk0ANHGbdCvlJx/E8A1QxhTfCbX+ROWos1Ws2MnhOm39aUGMOh+36TjUwpDmLfmwTr1Fg==
 
 type-check@^0.4.0, type-check@~0.4.0:
   version "0.4.0"
