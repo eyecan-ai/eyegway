@@ -16,51 +16,43 @@ class TestDemoData:
         generator = eug.RandomWalkGenerator()
         data = generator.generate()
         assert isinstance(data, dict)
-        assert "x" in data
-        assert "y" in data
-        assert isinstance(data["x"], float)
-        assert isinstance(data["y"], float)
+        assert "time" in data
+        assert "value" in data
+        assert isinstance(data["time"], float)
+        assert isinstance(data["value"], float)
 
     def test_sine_generator(self):
         generator = eug.SineGenerator()
         data = generator.generate()
         assert isinstance(data, dict)
-        assert "x" in data
-        assert "y" in data
-        assert isinstance(data["x"], float)
-        assert isinstance(data["y"], float)
-        assert -1 <= data["y"] <= 1
+        assert "time" in data
+        assert "value" in data
+        assert isinstance(data["time"], float)
+        assert isinstance(data["value"], float)
+        assert -1 <= data["value"] <= 1
 
     def test_helix_generator(self):
         generator = eug.HelixGenerator()
         data = generator.generate()
         assert isinstance(data, dict)
-        assert "x" in data
-        assert "y" in data
-        assert "z" in data
-        assert "marker" in data
-        assert isinstance(data["x"], float)
-        assert isinstance(data["y"], float)
-        assert isinstance(data["z"], float)
-        assert isinstance(data["marker"], dict)
-        assert "color" in data["marker"]
-        assert isinstance(data["marker"]["color"], float)
-        assert -1 <= data["y"] <= 1
-        assert -1 <= data["z"] <= 1
+        assert "time" in data
+        assert "value" in data
+        assert "height" in data
+        assert isinstance(data["time"], float)
+        assert isinstance(data["value"], float)
+        assert isinstance(data["height"], float)
+        assert -1 <= data["value"] <= 1
+        assert -1 <= data["height"] <= 1
 
     def test_daily_production_generator(self):
         generator = eug.DailyProductionGenerator()
         data = generator.generate()
         assert isinstance(data, dict)
-        assert "x" in data
-        assert "y" in data
-        assert "marker" in data
-        assert isinstance(data["x"], float)
-        assert isinstance(data["y"], float)
-        assert isinstance(data["marker"], dict)
-        assert "color" in data["marker"]
-        assert isinstance(data["marker"]["color"], float)
-        assert generator.min_value <= data["y"] <= generator.max_value
+        assert "time" in data
+        assert "value" in data
+        assert isinstance(data["time"], float)
+        assert isinstance(data["value"], float)
+        assert generator.min_value <= data["value"] <= generator.max_value
 
     def test_demo_data_generator(self):
         generator = eug.DemoDataGenerator()

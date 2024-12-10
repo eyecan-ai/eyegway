@@ -57,3 +57,50 @@ class TestPlot:
         assert plot.data[0]["y"] == [7, 8, 9]
         assert plot.layout["title"] == "Updated Plot"
         assert plot.config["responsive"] is False
+
+    def test_plot_to_file(self, tmp_path):
+        plot = Plot(
+            data=[{"x": [1, 2], "y": [3, 4]}],
+            layout={"title": "Test"},
+            config={"responsive": True},
+        )
+        params_path = tmp_path / "plot_params.json"
+        plot.to_file(params_path)
+        with open(params_path) as f:
+            saved_params = json.load(f)
+        assert saved_params == plot.to_dict()
+
+    def test_merge_nested_dicts(self):
+        d1 = {"layout": {"title": "Old", "axis": {"x": {"range": [0, 10]}}}}
+        d2 = {
+            "layout": {
+                "title": "New",
+                "axis": {"x": {"range": [0, 20]}, "y": {"range": [0, 30]}},
+            }
+        }
+        merged = Plot._merge(d1, d2)
+        assert merged == {
+            "layout": {
+                "title": "New",
+                "axis": {
+                    "x": {"range": [0, 20]},
+                    "y": {"range": [0, 30]},
+                },
+            }
+        }
+
+    def test_merge_extend_list(self):
+        d1 = {"data": [{"x": [1]}]}
+        d2 = {"data": [{"x": [2]}, {"x": [3]}]}
+        merged = Plot._merge(d1, d2)
+        assert merged == {"data": [{"x": [2]}, {"x": [3]}]}
+
+    def test_update_with_more_data(self):
+        plot = Plot(data=[{"x": [1], "y": [2]}])
+        new_params = {
+            "data": [
+                {"x": [3, 5], "y": [4, 6]},
+            ]
+        }
+        plot.update(new_params)
+        assert plot.data == new_params["data"]
