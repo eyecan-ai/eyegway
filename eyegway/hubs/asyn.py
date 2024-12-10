@@ -214,7 +214,6 @@ class AsyncMessageHubManager:
         self.redis = redis
 
     async def list(self) -> t.List[str]:
-        print(await self.redis.keys("*"))
         channels = await self.redis.keys(f"{eh.HubsParametrization.HUBS_PREFIX}*")
         channels = [channel.decode() for channel in channels]
         return eh.HubsParametrization.retrieve_hubs_names_from_channel_list(channels)

@@ -1,9 +1,11 @@
-import eyegway.hubs.connectors as ehc
-import pipelime.sequences as pls
-import pipelime.items as pli
+import typing as t
+
 import loguru
 import numpy as np
-import typing as t
+import pipelime.items as pli
+import pipelime.sequences as pls
+
+import eyegway.hubs.connectors as ehc
 
 
 def model3d_converter(item: pli.Model3DItem) -> t.Any:
@@ -62,18 +64,16 @@ class PipelimeHubConnector(ehc.HubConnector):
         output_data = {}
         for key in data:
             item = data[key]
-            found = False
             for item_type, converter in self.item_to_plaindata().items():
                 if isinstance(item, item_type):
                     try:
                         output_data[key] = converter(item)
-                        found = True
                         break
                     except Exception as e:  # pragma: no cover
                         loguru.logger.error(
                             f"Error converting {key} [{type(item)}] to plain data: {e}"
                         )
-            if not found:  # pragma: no cover
+            else:  # pragma: no cover
                 loguru.logger.warning(f"Item {key} [{type(item)}] is not allowed")
         return output_data
 
@@ -83,18 +83,15 @@ class PipelimeHubConnector(ehc.HubConnector):
 
         output_data = {}
         for key, value in data.items():
-            found = False
-
             for data_map_type, converter in self.plaindata_to_item().items():
                 if isinstance(value, data_map_type):
                     try:
                         output_data[key] = converter(value)
-                        found = True
                         break
                     except Exception as e:  # pragma: no cover
                         loguru.logger.error(
                             f"Error converting {key} [{type(value)}] to item: {e}"
                         )
-            if not found:  # pragma: no cover
+            else:  # pragma: no cover
                 loguru.logger.warning(f"Item {key} [{type(value)}] is not allowed")
         return pls.Sample(output_data)
