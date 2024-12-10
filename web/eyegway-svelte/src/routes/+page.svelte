@@ -16,35 +16,47 @@
 	onMount(() => {
 		const customTheme = {
 			...{
-				baseBackgroundColor: 'var(--bulma-body-background-color)',
+				baseBackgroundColor:
+					'hsl(var(--bulma-scheme-h), var(--bulma-scheme-s), calc(var(--bulma-scheme-main-l) - 2%))',
 				baseBorderRadius: 'var(--bulma-control-radius)',
 				baseFontFamily: 'var(--bulma-family-primary)',
-				baseShadowColor: 'var(--bulma-shadow-color)',
+				baseShadowColor: 'var(--bulma-shadow)',
 				bladeBorderRadius: 'var(--bulma-radius-small)',
-				// bladeHorizontalPadding: 'var(--bulma-block-spacing)',
-				buttonBackgroundColor: 'var(--bulma-button-background-color)',
-				buttonBackgroundColorActive: 'var(--bulma-button-background-color-active)',
-				buttonBackgroundColorFocus: 'var(--bulma-button-background-color-focus)',
-				buttonBackgroundColorHover: 'var(--bulma-button-background-color-hover)',
-				buttonForegroundColor: 'var(--bulma-button-color)',
-				containerBackgroundColor: 'var(--bulma-card-background-color)',
-				containerBackgroundColorActive: 'var(--bulma-card-background-color-active)',
-				containerBackgroundColorFocus: 'var(--bulma-card-background-color-focus)',
-				containerBackgroundColorHover: 'var(--bulma-card-background-color-hover)',
-				containerForegroundColor: 'var(--bulma-card-color)',
-				containerHorizontalPadding: 'var(--bulma-card-padding)',
-				containerVerticalPadding: 'var(--bulma-card-padding)',
+				buttonBackgroundColor:
+					'hsl(var(--bulma-scheme-h), var(--bulma-scheme-s), var(--bulma-text-strong-l))',
+				buttonBackgroundColorActive:
+					'hsl(var(--bulma-scheme-h), var(--bulma-scheme-s), var(--bulma-text-l))',
+				buttonBackgroundColorFocus:
+					'hsl(var(--bulma-scheme-h), var(--bulma-scheme-s), var(--bulma-text-weak-l))',
+				buttonBackgroundColorHover:
+					'hsl(var(--bulma-scheme-h), var(--bulma-scheme-s), var(--bulma-text-weak-l))',
+				buttonForegroundColor:
+					'hsl(var(--bulma-scheme-h), var(--bulma-scheme-s), var(--bulma-scheme-main-l))',
+				containerBackgroundColor:
+					'rgba(var(--eyegway-header-background-color-r), var(--eyegway-header-background-color-g), var(--eyegway-header-background-color-b), 0.2)',
+				containerBackgroundColorActive:
+					'rgba(var(--eyegway-header-background-color-r), var(--eyegway-header-background-color-g), var(--eyegway-header-background-color-b), 0.35)',
+				containerBackgroundColorFocus:
+					'rgba(var(--eyegway-header-background-color-r), var(--eyegway-header-background-color-g), var(--eyegway-header-background-color-b), 0.3)',
+				containerBackgroundColorHover:
+					'rgba(var(--eyegway-header-background-color-r), var(--eyegway-header-background-color-g), var(--eyegway-header-background-color-b), 0.25)',
+				containerForegroundColor: 'var(--bulma-text)',
 				grooveForegroundColor: 'var(--bulma-border)',
 				inputBackgroundColor:
-					'hsl(var(--bulma-input-h),var(--bulma-input-s),calc(var(--bulma-input-background-l) + var(--bulma-input-background-l-delta)))',
-				inputBackgroundColorActive: 'var(--bulma-input-background-color-active)',
-				inputBackgroundColorFocus: 'var(--bulma-input-background-color-focus)',
-				inputBackgroundColorHover: 'var(--bulma-input-background-color-hover)',
-				inputForegroundColor: 'var(--bulma-text)',
-				labelForegroundColor: 'var(--bulma-text)',
-				monitorBackgroundColor: 'var(--bulma-background)',
-				monitorForegroundColor: 'var(--bulma-text)',
-				pluginImageDraggingColor: 'var(--bulma-background)'
+					'hsl(var(--bulma-scheme-h), var(--bulma-scheme-s), calc(var(--bulma-scheme-main-l) + 2%))',
+				inputBackgroundColorActive:
+					'hsl(var(--bulma-scheme-h), var(--bulma-scheme-s), calc(var(--bulma-scheme-main-l) + 2%))',
+				inputBackgroundColorFocus:
+					'hsl(var(--bulma-scheme-h), var(--bulma-scheme-s), calc(var(--bulma-scheme-main-l) + 3%))',
+				inputBackgroundColorHover:
+					'hsl(var(--bulma-scheme-h), var(--bulma-scheme-s), calc(var(--bulma-scheme-main-l) + 4%))',
+				inputForegroundColor: 'var(--bulma-text-strong)',
+				labelForegroundColor: 'var(--bulma-text-strong)',
+				monitorBackgroundColor:
+					'hsl(var(--bulma-scheme-h), var(--bulma-scheme-s), calc(var(--bulma-scheme-main-l) + 2%))',
+				monitorForegroundColor: 'var(--bulma-text-strong)',
+				pluginImageDraggingColor:
+					'hsl(var(--bulma-scheme-h), var(--bulma-scheme-s), calc(var(--bulma-scheme-main-l) + 2%)'
 			}
 		};
 

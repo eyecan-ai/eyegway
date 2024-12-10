@@ -113,6 +113,7 @@
 					label="Logo Image"
 					on:change={(e) => {
 						if (e.detail.origin === 'internal') {
+							logoImage = e.detail.value;
 							if (logoImage && typeof logoImage !== 'string') {
 								// @ts-ignore
 								convertBlobToBase64(logoImage.src).then((value) => {
@@ -131,6 +132,7 @@
 					label="Main Accent Color"
 					on:change={(e) => {
 						if (e.detail.origin === 'internal') {
+							schemeRGB = e.detail.value;
 							const out = RGBToHSLString(schemeRGB.r, schemeRGB.g, schemeRGB.b);
 							$styleSettings.bulma.scheme = { h: out.h, s: out.s, main_l: out.l };
 
@@ -197,6 +199,7 @@
 					format={(v) => v.toFixed(0)}
 					on:change={(e) => {
 						if (e.detail.origin === 'internal') {
+							borderLPercent = e.detail.value;
 							$styleSettings.bulma.border_l = borderLPercent + '%';
 
 							borderLPercent = removePercent($styleSettings.bulma.border_l);
@@ -212,6 +215,7 @@
 					format={(v) => v.toFixed(0)}
 					on:change={(e) => {
 						if (e.detail.origin === 'internal') {
+							textLPercent = e.detail.value;
 							$styleSettings.bulma.text_l = textLPercent + '%';
 							$styleSettings.bulma.text_strong_l = textLPercent + 19 + '%';
 							$styleSettings.bulma.text_weak_l = textLPercent - 8 + '%';
@@ -229,6 +233,7 @@
 					format={(v) => v.toFixed(0)}
 					on:change={(e) => {
 						if (e.detail.origin === 'internal') {
+							shadowLPercent = e.detail.value;
 							$styleSettings.bulma.shadow_l = shadowLPercent + '%';
 
 							shadowLPercent = removePercent($styleSettings.bulma.shadow_l);
@@ -243,6 +248,7 @@
 					label="Primary Color"
 					on:change={(e) => {
 						if (e.detail.origin === 'internal') {
+							primaryRGB = e.detail.value;
 							const out = RGBToHSLString(primaryRGB.r, primaryRGB.g, primaryRGB.b);
 							$styleSettings.bulma.primary = { h: out.h, s: out.s, l: out.l };
 
@@ -259,6 +265,7 @@
 					label="Info Color"
 					on:change={(e) => {
 						if (e.detail.origin === 'internal') {
+							infoRGB = e.detail.value;
 							const out = RGBToHSLString(infoRGB.r, infoRGB.g, infoRGB.b);
 							$styleSettings.bulma.info = { h: out.h, s: out.s, l: out.l };
 
@@ -275,6 +282,7 @@
 					label="Link Color"
 					on:change={(e) => {
 						if (e.detail.origin === 'internal') {
+							linkRGB = e.detail.value;
 							const out = RGBToHSLString(linkRGB.r, linkRGB.g, linkRGB.b);
 							$styleSettings.bulma.link = { h: out.h, s: out.s, l: out.l };
 
@@ -291,6 +299,7 @@
 					label="Success Color"
 					on:change={(e) => {
 						if (e.detail.origin === 'internal') {
+							successRGB = e.detail.value;
 							const out = RGBToHSLString(successRGB.r, successRGB.g, successRGB.b);
 							$styleSettings.bulma.success = { h: out.h, s: out.s, l: out.l };
 
@@ -307,6 +316,7 @@
 					label="Warning Color"
 					on:change={(e) => {
 						if (e.detail.origin === 'internal') {
+							warningRGB = e.detail.value;
 							const out = RGBToHSLString(warningRGB.r, warningRGB.g, warningRGB.b);
 							$styleSettings.bulma.warning = { h: out.h, s: out.s, l: out.l };
 
@@ -323,6 +333,7 @@
 					label="Danger Color"
 					on:change={(e) => {
 						if (e.detail.origin === 'internal') {
+							dangerRGB = e.detail.value;
 							const out = RGBToHSLString(dangerRGB.r, dangerRGB.g, dangerRGB.b);
 							$styleSettings.bulma.danger = { h: out.h, s: out.s, l: out.l };
 
