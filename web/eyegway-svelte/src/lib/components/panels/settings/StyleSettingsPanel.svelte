@@ -85,6 +85,8 @@
 			$styleSettings.bulma.danger.l
 		);
 
+		$styleSettings = { ...$styleSettings };
+
 		refresh = false;
 	}
 
