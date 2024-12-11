@@ -99,7 +99,7 @@ export interface BulmaStyle {
 export class StyleSettings implements ConfigurationModel {
     id: number = Date.now();
     eyegway: EyegwayStyle = {
-        logo: 'images/logo.png',
+        logo: 'images/eyegway-logo.svg',
         header: { "background-color": { r: 255, g: 255, b: 255, a: 1 } },
         panel: { "background-color": { r: 255, g: 255, b: 255, a: 1 } },
         content: { "background-color": { r: 255, g: 255, b: 255, a: 1 } },

@@ -1,1 +1,86 @@
-{"id":1733312063761,"eyegway":{"logo":"images/logo.png","header":{"background-color":{"r":255,"g":255,"b":255,"a":1}},"panel":{"background-color":{"r":255,"g":255,"b":255,"a":1}},"content":{"background-color":{"r":255,"g":255,"b":255,"a":1}},"background":{"first-color":{"r":255,"g":255,"b":255,"a":1},"second-color":{"r":255,"g":255,"b":255,"a":1}}},"bulma":{"scheme":{"h":"0deg","s":"0%","main_l":"100%"},"primary":{"h":"171.10047846889952deg","s":"100%","l":"40.98039215686274%"},"info":{"h":"198.08612440191388deg","s":"100%","l":"40.98039215686274%"},"link":{"h":"233deg","s":"100%","l":"41%"},"success":{"h":"153deg","s":"100%","l":"41%"},"warning":{"h":"41.91387559808612deg","s":"100%","l":"40.98039215686274%"},"danger":{"h":"348deg","s":"100%","l":"41%"},"border_l":"86%","text_l":"29%","text_strong_l":"48%","text_weak_l":"21%","shadow_l":"4%"}}
+{
+    "id": 1733312063761,
+    "eyegway": {
+        "logo": "images/eyegway-logo.svg",
+        "header": {
+            "background-color": {
+                "r": 255,
+                "g": 255,
+                "b": 255,
+                "a": 1
+            }
+        },
+        "panel": {
+            "background-color": {
+                "r": 255,
+                "g": 255,
+                "b": 255,
+                "a": 1
+            }
+        },
+        "content": {
+            "background-color": {
+                "r": 255,
+                "g": 255,
+                "b": 255,
+                "a": 1
+            }
+        },
+        "background": {
+            "first-color": {
+                "r": 255,
+                "g": 255,
+                "b": 255,
+                "a": 1
+            },
+            "second-color": {
+                "r": 255,
+                "g": 255,
+                "b": 255,
+                "a": 1
+            }
+        }
+    },
+    "bulma": {
+        "scheme": {
+            "h": "0deg",
+            "s": "0%",
+            "main_l": "100%"
+        },
+        "primary": {
+            "h": "171.10047846889952deg",
+            "s": "100%",
+            "l": "40.98039215686274%"
+        },
+        "info": {
+            "h": "198.08612440191388deg",
+            "s": "100%",
+            "l": "40.98039215686274%"
+        },
+        "link": {
+            "h": "233deg",
+            "s": "100%",
+            "l": "41%"
+        },
+        "success": {
+            "h": "153deg",
+            "s": "100%",
+            "l": "41%"
+        },
+        "warning": {
+            "h": "41.91387559808612deg",
+            "s": "100%",
+            "l": "40.98039215686274%"
+        },
+        "danger": {
+            "h": "348deg",
+            "s": "100%",
+            "l": "41%"
+        },
+        "border_l": "86%",
+        "text_l": "29%",
+        "text_strong_l": "48%",
+        "text_weak_l": "21%",
+        "shadow_l": "4%"
+    }
+}

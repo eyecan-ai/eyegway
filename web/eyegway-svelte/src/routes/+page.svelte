@@ -69,7 +69,9 @@
 		<div class="columns is-vcentered">
 			<div class="column logo-container">
 				<img
-					src={$styleSettings.eyegway.logo ? $styleSettings.eyegway.logo : 'images/logo.png'}
+					src={$styleSettings.eyegway.logo
+						? $styleSettings.eyegway.logo
+						: 'images/eyegway-logo.svg'}
 					alt="Logo"
 					class="logo"
 				/>
