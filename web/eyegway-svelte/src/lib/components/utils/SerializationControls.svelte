@@ -20,17 +20,6 @@
 		activeOption = (await config.getActiveOption()) || '';
 	});
 
-	function toggleDropdown() {
-		config.getActiveOption().then((active) => {
-			activeOption = active;
-		});
-		showDropdown = !showDropdown;
-	}
-
-	function selectTheme(option: string) {
-		config.loadConfigurationFromOptions(option);
-		showDropdown = false;
-	}
 	function handleClickOutside(event: MouseEvent) {
 		if (dropdownRef && !dropdownRef.contains(event.target as Node)) {
 			showDropdown = false;
@@ -56,7 +45,6 @@
 			class="button is-small is-info is-outlined"
 			on:click={() => {
 				config.saveConfigurationToFile();
-				dispatch('update');
 			}}
 			title="Save Configuration to File"
 		>
@@ -68,8 +56,9 @@
 		<button
 			class="button is-small is-info is-outlined"
 			on:click={() => {
-				config.loadConfigurationFromFile();
-				dispatch('update');
+				config.loadConfigurationFromFile().then(() => {
+					dispatch('update');
+				});
 			}}
 			title="Load Configuration from File"
 		>
@@ -82,7 +71,12 @@
 			<div class="dropdown-trigger">
 				<button
 					class="button is-small is-success is-outlined"
-					on:click={toggleDropdown}
+					on:click={() => {
+						config.getActiveOption().then((active) => {
+							activeOption = active;
+						});
+						showDropdown = !showDropdown;
+					}}
 					aria-haspopup="true"
 					aria-controls="dropdown-menu"
 					title="Load Predefined Theme"
@@ -102,8 +96,10 @@
 								class="dropdown-item has-text-weight-bold"
 								class:is-active={option === activeOption}
 								on:click|preventDefault={() => {
-									selectTheme(option);
-									dispatch('update');
+									config.loadConfigurationFromOptions(option).then(() => {
+										showDropdown = false;
+										dispatch('update');
+									});
 								}}
 							>
 								{option.split('/').pop()?.replace('.json', '').replace(/_/g, ' ')}
