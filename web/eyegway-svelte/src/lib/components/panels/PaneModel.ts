@@ -7,7 +7,8 @@ import {
     PlotSettings,
     type GenericSettings
 } from './settings/SettingsModel.js';
-import { type ConfigurationModel } from '../utils/ConfigurationUtils.js';
+import { z } from "zod";
+
 export class GenericData { }
 
 
@@ -148,23 +149,21 @@ export class DataExtractor {
     }
 }
 
-export class PaneConfiguration implements ConfigurationModel {
-    id: number = Date.now();
-    split: '' | 'horizontal' | 'vertical' = '';
-    size: number = 100;
-    children: PaneConfiguration[] = [];
-    item: TileItem = { name: '', settings: {} }
-}
+export const TileItemSchema = z.object({
+    name: z.string(),
+    settings: z.custom<GenericSettings>(),
+});
 
-export class TileItem {
-    name: string = '';
-    settings: GenericSettings = {};
+export const PaneConfigurationSchema: z.ZodSchema = z.object({
+    id: z.number().default(() => Date.now()), // Default to current timestamp
+    split: z.enum(['', 'horizontal', 'vertical']).default(''), // Enum for split options
+    size: z.number().default(100),
+    children: z.lazy(() => z.array(PaneConfigurationSchema)).default([]), // Recursive definition
+    item: TileItemSchema.default({ name: '', settings: {} }),
+});
 
-    constructor(name: string = '', settings: GenericSettings = {}) {
-        this.name = name;
-        this.settings = settings;
-    }
-}
+export type TileItem = z.infer<typeof TileItemSchema>;
+export type PaneConfiguration = z.infer<typeof PaneConfigurationSchema>;
 
 export function splitPane(pane: PaneConfiguration, direction: 'horizontal' | 'vertical') {
     pane.split = direction;
@@ -190,7 +189,7 @@ export function splitPane(pane: PaneConfiguration, direction: 'horizontal' | 've
 export function removePane(parentPane: PaneConfiguration, paneToDelete: PaneConfiguration) {
     if (!parentPane.children) return false;
 
-    const index = parentPane.children.findIndex((child) => child.id === paneToDelete.id);
+    const index = parentPane.children.findIndex((child: PaneConfiguration) => child.id === paneToDelete.id);
     if (index !== -1) {
         parentPane.children.splice(index, 1);
         if (parentPane.children.length === 1) {

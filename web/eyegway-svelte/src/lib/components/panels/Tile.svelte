@@ -9,7 +9,7 @@
 		X
 	} from 'lucide-svelte';
 	import ViewGeneric from './views/ViewGeneric.svelte';
-	import { DataExtractor, TileItem } from './PaneModel.js';
+	import { DataExtractor, type TileItem } from './PaneModel.js';
 	import GenericSettingsPanel from './settings/GenericSettingsPanel.svelte';
 
 	export let item: TileItem | null = null;

@@ -1,34 +1,39 @@
 import { browser } from '$app/environment';
 import { writable, type Writable, get } from 'svelte/store';
 import { persisted } from 'svelte-persisted-store';
-import { isDeepEqual, clone, find, pipe } from 'remeda';
+import { find, pipe } from 'remeda';
+import { z } from 'zod';
 
-export interface ConfigurationModel {
-    id: number
-}
+const ConfigurationModelSchema = z.object({
+    id: z.number().default(Date.now()),
+});
+
+export type ConfigurationModel = z.infer<typeof ConfigurationModelSchema>;
+
 
 export class ConfigurationUtils<ConfigurationModel> {
     protected configurationName: string;
-    protected defaultValueType: new () => ConfigurationModel;
+    protected defaultValueSchema: z.ZodType<ConfigurationModel>;
     protected configOptions?: Record<string, ConfigurationModel>;
     protected defaultOption?: string;
     protected store: Writable<ConfigurationModel>;
 
-    constructor(configurationName: string, defaultValue: new () => ConfigurationModel, configOptions?: Record<string, ConfigurationModel>, defaultOption?: string) {
+    constructor(configurationName: string, defaultValueSchema: z.ZodType<ConfigurationModel>, configOptions?: Record<string, ConfigurationModel>, defaultOption?: string) {
         this.configurationName = configurationName;
-        this.defaultValueType = defaultValue;
+        this.defaultValueSchema = defaultValueSchema;
         this.configOptions = configOptions;
         this.defaultOption = defaultOption;
         this.store = this.createPersistedStore();
     }
 
     private createPersistedStore(): Writable<ConfigurationModel> {
+        const initialValue = this.configOptions && this.defaultOption ? this.configOptions[this.defaultOption] : undefined;
         // Use svelte-persisted-store for persistence
         if (browser) {
-            return persisted<ConfigurationModel>(this.configurationName, new this.defaultValueType());
+            return persisted<ConfigurationModel>(this.configurationName, this.defaultValueSchema.parse(initialValue));
         } else {
             // For SSR, use a regular writable store
-            return writable<ConfigurationModel>(new this.defaultValueType());
+            return writable<ConfigurationModel>(this.defaultValueSchema.parse(initialValue));
         }
     }
 
@@ -37,15 +42,8 @@ export class ConfigurationUtils<ConfigurationModel> {
     }
 
     resetStore(): void {
-        if (this.configOptions && this.defaultOption && this.configOptions[this.defaultOption]) {
-            const configuration = this.configOptions[this.defaultOption] as ConfigurationModel;
-            if (configuration) {
-                this.store.set(clone(configuration));
-            }
-        }
-        else {
-            this.store.set(new this.defaultValueType());
-        }
+        const initialValue = this.configOptions && this.defaultOption ? this.configOptions[this.defaultOption] : undefined;
+        this.store.set(this.defaultValueSchema.parse(initialValue));
     }
 
     async saveConfigurationToFile(): Promise<void> {
@@ -102,7 +100,13 @@ export class ConfigurationUtils<ConfigurationModel> {
             if (this.configOptions) {
                 const configuration = this.configOptions[optionName] as ConfigurationModel;
                 if (configuration) {
-                    this.store.set(clone(configuration));
+                    const result = this.defaultValueSchema.safeParse(configuration);
+                    if (result.success) {
+                        this.store.set(result.data);
+                        resolve();
+                    } else {
+                        reject(result.error.format());
+                    }
                     resolve();
                 } else {
                     reject('Invalid option name');
@@ -126,8 +130,13 @@ export class ConfigurationUtils<ConfigurationModel> {
                         reader.onload = () => {
                             try {
                                 const configuration = JSON.parse(reader.result as string) as ConfigurationModel;
-                                this.store.set(clone(configuration));
-                                resolve();
+                                const result = this.defaultValueSchema.safeParse(configuration);
+                                if (result.success) {
+                                    this.store.set(result.data);
+                                    resolve();
+                                } else {
+                                    reject(result.error.format());
+                                }
                             } catch (error) {
                                 reject(error);
                             }

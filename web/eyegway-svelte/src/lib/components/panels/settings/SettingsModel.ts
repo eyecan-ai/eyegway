@@ -1,4 +1,4 @@
-import { type ConfigurationModel } from "$lib/components/utils/ConfigurationUtils.js";
+import { z } from "zod";
 
 export class GenericSettings { }
 
@@ -69,87 +69,101 @@ export class PointCloudSettings extends GenericSettings {
     }
 }
 
-export interface EyegwayStyle {
-    logo: string;
-    header: { "background-color": { r: number, g: number, b: number, a: number } };
-    panel: { "background-color": { r: number, g: number, b: number, a: number } };
-    content: { "background-color": { r: number, g: number, b: number, a: number } };
-    background: {
-        "first-color": { r: number, g: number, b: number, a: number },
-        "second-color": { r: number, g: number, b: number, a: number }
-    };
-}
+// Define the EyegwayStyle schema with defaults
+export const EyegwayStyleSchema = z.object({
+    logo: z.string().default('images/eyegway-logo.svg'),
+    header: z.object({
+        "background-color": z.object({
+            r: z.number().default(255),
+            g: z.number().default(255),
+            b: z.number().default(255),
+            a: z.number().default(1),
+        }),
+    }),
+    panel: z.object({
+        "background-color": z.object({
+            r: z.number().default(255),
+            g: z.number().default(255),
+            b: z.number().default(255),
+            a: z.number().default(1),
+        }),
+    }),
+    content: z.object({
+        "background-color": z.object({
+            r: z.number().default(255),
+            g: z.number().default(255),
+            b: z.number().default(255),
+            a: z.number().default(1),
+        }),
+    }),
+    background: z.object({
+        "first-color": z.object({
+            r: z.number().default(255),
+            g: z.number().default(255),
+            b: z.number().default(255),
+            a: z.number().default(1),
+        }),
+        "second-color": z.object({
+            r: z.number().default(255),
+            g: z.number().default(255),
+            b: z.number().default(255),
+            a: z.number().default(1),
+        }),
+    }),
+});
 
-export interface BulmaStyle {
-    scheme: { h: string, s: string, main_l: string };
-    primary: { h: string, s: string, l: string };
-    info: { h: string, s: string, l: string };
-    link: { h: string, s: string, l: string };
-    success: { h: string, s: string, l: string };
-    warning: { h: string, s: string, l: string };
-    danger: { h: string, s: string, l: string };
-    //
-    border_l: string;
-    text_l: string;
-    text_strong_l: string,
-    text_weak_l: string,
-    shadow_l: string;
-}
+// Define the BulmaStyle schema with defaults
+const BulmaStyleSchema = z.object({
+    scheme: z.object({
+        h: z.string().default("221deg"),
+        s: z.string().default("14%"),
+        main_l: z.string().default("100%"),
+    }),
+    primary: z.object({
+        h: z.string().default("171deg"),
+        s: z.string().default("100%"),
+        l: z.string().default("41%"),
+    }),
+    info: z.object({
+        h: z.string().default("198deg"),
+        s: z.string().default("100%"),
+        l: z.string().default("41%"),
+    }),
+    link: z.object({
+        h: z.string().default("233deg"),
+        s: z.string().default("100%"),
+        l: z.string().default("41%"),
+    }),
+    success: z.object({
+        h: z.string().default("153deg"),
+        s: z.string().default("100%"),
+        l: z.string().default("41%"),
+    }),
+    warning: z.object({
+        h: z.string().default("42deg"),
+        s: z.string().default("100%"),
+        l: z.string().default("41%"),
+    }),
+    danger: z.object({
+        h: z.string().default("348deg"),
+        s: z.string().default("100%"),
+        l: z.string().default("41%"),
+    }),
+    border_l: z.string().default("86%"),
+    text_l: z.string().default("29%"),
+    text_strong_l: z.string().default("48%"),
+    text_weak_l: z.string().default("21%"),
+    shadow_l: z.string().default("4%"),
+});
 
-export class StyleSettings implements ConfigurationModel {
-    id: number = Date.now();
-    eyegway: EyegwayStyle = {
-        logo: 'images/eyegway-logo.svg',
-        header: { "background-color": { r: 255, g: 255, b: 255, a: 1 } },
-        panel: { "background-color": { r: 255, g: 255, b: 255, a: 1 } },
-        content: { "background-color": { r: 255, g: 255, b: 255, a: 1 } },
-        background: {
-            "first-color": { r: 255, g: 255, b: 255, a: 1 },
-            "second-color": { r: 255, g: 255, b: 255, a: 1 }
-        },
-    };
+// Define the StyleSettings schema
+export const StyleSettingsSchema: z.ZodSchema = z.object({
+    id: z.number().default(() => Date.now()),
+    eyegway: EyegwayStyleSchema,
+    bulma: BulmaStyleSchema,
+});
 
-    bulma: BulmaStyle = {
-        scheme: {
-            h: "221deg",
-            s: "14%",
-            main_l: "100%",
-        },
-        primary: {
-            h: "171deg",
-            s: "100%",
-            l: "41%"
-        },
-        info: {
-            h: "198deg",
-            s: "100%",
-            l: "41%"
-        },
-        link: {
-            h: "233deg",
-            s: "100%",
-            l: "41%"
-        },
-        success: {
-            h: "153deg",
-            s: "100%",
-            l: "41%"
-        },
-        warning: {
-            h: "42deg",
-            s: "100%",
-            l: "41%"
-        },
-        danger: {
-            h: "348deg",
-            s: "100%",
-            l: "41%"
-        },
+export type EyegwayStyle = z.infer<typeof EyegwayStyleSchema>;
+export type BulmaStyle = z.infer<typeof BulmaStyleSchema>;
 
-        border_l: "86%",
-        text_l: "29%",
-        text_strong_l: "48%",
-        text_weak_l: "21%",
-        shadow_l: "4%",
-    };
-}
+export type StyleSettings = z.infer<typeof StyleSettingsSchema>;
