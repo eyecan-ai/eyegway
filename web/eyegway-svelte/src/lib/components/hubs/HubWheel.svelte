@@ -103,13 +103,13 @@
 	}
 </script>
 
-<div class="columns is-vcentered is-variable is-0">
+<div class="columns is-vcentered is-variable is-0 is-mobile">
 	{#if hubClient}
 		{#if historyFrozen}
 			<button class="button is-small p-0">
 				<Pane
 					position={'inline'}
-					width={126}
+					width={125}
 					theme={{
 						baseShadowColor: 'rgba(0, 0, 0, 0)',
 						baseBackgroundColor: 'transparent'
@@ -206,7 +206,7 @@
 		</div>
 		<div class="column">
 			<button
-				class="button is-small has-text-weight-semibold is-outlined play-button"
+				class="button is-small has-text-weight-semibold is-outlined"
 				style="--animation-time: {autoPlayMs}ms;"
 				class:is-info={historyFrozen}
 				class:is-primary={!historyFrozen}
@@ -214,9 +214,11 @@
 				title={!historyFrozen ? 'Click to freeze History' : 'Click to unfreeze History'}
 			>
 				{#if historyFrozen}
-					Frozen
+					<p class="is-hidden-tablet">F</p>
+					<p class="is-hidden-mobile play-button">Frozen</p>
 				{:else}
-					Running
+					<p class="is-hidden-tablet">R</p>
+					<p class="is-hidden-mobile play-button">Running</p>
 				{/if}
 			</button>
 		</div>
@@ -225,7 +227,7 @@
 
 <style>
 	.play-button {
-		width: 70px;
+		width: 45px;
 	}
 	.settings {
 		width: 350px;

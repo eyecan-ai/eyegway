@@ -79,7 +79,7 @@
 					}}
 					aria-haspopup="true"
 					aria-controls="dropdown-menu"
-					title="Load Predefined Theme"
+					title="Load Predefined Configuration"
 				>
 					<Library strokeWidth={2} size={16} />
 				</button>

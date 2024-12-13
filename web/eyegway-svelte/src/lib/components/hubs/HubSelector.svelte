@@ -49,13 +49,11 @@
 				<div class="dropdown-item has-text-weight-bold">
 					{#if hubs.length == 0}
 						{#if isError}
-							<article class="message is-danger">
-								<div class="message-body">Server not connected</div>
-							</article>
+							<div class="dropdown-item has-text-weight-bold has-text-danger">
+								Server not connected
+							</div>
 						{:else}
-							<article class="message">
-								<div class="message-body">No hubs found</div>
-							</article>
+							<div class="dropdown-item has-text-weight-bold has-text-warning">No hubs found</div>
 						{/if}
 					{/if}
 				</div>

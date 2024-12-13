@@ -127,6 +127,14 @@
 	.panels:hover .controls-hidden {
 		display: block;
 	}
+
+	/* if touch device display the controls */
+	@media (hover: none) {
+		.panels .controls-hidden {
+			display: block;
+		}
+	}
+
 	.controls {
 		margin-top: 4px;
 	}

@@ -5,6 +5,8 @@
 	import { ThemeUtils } from 'svelte-tweakpane-ui';
 	import { onMount } from 'svelte';
 
+	import { ChevronDown, X } from 'lucide-svelte';
+
 	// This is to keep updating CSS Variables when $styleSettings changes
 	// to initialize them there's another similar function called in app.html
 	import { updateCSSVariables } from '$lib/components/panels/settings/StyleSettingsUtils.js';
@@ -12,6 +14,7 @@
 
 	let sharedData: any[] = [];
 	let editableMosaic: boolean = false;
+	let showControls: boolean = false;
 
 	onMount(() => {
 		const customTheme = {
@@ -64,10 +67,10 @@
 	});
 </script>
 
-<div class="container is-fluid">
+<div class="container my-fluid-container">
 	<div class="box mb-1 mt-2 header">
-		<div class="columns is-vcentered">
-			<div class="column logo-container">
+		<div class="columns {showControls ? '' : 'is-mobile'}">
+			<div class="column is-flex is-justify-content-space-between">
 				<img
 					src={$styleSettings.eyegway.logo
 						? $styleSettings.eyegway.logo
@@ -75,9 +78,24 @@
 					alt="Logo"
 					class="logo"
 				/>
+				<button
+					class="button is-small is-hidden-tablet"
+					class:is-active={showControls}
+					on:click={() => (showControls = !showControls)}
+				>
+					{#if showControls}
+						<X strokeWidth={1} />
+					{:else}
+						<ChevronDown strokeWidth={1} />
+					{/if}
+				</button>
 			</div>
-			<div class="column">
-				<HubControls bind:data={sharedData} />
+			<div
+				class="column is-flex is-justify-content-flex-end {showControls ? '' : 'is-hidden-mobile'}"
+			>
+				<div class="is-flex is-justify-content-right">
+					<HubControls bind:data={sharedData} />
+				</div>
 			</div>
 		</div>
 	</div>
@@ -88,6 +106,17 @@
 </div>
 
 <style>
+	.container.my-fluid-container {
+		max-width: none !important;
+		width: 100%;
+	}
+
+	@media screen and (min-width: 1024px) {
+		.container.my-fluid-container {
+			padding-left: 32px;
+			padding-right: 32px;
+		}
+	}
 	.header {
 		background-color: rgba(
 			var(--eyegway-header-background-color-r),

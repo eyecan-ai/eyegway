@@ -50,6 +50,50 @@
 		isDropdownOpen = false;
 		dispatch('update');
 	}
+
+	// EXPERIMENTAL: Dynamic dropdown positioning
+	let dropdownTrigger: HTMLElement;
+	let dropdownMenu: HTMLElement;
+	let dropdownStyles: string = '';
+	let dropdownItemHeight: number = 32;
+	let dropdownPadding: number = 8;
+	let dropdownItemWidth: number = 222;
+
+	function toggleDropdown(): void {
+		isDropdownOpen = !isDropdownOpen;
+		if (isDropdownOpen) {
+			const triggerRect: DOMRect = dropdownTrigger.getBoundingClientRect();
+
+			// get dropdown item height
+			const height = (tips.length + 1) * dropdownItemHeight + 2 * dropdownPadding;
+			const width = dropdownItemWidth;
+			const viewportHeight: number = window.innerHeight;
+			const viewportWidth: number = window.innerWidth;
+
+			const spaceAbove: number = triggerRect.top;
+			const spaceBelow: number = viewportHeight - triggerRect.bottom;
+
+			let top: number;
+			let left: number = triggerRect.left;
+
+			// Position dropdown below or above without overlapping the trigger
+			if (spaceBelow >= height) {
+				top = triggerRect.bottom; // Below trigger
+			} else if (spaceAbove >= height) {
+				top = triggerRect.top - height; // Above trigger
+			} else {
+				// Fit as much as possible without overlapping
+				top = spaceBelow > spaceAbove ? triggerRect.bottom : triggerRect.top - height;
+			}
+
+			// Adjust horizontal position if necessary
+			if (left + width > viewportWidth) {
+				left = viewportWidth - width;
+			}
+
+			dropdownStyles = `position: fixed; top: ${top}px; left: ${left}px;`;
+		}
+	}
 </script>
 
 <div class="tile-content">
@@ -66,12 +110,12 @@
 			<div class="columns">
 				<div class="column content">
 					<div class="dropdown" class:is-active={isDropdownOpen}>
-						<div class="dropdown-trigger">
+						<div class="dropdown-trigger" bind:this={dropdownTrigger}>
 							<button
 								class="button is-small is-fullwidth"
 								aria-haspopup="true"
 								aria-controls="dropdown-menu"
-								on:click={() => (isDropdownOpen = !isDropdownOpen)}
+								on:click={toggleDropdown}
 							>
 								<span class="ellipsis-text">{selectedTip || 'select data'}</span>
 								<span class="icon is-small">
@@ -80,7 +124,7 @@
 							</button>
 						</div>
 						<div class="dropdown-menu" id="dropdown-menu" role="menu">
-							<div class="dropdown-content">
+							<div class="dropdown-content" bind:this={dropdownMenu} style={dropdownStyles}>
 								<a
 									href={'#'}
 									class="dropdown-item has-text-danger is-flex is-justify-content-right"
@@ -226,9 +270,5 @@
 		width: 100%;
 		height: 100%;
 		border-radius: 10px;
-	}
-
-	.dropdown-content {
-		position: fixed;
 	}
 </style>

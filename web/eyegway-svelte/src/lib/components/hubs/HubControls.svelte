@@ -8,7 +8,7 @@
 	export let hubName: string | null = $HubsPreferences.activeHub;
 </script>
 
-<div class="columns is-justify-content-flex-end is-vcentered is-variable is-0">
+<div class="columns is-justify-content-flex-end is-vcentered is-variable is-0 is-mobile">
 	<div class="column is-narrow">
 		<HubWheel bind:data {hubName} />
 	</div>
