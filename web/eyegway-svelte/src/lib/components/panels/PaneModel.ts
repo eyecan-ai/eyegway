@@ -152,15 +152,16 @@ export class DataExtractor {
 export const TileItemSchema = z.object({
     name: z.string(),
     settings: z.custom<GenericSettings>(),
-});
+}).default({ name: '', settings: {} });
 
 export const PaneConfigurationSchema: z.ZodSchema = z.object({
-    id: z.number().default(() => Date.now()), // Default to current timestamp
-    split: z.enum(['', 'horizontal', 'vertical']).default(''), // Enum for split options
-    size: z.number().default(100),
-    children: z.lazy(() => z.array(PaneConfigurationSchema)).default([]), // Recursive definition
-    item: TileItemSchema.default({ name: '', settings: {} }),
-});
+    id: z.number().default(() => Date.now()),
+    split: z.enum(['', 'horizontal', 'vertical']),
+    size: z.number(),
+    children: z.lazy(() => z.array(PaneConfigurationSchema)),
+    item: TileItemSchema,
+}).default({ id: Date.now(), split: '', size: 100, children: [], item: TileItemSchema.parse(undefined) });
+
 
 export type TileItem = z.infer<typeof TileItemSchema>;
 export type PaneConfiguration = z.infer<typeof PaneConfigurationSchema>;
