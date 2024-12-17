@@ -9,15 +9,5 @@ export default defineConfig({
 	ssr: {
 		noExternal: ['three']
 	},
-	server: {
-		fs: {
-			allow: [
-				// @ts-ignore
-				searchForWorkspaceRoot(process.cwd()),
-				'/public/themes',
-				'/public/layouts',
-			],
-		},
-	}
-
+	envPrefix: 'EYEGWAY_',
 });
