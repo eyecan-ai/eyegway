@@ -7,7 +7,7 @@ export class StyleConfigurationUtils extends ConfigurationUtils<StyleConfigurati
         super(
             'EyegwayStyleSettings',
             StyleSettingsSchema,
-            Parameters.themes.split(',').map(theme => `/themes/${theme.trim()}.json`),
+            Parameters.themes.split(/;|:/).map(theme => `/themes/${theme.trim()}.json`),
             `/themes/${Parameters.defaultTheme}.json`
         );
     }

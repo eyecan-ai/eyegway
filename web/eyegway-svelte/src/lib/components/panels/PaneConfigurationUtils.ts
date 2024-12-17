@@ -7,7 +7,7 @@ export class PaneConfigurationUtils extends ConfigurationUtils<PaneConfiguration
         super(
             "EyegwayPaneConfiguration",
             PaneConfigurationSchema,
-            Parameters.layouts.split(",").map(layout => `/layouts/${layout.trim()}.json`),
+            Parameters.layouts.split(/;|:/).map(layout => `/layouts/${layout.trim()}.json`),
             `/layouts/${Parameters.defaultLayout.trim()}.json`
         );
     }
