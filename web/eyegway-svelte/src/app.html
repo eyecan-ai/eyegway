@@ -3,7 +3,10 @@
 
 <head>
 	<meta charset="utf-8" />
-	<link rel="icon" href="%sveltekit.assets%/favicon.png" />
+	<link rel="apple-touch-icon" type="image/svg" sizes="180x180" href="%sveltekit.assets%/images/eyegway-icon.svg" />
+	<link rel="icon" type="image/svg" sizes="32x32" href="%sveltekit.assets%/images/eyegway-icon.svg" />
+	<link rel="icon" type="image/svg" sizes="16x16" href="%sveltekit.assets%/images/eyegway-icon.svg" />
+	<link rel="shortcut icon" type="image/svg" href="%sveltekit.assets%/images/eyegway-icon.svg" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	%sveltekit.head%
 	<link rel="stylesheet" href="%sveltekit.assets%/css/bulma.min.css">
@@ -12,10 +15,10 @@
 		import "%sveltekit.assets%/js/themeUpdate.js";
 
 		// TODO: Find a way to import this from a file or env var
-		const styleSettingsKey = "EyegwayStyleSettings";
+		const styleConfigurationKey = "EyegwayStyleSettings";
 
 		(function () {
-			const styles = JSON.parse(localStorage.getItem(styleSettingsKey)) || undefined;
+			const styles = JSON.parse(localStorage.getItem(styleConfigurationKey)) || undefined;
 			if (styles) window.updateCSSVariables(styles);
 		})();
 	</script>
