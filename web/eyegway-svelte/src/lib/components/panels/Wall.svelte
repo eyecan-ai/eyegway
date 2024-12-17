@@ -1,11 +1,14 @@
 <script lang="ts">
 	import PaneNode from './PaneNode.svelte';
-	import StyleSettingsPanel from './settings/StyleSettingsPanel.svelte';
+	import StyleConfigurationPanel from './style/StyleConfigurationPanel.svelte';
 	import { Edit, Palette } from 'lucide-svelte';
-	import { paneUtils, paneConfiguration } from './PaneStore.js';
-	import { styleUtils } from './settings/SettingsStore.js';
+	import { PaneConfigurationUtils } from './PaneConfigurationUtils.js';
+	import { StyleConfigurationUtils } from './style/StyleConfigurationUtils.js';
 	import SerializationControls from '../utils/SerializationControls.svelte';
-	import { tick } from 'svelte';
+	import { onMount, tick } from 'svelte';
+	import { type Writable } from 'svelte/store';
+	import type { PaneConfiguration } from './PaneModel.js';
+	import type { StyleConfiguration } from './style/StyleModel.js';
 
 	export let editMode: boolean = true;
 	export let styleMode: boolean = false;
@@ -25,8 +28,24 @@
 	}
 
 	function handleUpdate() {
-		if (!refreshingPane && !refreshPane) $paneConfiguration.id = Date.now();
+		if (paneConfiguration) {
+			if (!refreshingPane && !refreshPane) $paneConfiguration.id = Date.now();
+		}
 	}
+
+	let paneConfiguration: Writable<PaneConfiguration>;
+	let styleConfiguration: Writable<StyleConfiguration>;
+	let paneUtils = new PaneConfigurationUtils();
+	let styleUtils = new StyleConfigurationUtils();
+
+	onMount(() => {
+		paneUtils.getStore().then((config) => {
+			paneConfiguration = config;
+		});
+		styleUtils.getStore().then((config) => {
+			styleConfiguration = config;
+		});
+	});
 
 	// This is a workaround to:
 	// 1. Be able to refresh the PaneNode when the user changes the configuration
@@ -51,17 +70,25 @@
 
 <div class="panels">
 	<div class="is-flex p-0 is-align-items-center is-justify-content-center" style="height: 100%">
-		{#key refreshPane}
-			<PaneNode
-				draggingStep={1}
-				bind:pane={$paneConfiguration}
-				{editMode}
-				{dataStream}
-				tips={dataStream ? Object.keys(dataStream) : []}
-				on:update={handleUpdate}
+		{#if paneConfiguration}
+			{#key refreshPane}
+				<PaneNode
+					draggingStep={1}
+					bind:pane={$paneConfiguration}
+					{editMode}
+					{dataStream}
+					tips={dataStream ? Object.keys(dataStream) : []}
+					on:update={handleUpdate}
+				/>
+			{/key}
+		{/if}
+		{#if styleConfiguration}
+			<StyleConfigurationPanel
+				{styleConfiguration}
+				isDisabled={!styleMode}
+				bind:refresh={refreshStyle}
 			/>
-		{/key}
-		<StyleSettingsPanel isDisabled={!styleMode} bind:refresh={refreshStyle} />
+		{/if}
 	</div>
 
 	{#if controls}

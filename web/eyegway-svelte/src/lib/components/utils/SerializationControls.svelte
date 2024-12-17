@@ -117,8 +117,9 @@
 		<button
 			class="button is-small is-danger is-outlined"
 			on:click={() => {
-				config.resetStore();
-				dispatch('update');
+				config.resetStore().then(() => {
+					dispatch('update');
+				});
 			}}
 			title="Reset to Default"
 		>

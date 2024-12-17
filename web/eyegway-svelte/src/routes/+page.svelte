@@ -1,22 +1,33 @@
 <script lang="ts">
 	import HubControls from '$lib/components/hubs/HubControls.svelte';
 	import Wall from '$lib/components/panels/Wall.svelte';
-	import { styleSettings } from '$lib/components/panels/settings/SettingsStore.js';
+	import { StyleConfigurationUtils } from '$lib/components/panels/style/StyleConfigurationUtils.js';
 	import { ThemeUtils } from 'svelte-tweakpane-ui';
 	import { onMount } from 'svelte';
+	import { type Writable } from 'svelte/store';
 
 	import { ChevronDown, X } from 'lucide-svelte';
 
 	// This is to keep updating CSS Variables when $styleSettings changes
 	// to initialize them there's another similar function called in app.html
-	import { updateCSSVariables } from '$lib/components/panels/settings/StyleSettingsUtils.js';
-	$: updateCSSVariables($styleSettings);
+	import { updateCSSVariables } from '$lib/components/panels/style/StyleConfigurationPanel.js';
+	import type { StyleConfiguration } from '$lib/components/panels/style/StyleModel.js';
 
 	let sharedData: any[] = [];
 	let editableMosaic: boolean = false;
 	let showControls: boolean = false;
 
+	let styleConfiguration: Writable<StyleConfiguration>;
+	let styleUtils = new StyleConfigurationUtils();
+
+	$: if (styleConfiguration) {
+		updateCSSVariables($styleConfiguration);
+	}
+
 	onMount(() => {
+		styleUtils.getStore().then((config) => {
+			styleConfiguration = config;
+		});
 		const customTheme = {
 			...{
 				baseBackgroundColor:
@@ -71,13 +82,15 @@
 	<div class="box mb-1 mt-2 header">
 		<div class="columns {showControls ? '' : 'is-mobile'}">
 			<div class="column is-flex is-justify-content-space-between">
-				<img
-					src={$styleSettings.eyegway.logo
-						? $styleSettings.eyegway.logo
-						: 'images/eyegway-logo.svg'}
-					alt="Logo"
-					class="logo"
-				/>
+				{#if styleConfiguration}
+					<img
+						src={$styleConfiguration.eyegway.logo
+							? $styleConfiguration.eyegway.logo
+							: 'images/eyegway-logo.svg'}
+						alt="Logo"
+						class="logo"
+					/>
+				{/if}
 				<button
 					class="button is-small is-hidden-tablet"
 					class:is-active={showControls}

@@ -2,7 +2,6 @@
 	import { PaneGroup, Pane, PaneResizer, type PaneAPI } from 'paneforge';
 	import Tile from './Tile.svelte';
 	import { type PaneConfiguration, splitPane, removePane } from './PaneModel.js';
-	import { paneConfiguration } from './PaneStore.js';
 
 	import { createEventDispatcher, onMount } from 'svelte';
 	import PaneHandle from './PaneHandle.svelte';
@@ -18,19 +17,23 @@
 
 	let showPercentage: boolean = false;
 
-	function handleUpdate() {
+	function dispatchUpdate() {
 		pane = { ...pane };
 		dispatch('update');
 	}
 
+	function dispatchDelete() {
+		dispatch('delete', { pane: pane });
+	}
+
 	function handleSplit(event: CustomEvent<{ direction: 'horizontal' | 'vertical' }>) {
 		splitPane(pane, event.detail.direction);
-		handleUpdate();
+		dispatchUpdate();
 	}
 
 	function handleDelete(event: CustomEvent) {
-		removePane($paneConfiguration, pane);
-		handleUpdate();
+		removePane(pane, event.detail.pane);
+		dispatchUpdate();
 	}
 
 	function handleResize(child: PaneConfiguration, index: number, size: number) {
@@ -39,12 +42,12 @@
 		// Round size to nearest multiple of draggingStep
 		child.size = Math.round(size / draggingStep) * draggingStep;
 		if (apis[index]) apis[index].resize(child.size);
-		handleUpdate();
+		dispatchUpdate();
 	}
 
 	function handleDraggingChange(child: PaneConfiguration) {
 		showPercentage = false; // Hide percentage when finished dragging
-		handleUpdate();
+		dispatchUpdate();
 	}
 
 	onMount(() => {
@@ -65,7 +68,14 @@
 				}}
 				bind:pane={apis[index]}
 			>
-				<svelte:self bind:pane={child} {editMode} {dataStream} {tips} on:update={handleUpdate} />
+				<svelte:self
+					bind:pane={child}
+					{editMode}
+					{dataStream}
+					{tips}
+					on:update={dispatchUpdate}
+					on:delete={handleDelete}
+				/>
 			</Pane>
 			{#if editMode}
 				{#if pane.children.length > 1 && pane.children.indexOf(child) < pane.children.length - 1}
@@ -84,8 +94,8 @@
 			bind:item={pane.item}
 			{tips}
 			on:split={handleSplit}
-			on:delete={handleDelete}
-			on:update={handleUpdate}
+			on:update={dispatchUpdate}
+			on:delete={dispatchDelete}
 		/>
 	{/key}
 {/if}

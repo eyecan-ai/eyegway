@@ -9,15 +9,16 @@
 		TabGroup,
 		TabPage
 	} from 'svelte-tweakpane-ui';
-	import { styleSettings } from './SettingsStore.js';
 	import {
 		HSLStringToRGB,
 		RGBToHSLString,
 		removePercent,
 		convertBlobToBase64
-	} from './StyleSettingsUtils.js';
+	} from './StyleConfigurationPanel.js';
 	import { onMount } from 'svelte';
+	import type { StyleConfiguration } from './StyleModel.js';
 
+	export let styleConfiguration: StyleConfiguration;
 	export let isDisabled: boolean = true;
 
 	let logoImage: ImageValue;
@@ -42,50 +43,50 @@
 	});
 
 	$: if (refresh) {
-		logoImage = $styleSettings.eyegway.logo;
+		logoImage = $styleConfiguration.eyegway.logo;
 
 		schemeRGB = HSLStringToRGB(
-			$styleSettings.bulma.scheme.h,
-			$styleSettings.bulma.scheme.s,
-			$styleSettings.bulma.scheme.main_l
+			$styleConfiguration.bulma.scheme.h,
+			$styleConfiguration.bulma.scheme.s,
+			$styleConfiguration.bulma.scheme.main_l
 		);
 
-		borderLPercent = removePercent($styleSettings.bulma.border_l);
-		textLPercent = removePercent($styleSettings.bulma.text_l);
-		shadowLPercent = removePercent($styleSettings.bulma.shadow_l);
+		borderLPercent = removePercent($styleConfiguration.bulma.border_l);
+		textLPercent = removePercent($styleConfiguration.bulma.text_l);
+		shadowLPercent = removePercent($styleConfiguration.bulma.shadow_l);
 
 		primaryRGB = HSLStringToRGB(
-			$styleSettings.bulma.primary.h,
-			$styleSettings.bulma.primary.s,
-			$styleSettings.bulma.primary.l
+			$styleConfiguration.bulma.primary.h,
+			$styleConfiguration.bulma.primary.s,
+			$styleConfiguration.bulma.primary.l
 		);
 		infoRGB = HSLStringToRGB(
-			$styleSettings.bulma.info.h,
-			$styleSettings.bulma.info.s,
-			$styleSettings.bulma.info.l
+			$styleConfiguration.bulma.info.h,
+			$styleConfiguration.bulma.info.s,
+			$styleConfiguration.bulma.info.l
 		);
 		linkRGB = HSLStringToRGB(
-			$styleSettings.bulma.link.h,
-			$styleSettings.bulma.link.s,
-			$styleSettings.bulma.link.l
+			$styleConfiguration.bulma.link.h,
+			$styleConfiguration.bulma.link.s,
+			$styleConfiguration.bulma.link.l
 		);
 		successRGB = HSLStringToRGB(
-			$styleSettings.bulma.success.h,
-			$styleSettings.bulma.success.s,
-			$styleSettings.bulma.success.l
+			$styleConfiguration.bulma.success.h,
+			$styleConfiguration.bulma.success.s,
+			$styleConfiguration.bulma.success.l
 		);
 		warningRGB = HSLStringToRGB(
-			$styleSettings.bulma.warning.h,
-			$styleSettings.bulma.warning.s,
-			$styleSettings.bulma.warning.l
+			$styleConfiguration.bulma.warning.h,
+			$styleConfiguration.bulma.warning.s,
+			$styleConfiguration.bulma.warning.l
 		);
 		dangerRGB = HSLStringToRGB(
-			$styleSettings.bulma.danger.h,
-			$styleSettings.bulma.danger.s,
-			$styleSettings.bulma.danger.l
+			$styleConfiguration.bulma.danger.h,
+			$styleConfiguration.bulma.danger.s,
+			$styleConfiguration.bulma.danger.l
 		);
 
-		$styleSettings = { ...$styleSettings };
+		$styleConfiguration = { ...$styleConfiguration };
 
 		refresh = false;
 	}
@@ -119,13 +120,13 @@
 							if (logoImage && typeof logoImage !== 'string') {
 								// @ts-ignore
 								convertBlobToBase64(logoImage.src).then((value) => {
-									if (value) $styleSettings.eyegway.logo = value;
+									if (value) $styleConfiguration.eyegway.logo = value;
 								});
 							}
 
-							logoImage = $styleSettings.eyegway.logo;
+							logoImage = $styleConfiguration.eyegway.logo;
 
-							$styleSettings.id = Date.now();
+							$styleConfiguration.id = Date.now();
 						}
 					}}
 				/>
@@ -136,59 +137,59 @@
 						if (e.detail.origin === 'internal') {
 							schemeRGB = e.detail.value;
 							const out = RGBToHSLString(schemeRGB.r, schemeRGB.g, schemeRGB.b);
-							$styleSettings.bulma.scheme = { h: out.h, s: out.s, main_l: out.l };
+							$styleConfiguration.bulma.scheme = { h: out.h, s: out.s, main_l: out.l };
 
 							schemeRGB = HSLStringToRGB(
-								$styleSettings.bulma.scheme.h,
-								$styleSettings.bulma.scheme.s,
-								$styleSettings.bulma.scheme.main_l
+								$styleConfiguration.bulma.scheme.h,
+								$styleConfiguration.bulma.scheme.s,
+								$styleConfiguration.bulma.scheme.main_l
 							);
-							$styleSettings.id = Date.now();
+							$styleConfiguration.id = Date.now();
 						}
 					}}
 				/>
 				<Color
-					bind:value={$styleSettings.eyegway.header['background-color']}
+					bind:value={$styleConfiguration.eyegway.header['background-color']}
 					label="Header Background Color"
 					on:change={(e) => {
 						if (e.detail.origin === 'internal') {
-							$styleSettings.id = Date.now();
+							$styleConfiguration.id = Date.now();
 						}
 					}}
 				/>
 				<Color
-					bind:value={$styleSettings.eyegway.panel['background-color']}
+					bind:value={$styleConfiguration.eyegway.panel['background-color']}
 					label="Panel Background Color"
 					on:change={(e) => {
 						if (e.detail.origin === 'internal') {
-							$styleSettings.id = Date.now();
+							$styleConfiguration.id = Date.now();
 						}
 					}}
 				/>
 				<Color
-					bind:value={$styleSettings.eyegway.content['background-color']}
+					bind:value={$styleConfiguration.eyegway.content['background-color']}
 					label="Content Background Color"
 					on:change={(e) => {
 						if (e.detail.origin === 'internal') {
-							$styleSettings.id = Date.now();
+							$styleConfiguration.id = Date.now();
 						}
 					}}
 				/>
 				<Color
-					bind:value={$styleSettings.eyegway.background['first-color']}
+					bind:value={$styleConfiguration.eyegway.background['first-color']}
 					label="Internal Body Background Color"
 					on:change={(e) => {
 						if (e.detail.origin === 'internal') {
-							$styleSettings.id = Date.now();
+							$styleConfiguration.id = Date.now();
 						}
 					}}
 				/>
 				<Color
-					bind:value={$styleSettings.eyegway.background['second-color']}
+					bind:value={$styleConfiguration.eyegway.background['second-color']}
 					label="External Body Background Color"
 					on:change={(e) => {
 						if (e.detail.origin === 'internal') {
-							$styleSettings.id = Date.now();
+							$styleConfiguration.id = Date.now();
 						}
 					}}
 				/>
@@ -202,10 +203,10 @@
 					on:change={(e) => {
 						if (e.detail.origin === 'internal') {
 							borderLPercent = e.detail.value;
-							$styleSettings.bulma.border_l = borderLPercent + '%';
+							$styleConfiguration.bulma.border_l = borderLPercent + '%';
 
-							borderLPercent = removePercent($styleSettings.bulma.border_l);
-							$styleSettings.id = Date.now();
+							borderLPercent = removePercent($styleConfiguration.bulma.border_l);
+							$styleConfiguration.id = Date.now();
 						}
 					}}
 				/>
@@ -218,12 +219,12 @@
 					on:change={(e) => {
 						if (e.detail.origin === 'internal') {
 							textLPercent = e.detail.value;
-							$styleSettings.bulma.text_l = textLPercent + '%';
-							$styleSettings.bulma.text_strong_l = textLPercent + 19 + '%';
-							$styleSettings.bulma.text_weak_l = textLPercent - 8 + '%';
+							$styleConfiguration.bulma.text_l = textLPercent + '%';
+							$styleConfiguration.bulma.text_strong_l = textLPercent + 19 + '%';
+							$styleConfiguration.bulma.text_weak_l = textLPercent - 8 + '%';
 
-							textLPercent = removePercent($styleSettings.bulma.text_l);
-							$styleSettings.id = Date.now();
+							textLPercent = removePercent($styleConfiguration.bulma.text_l);
+							$styleConfiguration.id = Date.now();
 						}
 					}}
 				/>
@@ -236,10 +237,10 @@
 					on:change={(e) => {
 						if (e.detail.origin === 'internal') {
 							shadowLPercent = e.detail.value;
-							$styleSettings.bulma.shadow_l = shadowLPercent + '%';
+							$styleConfiguration.bulma.shadow_l = shadowLPercent + '%';
 
-							shadowLPercent = removePercent($styleSettings.bulma.shadow_l);
-							$styleSettings.id = Date.now();
+							shadowLPercent = removePercent($styleConfiguration.bulma.shadow_l);
+							$styleConfiguration.id = Date.now();
 						}
 					}}
 				/>
@@ -252,12 +253,12 @@
 						if (e.detail.origin === 'internal') {
 							primaryRGB = e.detail.value;
 							const out = RGBToHSLString(primaryRGB.r, primaryRGB.g, primaryRGB.b);
-							$styleSettings.bulma.primary = { h: out.h, s: out.s, l: out.l };
+							$styleConfiguration.bulma.primary = { h: out.h, s: out.s, l: out.l };
 
 							primaryRGB = HSLStringToRGB(
-								$styleSettings.bulma.primary.h,
-								$styleSettings.bulma.primary.s,
-								$styleSettings.bulma.primary.l
+								$styleConfiguration.bulma.primary.h,
+								$styleConfiguration.bulma.primary.s,
+								$styleConfiguration.bulma.primary.l
 							);
 						}
 					}}
@@ -269,12 +270,12 @@
 						if (e.detail.origin === 'internal') {
 							infoRGB = e.detail.value;
 							const out = RGBToHSLString(infoRGB.r, infoRGB.g, infoRGB.b);
-							$styleSettings.bulma.info = { h: out.h, s: out.s, l: out.l };
+							$styleConfiguration.bulma.info = { h: out.h, s: out.s, l: out.l };
 
 							infoRGB = HSLStringToRGB(
-								$styleSettings.bulma.info.h,
-								$styleSettings.bulma.info.s,
-								$styleSettings.bulma.info.l
+								$styleConfiguration.bulma.info.h,
+								$styleConfiguration.bulma.info.s,
+								$styleConfiguration.bulma.info.l
 							);
 						}
 					}}
@@ -286,12 +287,12 @@
 						if (e.detail.origin === 'internal') {
 							linkRGB = e.detail.value;
 							const out = RGBToHSLString(linkRGB.r, linkRGB.g, linkRGB.b);
-							$styleSettings.bulma.link = { h: out.h, s: out.s, l: out.l };
+							$styleConfiguration.bulma.link = { h: out.h, s: out.s, l: out.l };
 
 							linkRGB = HSLStringToRGB(
-								$styleSettings.bulma.link.h,
-								$styleSettings.bulma.link.s,
-								$styleSettings.bulma.link.l
+								$styleConfiguration.bulma.link.h,
+								$styleConfiguration.bulma.link.s,
+								$styleConfiguration.bulma.link.l
 							);
 						}
 					}}
@@ -303,12 +304,12 @@
 						if (e.detail.origin === 'internal') {
 							successRGB = e.detail.value;
 							const out = RGBToHSLString(successRGB.r, successRGB.g, successRGB.b);
-							$styleSettings.bulma.success = { h: out.h, s: out.s, l: out.l };
+							$styleConfiguration.bulma.success = { h: out.h, s: out.s, l: out.l };
 
 							successRGB = HSLStringToRGB(
-								$styleSettings.bulma.success.h,
-								$styleSettings.bulma.success.s,
-								$styleSettings.bulma.success.l
+								$styleConfiguration.bulma.success.h,
+								$styleConfiguration.bulma.success.s,
+								$styleConfiguration.bulma.success.l
 							);
 						}
 					}}
@@ -320,12 +321,12 @@
 						if (e.detail.origin === 'internal') {
 							warningRGB = e.detail.value;
 							const out = RGBToHSLString(warningRGB.r, warningRGB.g, warningRGB.b);
-							$styleSettings.bulma.warning = { h: out.h, s: out.s, l: out.l };
+							$styleConfiguration.bulma.warning = { h: out.h, s: out.s, l: out.l };
 
 							warningRGB = HSLStringToRGB(
-								$styleSettings.bulma.warning.h,
-								$styleSettings.bulma.warning.s,
-								$styleSettings.bulma.warning.l
+								$styleConfiguration.bulma.warning.h,
+								$styleConfiguration.bulma.warning.s,
+								$styleConfiguration.bulma.warning.l
 							);
 						}
 					}}
@@ -337,14 +338,14 @@
 						if (e.detail.origin === 'internal') {
 							dangerRGB = e.detail.value;
 							const out = RGBToHSLString(dangerRGB.r, dangerRGB.g, dangerRGB.b);
-							$styleSettings.bulma.danger = { h: out.h, s: out.s, l: out.l };
+							$styleConfiguration.bulma.danger = { h: out.h, s: out.s, l: out.l };
 
 							dangerRGB = HSLStringToRGB(
-								$styleSettings.bulma.danger.h,
-								$styleSettings.bulma.danger.s,
-								$styleSettings.bulma.danger.l
+								$styleConfiguration.bulma.danger.h,
+								$styleConfiguration.bulma.danger.s,
+								$styleConfiguration.bulma.danger.l
 							);
-							$styleSettings.id = Date.now();
+							$styleConfiguration.id = Date.now();
 						}
 					}}
 				/>
