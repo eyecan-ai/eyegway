@@ -65,6 +65,7 @@
 		);
 	}
 	.percent {
+		color: var(--bulma-text);
 		font-size: 0.7em;
 		font-weight: bold;
 		padding-left: 5px;
