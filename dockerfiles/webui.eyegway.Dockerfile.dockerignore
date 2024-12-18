@@ -8,3 +8,4 @@
 !web/eyegway-svelte/tsconfig.json
 !web/eyegway-svelte/vite.config.ts
 !web/eyegway-svelte/yarn.lock
+!web/eyegway-svelte/.yarnrc.yml
