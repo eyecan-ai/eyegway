@@ -1,6 +1,8 @@
 from __future__ import annotations
-import pydantic as pyd
+
 import typing as t
+
+import pydantic as pyd
 
 
 class HubsParametrization:
@@ -59,6 +61,7 @@ class HubsParametrization:
 
 
 class HubsConfig(pyd.BaseSettings):
+    hub_name: str = "default_hub"
     max_buffer_size: int = 64
     max_history_size: int = 64
     max_payload_size: int = 64_000_000

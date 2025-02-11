@@ -1,15 +1,16 @@
 from __future__ import annotations
-import eyegway.packers as ecm
-import eyegway.communication.async_channels as ecom
-import eyegway.communication.async_variables as ecov
-import eyegway.packers.factory as ecp
-import eyegway.utils as eut
-import eyegway.hubs as eh
-import eyegway.hubs.connectors as ehc
-from redis.asyncio import Redis
-
 
 import typing as t
+
+from redis.asyncio import Redis
+
+import eyegway.communication.async_channels as ecom
+import eyegway.communication.async_variables as ecov
+import eyegway.hubs as eh
+import eyegway.hubs.connectors as ehc
+import eyegway.packers as ecm
+import eyegway.packers.factory as ecp
+import eyegway.utils as eut
 
 
 class AsyncMessageHub:
@@ -190,7 +191,7 @@ class AsyncMessageHub:
 
     @staticmethod
     def create(
-        name: str,
+        name: t.Optional[str] = None,
         config: t.Optional[eh.HubsConfig] = None,
         redis: t.Optional[Redis] = None,
     ) -> AsyncMessageHub:
@@ -199,7 +200,7 @@ class AsyncMessageHub:
 
         return AsyncMessageHub(
             redis or eh.HubsConfig.create_redis_async_instance(config),
-            name,
+            name or config.hub_name,
             ecp.PackersFactory.create(config.packer),
             config.max_buffer_size,
             config.max_history_size,
