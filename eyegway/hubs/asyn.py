@@ -191,7 +191,7 @@ class AsyncMessageHub:
 
     @staticmethod
     def create(
-        name: str,
+        name: t.Optional[str] = None,
         config: t.Optional[eh.HubsConfig] = None,
         redis: t.Optional[Redis] = None,
     ) -> AsyncMessageHub:
@@ -200,7 +200,7 @@ class AsyncMessageHub:
 
         return AsyncMessageHub(
             redis or eh.HubsConfig.create_redis_async_instance(config),
-            name,
+            name or config.hub_name,
             ecp.PackersFactory.create(config.packer),
             config.max_buffer_size,
             config.max_history_size,

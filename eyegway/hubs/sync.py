@@ -188,7 +188,7 @@ class MessageHub:
 
     @staticmethod
     def create(
-        name: str,
+        name: t.Optional[str] = None,
         config: t.Optional[eh.HubsConfig] = None,
         redis: t.Optional[Redis] = None,
     ) -> MessageHub:
@@ -196,8 +196,8 @@ class MessageHub:
             config = eh.HubsConfig()
 
         return MessageHub(
-            eh.HubsConfig.create_redis_instance(config) if redis is None else redis,
-            name,
+            redis or eh.HubsConfig.create_redis_instance(config),
+            name or config.hub_name,
             ecp.PackersFactory.create(config.packer),
             config.max_buffer_size,
             config.max_history_size,
