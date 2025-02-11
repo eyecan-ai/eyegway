@@ -1,13 +1,16 @@
 from __future__ import annotations
-import eyegway.packers as ecm
+
+import typing as t
+
+from redis import Redis
+
 import eyegway.communication.channels as ecom
 import eyegway.communication.variables as ecov
-import eyegway.packers.factory as ecp
-import eyegway.utils as eut
 import eyegway.hubs as eh
 import eyegway.hubs.connectors as ehc
-from redis import Redis
-import typing as t
+import eyegway.packers as ecm
+import eyegway.packers.factory as ecp
+import eyegway.utils as eut
 
 
 class MessageHub:
