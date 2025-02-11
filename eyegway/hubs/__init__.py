@@ -1,6 +1,8 @@
 from __future__ import annotations
-import pydantic as pyd
+
 import typing as t
+
+import pydantic as pyd
 
 
 class HubsParametrization:
