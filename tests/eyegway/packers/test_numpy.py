@@ -1,11 +1,13 @@
-import eyegway.packers.numpy as ecp
 import numpy as np
 import pytest
-import eyegway.packers as ep
-import eyegway.packers.numpy as epn
-import eyegway.packers.images as epi
 from deepdiff import DeepDiff
-from .commons import test_valid_numpy_messages
+
+import eyegway.packers as ep
+import eyegway.packers.images as epi
+import eyegway.packers.numpy as ecp
+import eyegway.packers.numpy as epn
+
+from .commons import valid_numpy_messages
 
 
 def generate(shape, dtype):
@@ -202,7 +204,7 @@ class TestConversion:
 
 class TestNumpyPackers:
 
-    @pytest.mark.parametrize("message", test_valid_numpy_messages())
+    @pytest.mark.parametrize("message", valid_numpy_messages())
     def test_equality(self, message):
         # Multi Parser
 

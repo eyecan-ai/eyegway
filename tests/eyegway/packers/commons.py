@@ -1,5 +1,6 @@
-import numpy as np
 import typing as t
+
+import numpy as np
 import pydantic as pyd
 
 
@@ -14,7 +15,7 @@ def simple_messages():
         {"list": [1, 2, 3]},
         {
             "metadata": {
-                'alpha': 1,
+                "alpha": 1,
                 2: "hello",
                 True: False,
                 2.2: "float",
@@ -54,12 +55,12 @@ def numpy_messages():
     ]
 
 
-def test_valid_numpy_messages() -> t.List[t.Any]:
+def valid_numpy_messages() -> t.List[t.Any]:
     return simple_messages() + numpy_messages()
 
 
-def test_valid_messages() -> t.List[t.Any]:
-    return test_valid_numpy_messages() + []
+def valid_messages() -> t.List[t.Any]:
+    return valid_numpy_messages() + []
 
 
 # Invalid messages
@@ -69,5 +70,5 @@ class InvalidObject(pyd.BaseModel):
     a: int = 2
 
 
-def test_invalid_messages() -> t.List[t.Any]:
+def invalid_messages() -> t.List[t.Any]:
     return [InvalidObject()]

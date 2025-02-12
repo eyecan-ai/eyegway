@@ -53,7 +53,7 @@ class HubsRestAPI(fa.FastAPI):
     def get_hub(self, name: str) -> eha.AsyncMessageHub:
         if name not in self._message_hubs_map:
             self._message_hubs_map[name] = eha.AsyncMessageHub.create(
-                name=name, config=self.config
+                name=name, config=self.config, redis=self._message_hubs_manager.redis
             )
         return self._message_hubs_map[name]
 

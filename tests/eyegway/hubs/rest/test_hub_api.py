@@ -1,5 +1,5 @@
 import pytest
-from httpx import AsyncClient
+from httpx import ASGITransport, AsyncClient
 
 import eyegway.hubs as eh
 import eyegway.hubs.rest.api as erha
@@ -16,7 +16,9 @@ class TestHubsRestAPI:
 
         hub_name = "test"
 
-        async with AsyncClient(app=api, base_url="http://test") as tc:
+        async with AsyncClient(
+            transport=ASGITransport(app=api), base_url="http://test"
+        ) as tc:
 
             response = await tc.post(f"/hubs/{hub_name}/clear_history")
             assert response.status_code == 200
@@ -48,10 +50,9 @@ class TestHubsRestAPI:
             assert response.status_code == 200
             assert response.json() == data_to_send
 
-            # This test fails unexpectedly saying there are no hubs
-            # response = await tc.get("/hubs")
-            # assert response.status_code == 200
-            # assert response.json() == [hub_name]
+            response = await tc.get("/hubs")
+            assert response.status_code == 200
+            assert response.json() == [hub_name]
 
             last = await tc.get(f"/hubs/{hub_name}/last")
             assert last.status_code == 200
