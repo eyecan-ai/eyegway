@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { EyegwayHubClient } from '$lib/Eyegway.js';
 	import { ServerPreferences } from '$lib/Stores.js';
-	import { Wheel, Stepper, Pane } from 'svelte-tweakpane-ui';
+	import { Slider, Stepper, Pane } from 'svelte-tweakpane-ui';
 
 	import { CirclePlay, CircleStop, Settings, RotateCw, EllipsisVertical } from 'lucide-svelte';
 	import { onDestroy } from 'svelte';
@@ -16,6 +16,8 @@
 	let dataPointer: number = 0;
 	let autoPlay: boolean = true;
 	let autoPlayMs: number = 500;
+	let sliderDebounce: number = 5;
+	let sliderTimeout: number | null = null;
 	let autoPlayTimeout: number | null = null;
 	let settingsOpen: boolean = false;
 
@@ -39,18 +41,26 @@
 			historySize = await hubClient.historySize();
 			bufferSize = await hubClient.bufferSize();
 			historyFrozen = await hubClient.isHistoryFrozen();
-			data = await hubClient.last(dataPointer);
+			data = await hubClient.last(-dataPointer);
 		} catch (e) {
 			console.log(e);
 			data = null;
 		}
 	}
 
+	// Debounced reload function for slider changes
+	function debouncedReload() {
+		if (sliderTimeout !== null) clearTimeout(sliderTimeout);
+		sliderTimeout = setTimeout(() => {
+			reload();
+		}, sliderDebounce);
+	}
+
 	export async function reloadData() {
 		if (hubClient === null) return;
 		try {
 			console.log('reloadin datapointer', dataPointer);
-			data = await hubClient.last(dataPointer);
+			data = await hubClient.last(-dataPointer);
 		} catch (e) {
 			console.log(e);
 			data = null;
@@ -115,14 +125,14 @@
 						baseBackgroundColor: 'transparent'
 					}}
 				>
-					<Wheel
+					<Slider
 						bind:value={dataPointer}
-						max={historySize - 1}
-						min={0}
+						max={0}
+						min={-(historySize - 1)}
 						step={1}
-						on:change={reload}
+						on:change={debouncedReload}
 						format={(value) => {
-							return `${value}/${historySize - 1}`;
+							return `${value}`;
 						}}
 					/>
 				</Pane>
