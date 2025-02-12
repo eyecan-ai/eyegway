@@ -133,7 +133,7 @@
 		background-color: #222;
 		width: 100%;
 		height: 100%;
-		overflow: scroll;
+		overflow: auto;
 	}
 
 	.item .banner {

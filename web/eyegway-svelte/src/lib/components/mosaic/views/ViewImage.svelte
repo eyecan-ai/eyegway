@@ -10,6 +10,7 @@
 
 <style>
 	.image-container {
+		border-radius: 10px;
 		background-size: contain;
 		background-repeat: no-repeat;
 		background-position: center;

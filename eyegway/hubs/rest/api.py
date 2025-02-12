@@ -1,11 +1,13 @@
-import eyegway.hubs.asyn as eha
-import eyegway.hubs as eh
-import fastapi as fa
-import fastapi.responses as far
-import fastapi.requests as farq
 import typing as t
+
+import fastapi as fa
 import fastapi.middleware.cors as fa_cors
+import fastapi.requests as farq
+import fastapi.responses as far
 import pydantic as pyd
+
+import eyegway.hubs as eh
+import eyegway.hubs.asyn as eha
 
 HUBS_REST_API_DEFAULT_PORT = 55221
 
@@ -51,7 +53,7 @@ class HubsRestAPI(fa.FastAPI):
     def get_hub(self, name: str) -> eha.AsyncMessageHub:
         if name not in self._message_hubs_map:
             self._message_hubs_map[name] = eha.AsyncMessageHub.create(
-                name=name, config=self.config
+                name=name, config=self.config, redis=self._message_hubs_manager.redis
             )
         return self._message_hubs_map[name]
 
@@ -75,8 +77,7 @@ class HubsRestAPI(fa.FastAPI):
         return await hub.buffer_size()
 
     async def pop(self, name: str, timeout: int = 1) -> far.Response:
-        if timeout < 1:
-            timeout = 1
+        timeout = max(timeout, 1)
         hub = self.get_hub(name)
         data = await hub.pop_raw(timeout)
         if data is None:

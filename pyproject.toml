@@ -12,27 +12,30 @@ license = "MIT"
 keywords = []
 authors = [{ name = "m4nh", email = "degregorio.daniele@gmail.com" }]
 classifiers = [
-  "Development Status :: 4 - Beta",
-  "Programming Language :: Python",
-  "Programming Language :: Python :: 3.7",
-  "Programming Language :: Python :: 3.8",
-  "Programming Language :: Python :: 3.9",
-  "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: 3.11",
-  "Programming Language :: Python :: Implementation :: CPython",
-  "Programming Language :: Python :: Implementation :: PyPy",
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
-  "pydantic>=1.10.13",
-  "httpx[http2]",
-  "typer",
-  "redis[hiredis]==5.0.1",   # https://github.com/redis/redis-py/issues/3239
-  "msgpack>=1.0.7",
-  "pipelime-python>=1.9.0",
-  "fastapi>=0.115.0",
-  "fakeredis",
-  "uvicorn[standard]>=0.30",
+    "pydantic>=1.10.13",
+    "httpx[http2]",
+    "typer",
+    "redis[hiredis]==5.0.1",   # https://github.com/redis/redis-py/issues/3239
+    "msgpack>=1.0.7",
+    "pipelime-python>=1.9.0",
+    "fastapi>=0.115.0",
+    "fakeredis",
+    "uvicorn[standard]>=0.30",
 ]
+
+[project.optional-dependencies]
+tests = ["pytest", "pytest-cov", "pytest-asyncio"]
 
 [project.urls]
 Documentation = "https://github.com/unknown/eyegway#readme"
@@ -44,11 +47,11 @@ path = "eyegway/__init__.py"
 
 [tool.hatch.envs.default]
 dependencies = [
-  "coverage[toml]>=6.5",
-  "pytest",
-  "pytest-asyncio",
-  "pytest-cov",
-  "fakeredis",
+    "coverage[toml]>=6.5",
+    "pytest",
+    "pytest-asyncio",
+    "pytest-cov",
+    "fakeredis",
 ]
 [tool.hatch.envs.default.scripts]
 test = "pytest {args:tests}"
@@ -77,51 +80,51 @@ skip-string-normalization = true
 target-version = "py37"
 line-length = 88
 select = [
-  "A",
-  "ARG",
-  "B",
-  "C",
-  "DTZ",
-  "E",
-  "EM",
-  "F",
-  "FBT",
-  "I",
-  "ICN",
-  "ISC",
-  "N",
-  "PLC",
-  "PLE",
-  "PLR",
-  "PLW",
-  "Q",
-  "RUF",
-  "S",
-  "T",
-  "TID",
-  "UP",
-  "W",
-  "YTT",
+    "A",
+    "ARG",
+    "B",
+    "C",
+    "DTZ",
+    "E",
+    "EM",
+    "F",
+    "FBT",
+    "I",
+    "ICN",
+    "ISC",
+    "N",
+    "PLC",
+    "PLE",
+    "PLR",
+    "PLW",
+    "Q",
+    "RUF",
+    "S",
+    "T",
+    "TID",
+    "UP",
+    "W",
+    "YTT",
 ]
 ignore = [
-  # Allow non-abstract empty methods in abstract base classes
-  "B027",
-  # Allow boolean positional values in function calls, like `dict.get(... True)`
-  "FBT003",
-  # Ignore checks for possible passwords
-  "S105",
-  "S106",
-  "S107",
-  # Ignore complexity
-  "C901",
-  "PLR0911",
-  "PLR0912",
-  "PLR0913",
-  "PLR0915",
+    # Allow non-abstract empty methods in abstract base classes
+    "B027",
+    # Allow boolean positional values in function calls, like `dict.get(... True)`
+    "FBT003",
+    # Ignore checks for possible passwords
+    "S105",
+    "S106",
+    "S107",
+    # Ignore complexity
+    "C901",
+    "PLR0911",
+    "PLR0912",
+    "PLR0913",
+    "PLR0915",
 ]
 unfixable = [
-  # Don't touch unused imports
-  "F401",
+    # Don't touch unused imports
+    "F401",
 ]
 
 [tool.ruff.isort]

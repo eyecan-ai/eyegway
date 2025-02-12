@@ -1,10 +1,11 @@
+import pickle
+import typing as t
 from abc import ABC, abstractmethod
 from enum import Enum
+
 import msgpack
-import pydantic as pyd
-import typing as t
 import numpy as np
-import pickle
+import pydantic as pyd
 
 
 class CustomMessageTypes(Enum):
@@ -70,8 +71,6 @@ class MessageUnparserCompose(GenericMessageUnparser):
         return False  # pragma: no cover
 
     def __call__(self, code: int, data: bytes) -> t.Any:
-        if not self.match(code):
-            return data  # pragma: no cover
         for unparser in self.unparsers:
             if unparser.match(code):
                 return unparser(code, data)
@@ -94,13 +93,13 @@ class Packer(ABC):
 
 
 class MessagePacker(Packer, pyd.BaseModel, arbitrary_types_allowed=True):
-    parser: MessageParserCompose = pyd.Field(...)
-    unparser: MessageUnparserCompose = pyd.Field(...)
+    parser: GenericMessageParser = pyd.Field()
+    unparser: GenericMessageUnparser = pyd.Field()
     _packer: msgpack.Packer = pyd.PrivateAttr()
     _unpacker: msgpack.Unpacker = pyd.PrivateAttr()
 
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
+    def __init__(self, **kwargs) -> None:
+        super().__init__(**kwargs)
         self._packer = msgpack.Packer(default=self.parser, use_bin_type=True)
         self._unpacker = msgpack.Unpacker(
             ext_hook=self.unparser,
@@ -129,7 +128,6 @@ class MessagePacker(Packer, pyd.BaseModel, arbitrary_types_allowed=True):
             else:
                 return obj
 
-        pretty.install()
         pretty.pprint(render_object(data), max_depth=max_depth)
 
 

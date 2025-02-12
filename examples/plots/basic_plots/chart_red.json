@@ -1,0 +1,34 @@
+{
+  "data": [
+    {
+      "type": "scatter",
+      "mode": "lines",
+      "x": [],
+      "y": [],
+      "hoverinfo": "x+y",
+      "line": {
+        "color": "rgb(250, 99, 102)",
+        "width": 5,
+        "shape": "spline"
+      },
+      "connectgaps": true,
+      "fill": "tozeroy"
+    }
+  ],
+  "layout": {
+    "margin": {
+      "l": 0,
+      "r": 0,
+      "b": 0,
+      "t": 0,
+      "pad": 0
+    },
+    "xaxis": {
+      "autorange": true
+    },
+    "yaxis": {
+      "autorange": true
+    },
+    "autosize": true
+  }
+}
