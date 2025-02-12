@@ -176,7 +176,7 @@ class TestHubsRestAPI:
             assert response.status_code == 200
             assert set(response.json()) == set(variables.keys())
 
-            for key, value in variables.items():
+            for key in variables:
                 response = await tc.delete(f"/hubs/{hub_name}/variables/{key}")
                 assert response.status_code == 200
 

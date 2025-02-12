@@ -1,4 +1,4 @@
-ARG nodever=22
+ARG nodever=22.11.0
 
 FROM node:${nodever} AS build
 

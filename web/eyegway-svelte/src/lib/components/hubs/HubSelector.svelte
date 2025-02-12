@@ -34,7 +34,7 @@
 	<div class="dropdown is-right" class:is-active={isOpen}>
 		<div class="dropdown-trigger">
 			<button class="button is-small" on:click={toggle}>
-				<span class="mr-2">
+				<span class="mr-2 has-text-weight-bold">
 					{#if hubName}
 						{hubName}
 					{:else}
@@ -46,29 +46,28 @@
 		</div>
 		<div class="dropdown-menu" id="dropdown-menu4" role="menu">
 			<div class="dropdown-content">
-				<div class="dropdown-item">
+				<div class="dropdown-item has-text-weight-bold">
 					{#if hubs.length == 0}
 						{#if isError}
-							<article class="message is-danger">
-								<div class="message-body">Server not connected</div>
-							</article>
+							<div class="dropdown-item has-text-weight-bold has-text-danger">
+								Server not connected
+							</div>
 						{:else}
-							<article class="message">
-								<div class="message-body">No hubs found</div>
-							</article>
+							<div class="dropdown-item has-text-weight-bold has-text-warning">No hubs found</div>
 						{/if}
 					{/if}
-					{#each hubs as hub}
-						<button
-							class="button is-small is-dark is-fullwidth"
-							class:is-outlined={hubName !== hub}
-							on:click={() => {
-								hubName = hub;
-								isOpen = false;
-							}}>{hub}</button
-						>
-					{/each}
 				</div>
+				{#each hubs as hub}
+					<a
+						href={'#'}
+						class="dropdown-item has-text-weight-bold"
+						class:is-active={hub == hubName}
+						on:click={() => {
+							hubName = hub;
+							isOpen = false;
+						}}>{hub}</a
+					>
+				{/each}
 				<div class="dropdown-item">
 					<HubSettings />
 				</div>

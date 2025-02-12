@@ -10,7 +10,7 @@ import eyegway.hubs as eh
 import eyegway.hubs.connectors as ehc
 import eyegway.packers as ecm
 import eyegway.packers.factory as ecp
-import eyegway.utils as eut
+import eyegway.utils.logging as eul
 
 
 class AsyncMessageHub:
@@ -64,7 +64,7 @@ class AsyncMessageHub:
         return output_data
 
     async def push_raw(self, data: bytes) -> None:
-        with eut.LoguruTimer("HUB Pushing"):
+        with eul.LoguruTimer("HUB Pushing"):
             pipe = self.redis.pipeline()
             if not await self.is_buffer_frozen():
                 await self.buffer.push(data, pipe)
@@ -74,7 +74,7 @@ class AsyncMessageHub:
 
     async def push(self, obj: t.Any) -> None:
         obj = self.world_to_hub(obj)
-        with eut.LoguruTimer("HUB Packing"):
+        with eul.LoguruTimer("HUB Packing"):
             data = self.packer.pack(obj)
 
         if self.max_payload_size > 0 and len(data) > self.max_payload_size:

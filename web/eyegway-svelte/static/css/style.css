@@ -1,0 +1,12 @@
+html {
+    background-image: radial-gradient(at center center,
+            rgba(var(--eyegway-background-first-color-r),
+                var(--eyegway-background-first-color-g),
+                var(--eyegway-background-first-color-b),
+                var(--eyegway-background-first-color-a)) 27%,
+            rgba(var(--eyegway-background-second-color-r),
+                var(--eyegway-background-second-color-g),
+                var(--eyegway-background-second-color-b),
+                var(--eyegway-background-second-color-a)) 100%);
+    overflow: hidden;
+}

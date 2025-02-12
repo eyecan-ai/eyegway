@@ -1,0 +1,31 @@
+{
+  "data": [
+    {
+      "type": "scatter",
+      "mode": "lines",
+      "x": [],
+      "y": [],
+      "hoverinfo": "x+y"
+    }
+  ],
+  "layout": {
+    "margin": {
+      "l": 0,
+      "r": 0,
+      "b": 0,
+      "t": 0,
+      "pad": 0
+    },
+    "xaxis": {
+      "autorange": true
+    },
+    "yaxis": {
+      "range": [
+        -1.5,
+        1.5
+      ],
+      "autorange": false
+    },
+    "autosize": true
+  }
+}

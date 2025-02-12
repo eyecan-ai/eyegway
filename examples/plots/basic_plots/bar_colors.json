@@ -1,0 +1,39 @@
+{
+  "data": [
+    {
+      "type": "bar",
+      "mode": "markers",
+      "x": [],
+      "y": [],
+      "hovertemplate": "",
+      "hoverinfo": "y",
+      "connectgaps": true,
+      "marker": {
+        "color": [],
+        "colorscale": "Greens"
+      },
+      "orientation": "v"
+    }
+  ],
+  "layout": {
+    "margin": {
+      "l": 0,
+      "r": 0,
+      "b": 0,
+      "t": 0,
+      "pad": 0
+    },
+    "xaxis": {
+      "autorange": true
+    },
+    "yaxis": {
+      "range": [
+        0,
+        150
+      ],
+      "autorange": false,
+      "type": "linear"
+    },
+    "autosize": false
+  }
+}

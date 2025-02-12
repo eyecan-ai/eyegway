@@ -1,16 +1,9 @@
 <script lang="ts">
 	import { EyegwayHubClient } from '$lib/Eyegway.js';
 	import { ServerPreferences } from '$lib/Stores.js';
+	import { Wheel, Stepper, Pane } from 'svelte-tweakpane-ui';
 
-	import {
-		CirclePlay,
-		CircleStop,
-		ChevronLeft,
-		ChevronRight,
-		Settings,
-		RotateCw,
-		EllipsisVertical
-	} from 'lucide-svelte';
+	import { CirclePlay, CircleStop, Settings, RotateCw, EllipsisVertical } from 'lucide-svelte';
 	import { onDestroy } from 'svelte';
 
 	export let hubName: string | null = null;
@@ -24,6 +17,7 @@
 	let autoPlay: boolean = true;
 	let autoPlayMs: number = 500;
 	let autoPlayTimeout: number | null = null;
+	let settingsOpen: boolean = false;
 
 	export async function reloadInfo() {
 		if (hubClient === null) return;
@@ -50,7 +44,6 @@
 			console.log(e);
 			data = null;
 		}
-		console.log('Reloading ...');
 	}
 
 	export async function reloadData() {
@@ -62,17 +55,6 @@
 			console.log(e);
 			data = null;
 		}
-	}
-
-	async function setDataPointer(delta: number | null) {
-		if (delta === null) {
-			dataPointer = 0;
-		} else {
-			dataPointer += delta;
-			dataPointer = Math.max(0, dataPointer);
-			dataPointer = Math.min(historySize - 1, dataPointer);
-		}
-		await reload();
 	}
 
 	async function play() {
@@ -121,43 +103,30 @@
 	}
 </script>
 
-<div class="columns is-vcentered is-variable is-0">
+<div class="columns is-vcentered is-variable is-0 is-mobile">
 	{#if hubClient}
 		{#if historyFrozen}
-			<div class="column is-narrow">
-				<div class="field has-addons">
-					<!----------------------------->
-					<!-- History offset controls -->
-					<!----------------------------->
-					<p class="control">
-						<button
-							class="button is-small p-0"
-							on:click={() => setDataPointer(-1)}
-							disabled={!historyFrozen || dataPointer == 0}
-						>
-							<ChevronLeft size={iconSize} />
-						</button>
-					</p>
-					<p class="control">
-						<button
-							class="button is-small p-2"
-							on:click={() => setDataPointer(null)}
-							disabled={!historyFrozen}
-						>
-							{dataPointer + 1} / {historySize}
-						</button>
-					</p>
-					<p class="control">
-						<button
-							class="button is-small p-0"
-							on:click={() => setDataPointer(1)}
-							disabled={!historyFrozen || dataPointer == historySize - 1}
-						>
-							<ChevronRight size={iconSize} />
-						</button>
-					</p>
-				</div>
-			</div>
+			<button class="button is-small p-0">
+				<Pane
+					position={'inline'}
+					width={125}
+					theme={{
+						baseShadowColor: 'rgba(0, 0, 0, 0)',
+						baseBackgroundColor: 'transparent'
+					}}
+				>
+					<Wheel
+						bind:value={dataPointer}
+						max={historySize - 1}
+						min={0}
+						step={1}
+						on:change={reload}
+						format={(value) => {
+							return `${value}/${historySize - 1}`;
+						}}
+					/>
+				</Pane>
+			</button>
 		{:else}
 			<!------------------->
 			<!-- Play controls -->
@@ -167,10 +136,17 @@
 				<!-- Play settings -->
 				<!--------------------->
 				<div class="field has-addons">
-					<div class="dropdown is-right" class:is-hoverable={!historyFrozen}>
+					<div class="dropdown is-right {settingsOpen ? 'is-active' : ''}">
 						<div class="dropdown-trigger">
-							<button class="button is-small is-white" disabled={historyFrozen}>
-								<Settings strokeWidth={1} size={iconSize} />
+							<button
+								class="button is-small"
+								class:is-inverted={settingsOpen}
+								disabled={historyFrozen}
+								on:click={() => {
+									settingsOpen = !settingsOpen;
+								}}
+							>
+								<Settings strokeWidth={2} size={iconSize} />
 							</button>
 						</div>
 						<div class="dropdown-menu" id="dropdown-menu4" role="menu">
@@ -178,9 +154,8 @@
 								<div class="dropdown-item">
 									<div class="field">
 										<!-- svelte-ignore a11y-label-has-associated-control -->
-										<label class="label">Auto Play Delay (ms):</label>
 										<div class="control">
-											<input class="input" type="number" bind:value={autoPlayMs} />
+											<Stepper bind:value={autoPlayMs} label="Auto Play Delay (ms)" step={10} />
 										</div>
 									</div>
 								</div>
@@ -192,12 +167,12 @@
 					<!--------------------->
 					<p class="control">
 						<button
-							class="button is-small is-white"
+							class="button is-small"
 							on:click={reload}
 							disabled={historyFrozen}
 							title="Click to trigger a single update"
 						>
-							<RotateCw strokeWidth={1} size={iconSize} />
+							<RotateCw strokeWidth={2} size={iconSize} />
 						</button>
 					</p>
 
@@ -206,7 +181,7 @@
 					<!--------------------->
 					<p class="control">
 						<button
-							class="button is-small is-white"
+							class="button is-small"
 							style="--animation-time: {autoPlayMs}ms;"
 							class:blink={autoPlay}
 							disabled={historyFrozen}
@@ -216,9 +191,9 @@
 							title="Click to auto update every {autoPlayMs}ms"
 						>
 							{#if !autoPlay}
-								<CirclePlay strokeWidth={1} size={iconSize} />
+								<CirclePlay strokeWidth={2} size={iconSize} />
 							{:else}
-								<CircleStop class="has-text-danger" strokeWidth={1} size={iconSize} />
+								<CircleStop strokeWidth={2} size={iconSize} />
 							{/if}
 						</button>
 					</p>
@@ -231,7 +206,7 @@
 		</div>
 		<div class="column">
 			<button
-				class="button is-small is-outlined"
+				class="button is-small has-text-weight-semibold is-outlined"
 				style="--animation-time: {autoPlayMs}ms;"
 				class:is-info={historyFrozen}
 				class:is-primary={!historyFrozen}
@@ -239,9 +214,11 @@
 				title={!historyFrozen ? 'Click to freeze History' : 'Click to unfreeze History'}
 			>
 				{#if historyFrozen}
-					Frozen
+					<p class="is-hidden-tablet">F</p>
+					<p class="is-hidden-mobile play-button">Frozen</p>
 				{:else}
-					Running
+					<p class="is-hidden-tablet">R</p>
+					<p class="is-hidden-mobile play-button">Running</p>
 				{/if}
 			</button>
 		</div>
@@ -249,11 +226,11 @@
 </div>
 
 <style>
-	.button[disabled] {
-		opacity: 0.2;
+	.play-button {
+		width: 45px;
 	}
 	.settings {
-		width: 300px;
+		width: 350px;
 	}
 
 	.blink {

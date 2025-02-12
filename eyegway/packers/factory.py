@@ -28,12 +28,10 @@ def message_packer_smart_images() -> ep.MessagePacker:
     ]
 
     # Parser
-    parser = ep.MessageParserCompose(
-        parsers=[epn.NumpyMessageParser(numpy_conversions=conversions)]
-    )
+    parser = epn.NumpyMessageParser(numpy_conversions=conversions)
 
     # Unparser
-    unparser = ep.MessageUnparserCompose(unparsers=[epn.NumpyMessageUnparser()])
+    unparser = epn.NumpyMessageUnparser()
 
     # Build Packer
     return ep.MessagePacker(parser=parser, unparser=unparser)
@@ -42,17 +40,17 @@ def message_packer_smart_images() -> ep.MessagePacker:
 def message_packer_raw() -> ep.MessagePacker:
 
     # Parser, all numpy to simple tensors
-    parser = ep.MessageParserCompose(parsers=[epn.NumpyMessageParser()])
+    parser = epn.NumpyMessageParser()
 
     # Unparser
-    unparser = ep.MessageUnparserCompose(unparsers=[epn.NumpyMessageUnparser()])
+    unparser = epn.NumpyMessageUnparser()
 
     # Build Packer
     return ep.MessagePacker(parser=parser, unparser=unparser)
 
 
 class PackersFactory:
-    PACKERS = {
+    PACKERS: t.ClassVar = {
         "default": message_packer_smart_images,
         "smart_images": message_packer_smart_images,
         "raw": message_packer_raw,
