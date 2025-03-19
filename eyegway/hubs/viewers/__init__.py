@@ -2,7 +2,7 @@ import typing as t
 from abc import ABC, abstractmethod
 from collections import deque
 
-import pydantic as pyd
+import pydantic.v1 as pyd
 
 from eyegway.hubs.asyn import AsyncMessageHub
 from eyegway.hubs.sync import MessageHub
