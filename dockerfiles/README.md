@@ -8,9 +8,6 @@ docker build -f dockerfiles/server.eyegway.Dockerfile -t eyecan/eyegway:latest .
 
 # Eyegway webui
 docker build -f dockerfiles/webui.eyegway.Dockerfile -t eyecan/eyegway-ui:latest .
-
-# Eyegway full (server + webui)
-docker build -f dockerfiles/full.eyegway.Dockerfile -t eyecan/eyegway-full:latest .
 ```
 
 Then, start the server with:
