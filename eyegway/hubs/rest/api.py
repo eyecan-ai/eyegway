@@ -4,7 +4,7 @@ import fastapi as fa
 import fastapi.middleware.cors as fa_cors
 import fastapi.requests as farq
 import fastapi.responses as far
-import pydantic as pyd
+import pydantic.v1 as pyd
 
 import eyegway.hubs as eh
 import eyegway.hubs.asyn as eha
@@ -31,6 +31,17 @@ class HubsRestAPI(fa.FastAPI):
             allow_headers=["*"],
         )
 
+        self.get(
+            "/health",
+            summary="Health check",
+            responses={
+                fa.status.HTTP_200_OK: {"description": "Ready to serve requests"},
+                fa.status.HTTP_503_SERVICE_UNAVAILABLE: {
+                    "description": "Not ready, retry later"
+                },
+            },
+        )(self.health_check)
+
         self.get("/hubs")(self.hubs_list)
         self.get("/hubs/{name}/history_size")(self.history_size)
         self.get("/hubs/{name}/buffer_size")(self.buffer_size)
@@ -49,6 +60,16 @@ class HubsRestAPI(fa.FastAPI):
         self.post("/hubs/{name}/variables/{variable}")(self.set_variable_value)
         self.delete("/hubs/{name}/variables/{variable}")(self.delete_variable)
         self.get("/hubs/{name}/variables")(self.list_variables)
+
+    async def health_check(self, response: fa.Response):
+        try:
+            ready = self._message_hubs_manager.redis.ping()
+        except Exception:
+            ready = False
+
+        response.status_code = (
+            fa.status.HTTP_200_OK if ready else fa.status.HTTP_503_SERVICE_UNAVAILABLE
+        )
 
     def get_hub(self, name: str) -> eha.AsyncMessageHub:
         if name not in self._message_hubs_map:

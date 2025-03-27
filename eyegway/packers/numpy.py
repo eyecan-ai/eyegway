@@ -2,7 +2,7 @@ from __future__ import annotations
 import ast
 import typing as t
 import numpy as np
-import pydantic as pyd
+import pydantic.v1 as pyd
 import msgpack
 from eyegway.packers.images import ImageEncoder, ImageEncodersMap
 from eyegway.packers import (

@@ -9,7 +9,7 @@ import eyegway.hubs.connectors.pipelime as ehcp
 import pipelime.stages as pst
 import pipelime.sequences as pls
 import pipelime.items as pli
-import pydantic as pyd
+import pydantic.v1 as pyd
 from abc import ABC, abstractmethod
 import cv2
 import pipelime.stages as pst

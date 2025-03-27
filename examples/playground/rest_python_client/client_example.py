@@ -4,7 +4,7 @@ import numpy as np
 import httpx
 import eyegway.packers.factory as epf
 import eyegway.hubs.rest.api as erha
-import pydantic as pyd
+import pydantic.v1 as pyd
 import typing as t
 
 
