@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import typing as t
 
-import pydantic as pyd
+import pydantic.v1 as pyd
 
 
 class HubsParametrization:

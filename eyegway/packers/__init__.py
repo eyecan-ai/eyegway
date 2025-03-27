@@ -5,7 +5,7 @@ from enum import Enum
 
 import msgpack
 import numpy as np
-import pydantic as pyd
+import pydantic.v1 as pyd
 
 
 class CustomMessageTypes(Enum):
