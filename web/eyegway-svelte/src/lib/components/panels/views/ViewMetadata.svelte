@@ -8,16 +8,16 @@
 </script>
 
 {#if userData && userSettings}
-	<div class="my-json-editor">
-		<JSONEditor
-			content={{ json: userData.data }}
-			mode={Mode[userSettings.mode]}
-			mainMenuBar={false}
-			navigationBar={false}
-			statusBar={false}
-			readOnly
-		/>
-	</div>
+    <div class="my-json-editor">
+        <JSONEditor
+            content={{ json: userData.data }}
+            mode={Mode[userSettings.mode]}
+            mainMenuBar={false}
+            navigationBar={false}
+            statusBar={false}
+            readOnly
+        />
+    </div>
 {/if}
 
 <style>
@@ -33,5 +33,6 @@
 		--jse-value-color-null: var(--bulma-warning);
 		--jse-value-color-string: var(--bulma-info);
 		--jse-value-color-url: var(--bulma-link);
+        overflow: auto;
 	}
 </style>

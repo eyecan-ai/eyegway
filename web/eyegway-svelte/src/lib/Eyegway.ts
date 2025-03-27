@@ -94,13 +94,7 @@ export class Image2UrlDecoder {
 	private constructor() {}
 
 	buildUrl(data: Uint8Array, type: string): string {
-		// Old code using ObjectURLs
-		//
-		// const blob = new Blob([data], { type });
-		// const urlCreator = window.URL || window.webkitURL;
-		// const imageUrl = urlCreator.createObjectURL(blob);
-
-		const buffer = String.fromCharCode.apply(null, Array.from(data));
+		const buffer = Array.from(data).map((byte) => String.fromCharCode(byte)).join('');
 		const imageUrl = `data:{${type}};base64,` + btoa(buffer);
 		return imageUrl;
 	}
