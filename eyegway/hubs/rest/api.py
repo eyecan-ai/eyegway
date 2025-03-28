@@ -4,7 +4,7 @@ import fastapi as fa
 import fastapi.middleware.cors as fa_cors
 import fastapi.requests as farq
 import fastapi.responses as far
-import pydantic.v1 as pyd
+import pydantic as pyd
 
 import eyegway.hubs as eh
 import eyegway.hubs.asyn as eha

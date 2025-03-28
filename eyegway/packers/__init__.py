@@ -5,7 +5,7 @@ from enum import Enum
 
 import msgpack
 import numpy as np
-import pydantic.v1 as pyd
+import pydantic as pyd
 
 
 class CustomMessageTypes(Enum):
@@ -92,7 +92,9 @@ class Packer(ABC):
         pass
 
 
-class MessagePacker(Packer, pyd.BaseModel, arbitrary_types_allowed=True):
+class MessagePacker(Packer, pyd.BaseModel):
+    model_config = pyd.ConfigDict(arbitrary_types_allowed=True)
+
     parser: GenericMessageParser = pyd.Field()
     unparser: GenericMessageUnparser = pyd.Field()
     _packer: msgpack.Packer = pyd.PrivateAttr()

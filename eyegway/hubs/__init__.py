@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import typing as t
 
-import pydantic.v1 as pyd
+import pydantic as pyd
+import pydantic_settings as pyds
 
 
 class HubsParametrization:
@@ -60,7 +61,7 @@ class HubsParametrization:
         return list(set(variables))
 
 
-class HubsConfig(pyd.BaseSettings):
+class HubsConfig(pyds.BaseSettings):
     hub_name: str = "default_hub"
     max_buffer_size: int = 64
     max_history_size: int = 64
@@ -72,8 +73,7 @@ class HubsConfig(pyd.BaseSettings):
     redis_extra_options: t.Mapping[str, t.Any] = pyd.Field(default_factory=dict)
     packer: t.Optional[str] = None
 
-    class Config:
-        env_prefix = "eyegway_hubs_"
+    model_config = pyds.SettingsConfigDict(env_prefix="eyegway_hubs_")
 
     @classmethod
     def create_redis_async_instance(cls, config: HubsConfig) -> t.Any:
