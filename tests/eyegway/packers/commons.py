@@ -1,7 +1,7 @@
 import typing as t
 
 import numpy as np
-import pydantic.v1 as pyd
+import pydantic as pyd
 
 
 def simple_messages():

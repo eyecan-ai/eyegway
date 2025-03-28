@@ -2,7 +2,7 @@ import typing as t
 from abc import ABC, abstractmethod
 from collections import deque
 
-import pydantic.v1 as pyd
+import pydantic as pyd
 
 from eyegway.hubs.asyn import AsyncMessageHub
 from eyegway.hubs.sync import MessageHub
@@ -11,13 +11,9 @@ from eyegway.hubs.sync import MessageHub
 class HubView(ABC, pyd.BaseModel):
     """
     An abstract base class for views that rearrange elements into a dictionary format.
-
-    Attributes:
-        Config (class): Configuration class for Pydantic model.
     """
 
-    class Config:
-        arbitrary_types_allowed = True
+    model_config = pyd.ConfigDict(arbitrary_types_allowed=True)
 
     @abstractmethod
     def _rearrange(self, elements: list) -> t.Dict[str, t.Any]:

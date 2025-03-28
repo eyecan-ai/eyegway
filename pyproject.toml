@@ -7,28 +7,27 @@ name = "eyegway"
 dynamic = ["version"]
 description = ''
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.10"
 license = "MIT"
 keywords = []
 authors = [{ name = "m4nh", email = "degregorio.daniele@gmail.com" }]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
-    "pydantic>=1.10.17,<3",    # this enables `import pydantic.v1`
+    "pydantic>=2,<3",
+    "pydantic-settings",
     "httpx[http2]",
     "typer",
     "redis[hiredis]>=5.2.1",
     "msgpack>=1.0.7",
     "pipelime-python>=2,<3",
+    "numpy<2",
     "fastapi>=0.115.0",
     "fakeredis",
     "uvicorn[standard]>=0.30",
@@ -60,7 +59,7 @@ cov-report = ["- coverage combine", "coverage report"]
 cov = ["test-cov", "cov-report"]
 
 [[tool.hatch.envs.all.matrix]]
-python = ["3.7", "3.8", "3.9", "3.10", "3.11"]
+python = ["3.10", "3.11"]
 
 [tool.hatch.envs.lint]
 detached = true
@@ -72,12 +71,12 @@ fmt = ["black {args:.}", "ruff --fix {args:.}", "style"]
 all = ["style", "typing"]
 
 [tool.black]
-target-version = ["py37"]
+target-version = ["py310", "py311"]
 line-length = 88
 skip-string-normalization = true
 
 [tool.ruff]
-target-version = "py37"
+target-version = "py310"
 line-length = 88
 select = [
     "A",

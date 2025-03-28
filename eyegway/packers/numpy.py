@@ -1,27 +1,32 @@
 from __future__ import annotations
+
 import ast
 import typing as t
-import numpy as np
-import pydantic.v1 as pyd
+
 import msgpack
-from eyegway.packers.images import ImageEncoder, ImageEncodersMap
+import numpy as np
+import pydantic as pyd
+
 from eyegway.packers import (
     CustomMessageTypes,
     GenericMessageParser,
     GenericMessageUnparser,
 )
+from eyegway.packers.images import ImageEncoder, ImageEncodersMap
 
-MatchShape = t.Union[t.Sequence, type(Ellipsis)]
-MatchDtype = t.Union[np.dtype, type(Ellipsis)]
+MatchShape = t.Union[t.Sequence, type(...)]
+MatchDtype = t.Union[np.dtype, type(...)]
 
 
-class NumpyFormat(pyd.BaseModel, arbitrary_types_allowed=True):
-    shape: MatchShape = pyd.Field(...)
-    dtype: MatchDtype = pyd.Field(...)
+def numpy_dtype_conversion(v):
+    return np.dtype(v) if v is not ... else v
 
-    @pyd.validator('dtype', pre=True)
-    def dtype_conversion(cls, v):
-        return np.dtype(v) if v is not Ellipsis else v
+
+class NumpyFormat(pyd.BaseModel):
+    model_config = pyd.ConfigDict(arbitrary_types_allowed=True)
+
+    shape: MatchShape
+    dtype: t.Annotated[MatchDtype, pyd.BeforeValidator(numpy_dtype_conversion)]
 
     def __eq__(self, format: NumpyFormat) -> bool:
         return self.shape == format.shape and self.dtype == format.dtype
@@ -29,10 +34,10 @@ class NumpyFormat(pyd.BaseModel, arbitrary_types_allowed=True):
     def __str__(self) -> str:
         shape = (
             "..."
-            if self.shape is Ellipsis
-            else ",".join(["..." if x is Ellipsis else str(x) for x in self.shape])
+            if self.shape is ...
+            else ",".join(["..." if x is ... else str(x) for x in self.shape])
         )
-        dtype = self.dtype.name if self.dtype is not Ellipsis else "..."
+        dtype = self.dtype.name if self.dtype is not ... else "..."
         return f"({shape})/{dtype}"
 
     @classmethod
@@ -40,7 +45,7 @@ class NumpyFormat(pyd.BaseModel, arbitrary_types_allowed=True):
         shape, dtype = string.split("/")
         shape = ast.literal_eval(shape)
         dtype = dtype.strip()
-        dtype = np.dtype(dtype) if dtype != "..." else Ellipsis
+        dtype = np.dtype(dtype) if dtype != "..." else ...
         return NumpyFormat(shape=shape, dtype=dtype)
 
     def match(self, array: np.ndarray) -> bool:
@@ -59,8 +64,8 @@ class NumpyFormat(pyd.BaseModel, arbitrary_types_allowed=True):
 
 
 class NumpyConversion(pyd.BaseModel, arbitrary_types_allowed=True):
-    numpy_format: NumpyFormat = pyd.Field(...)
-    image_encoder: ImageEncoder = pyd.Field(...)
+    numpy_format: NumpyFormat
+    image_encoder: ImageEncoder
 
     def __eq__(self, conversion: NumpyConversion) -> bool:
         return (
@@ -75,7 +80,7 @@ class NumpyConversion(pyd.BaseModel, arbitrary_types_allowed=True):
     def parse(cls, string: str) -> NumpyConversion:
         numpy_format, encoder = string.split("=")
         numpy_format = NumpyFormat.parse(numpy_format)
-        encoder = ImageEncodersMap.get(encoder.strip())
+        encoder = ImageEncodersMap[encoder.strip()]
         return NumpyConversion(numpy_format=numpy_format, image_encoder=encoder)
 
     def match(self, array: np.ndarray) -> bool:
@@ -129,14 +134,21 @@ class NumpyMessageUnparser(GenericMessageUnparser):
         return code in [CustomMessageTypes.TENSOR.value, CustomMessageTypes.IMAGE.value]
 
     def __call__(self, code: int, data: bytes) -> t.Any:
+        data_dict: dict[str, t.Any] = msgpack.unpackb(data, raw=False)
+        if "data" not in data_dict:
+            raise ValueError("Invalid image format, missing 'data'")
+        if "type" not in data_dict:
+            raise ValueError("Invalid image format, missing 'type'")
+        if "shape" not in data_dict:
+            raise ValueError("Invalid image format, missing 'shape'")
+
         if code == CustomMessageTypes.IMAGE.value:
-            data = msgpack.unpackb(data, raw=False)
-            encoder = ImageEncodersMap.get(data["type"])
-            if 'shape' not in data:  # pragma: no cover
-                raise ValueError("Invalid image format, missing 'shape'")
-            return encoder.decode(data["data"])
+            encoder = ImageEncodersMap.get(data_dict["type"])
+            if encoder is None:
+                raise ValueError(f"Invalid image encoder: {data_dict['type']}")
+
+            return encoder.decode(data_dict["data"])
         else:
-            data = msgpack.unpackb(data, raw=False)
-            return np.frombuffer(data["data"], dtype=data["type"]).reshape(
-                data["shape"]
+            return np.frombuffer(data_dict["data"], dtype=data_dict["type"]).reshape(
+                data_dict["shape"]
             )
