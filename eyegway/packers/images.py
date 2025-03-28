@@ -70,7 +70,7 @@ class JPEGImageEncoder(ImageEncoder):
         return "image/jpeg"
 
 
-ImageEncodersMap = {
+ImageEncodersMap: dict[str, ImageEncoder] = {
     TIFFImageEncoder.name(): TIFFImageEncoder(),
     PNGImageEncoder.name(): PNGImageEncoder(),
     JPEGImageEncoder.name(): JPEGImageEncoder(),

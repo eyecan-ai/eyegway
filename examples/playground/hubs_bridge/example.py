@@ -9,7 +9,7 @@ import eyegway.hubs.connectors.pipelime as ehcp
 import pipelime.stages as pst
 import pipelime.sequences as pls
 import pipelime.items as pli
-import pydantic.v1 as pyd
+import pydantic as pyd
 from abc import ABC, abstractmethod
 import cv2
 import pipelime.stages as pst
@@ -35,12 +35,14 @@ class StageDrawing(pst.SampleStage):
         return x.set_value('backl_image', image)
 
 
-class HubBridgeAsync(pyd.BaseModel, ABC, arbitrary_types_allowed=True):
+class HubBridgeAsync(pyd.BaseModel, ABC):
     hub_from: str
     hub_to: str
     hub_from_connectors: t.List[ehc.HubConnector] = []
     hub_to_connectors: t.List[ehc.HubConnector] = []
     clear_hub_to: bool = True
+
+    model_config = pyd.ConfigDict(arbitrary_types_allowed=True)
 
     @abstractmethod
     def process(self, data: t.Any) -> t.Any:
