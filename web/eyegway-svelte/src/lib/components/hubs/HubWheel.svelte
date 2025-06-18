@@ -2,8 +2,15 @@
 	import { EyegwayHubClient } from '$lib/Eyegway.js';
 	import { ServerPreferences } from '$lib/Stores.js';
 	import { Slider, Stepper, Pane } from 'svelte-tweakpane-ui';
-
-	import { CirclePlay, CircleStop, Settings, RotateCw, EllipsisVertical } from 'lucide-svelte';
+	import {
+		CirclePlay,
+		CircleStop,
+		Settings,
+		RotateCw,
+		EllipsisVertical,
+		ChevronLeft,
+		ChevronRight
+	} from 'lucide-svelte';
 	import { onDestroy } from 'svelte';
 
 	export let hubName: string | null = null;
@@ -54,6 +61,17 @@
 		sliderTimeout = setTimeout(() => {
 			reload();
 		}, sliderDebounce);
+	}
+
+	async function setDataPointer(delta: number | null) {
+		if (delta === null) {
+			dataPointer = 0;
+		} else {
+			dataPointer += delta;
+			dataPointer = Math.min(0, dataPointer);
+			dataPointer = Math.max(-(historySize - 1), dataPointer);
+		}
+		await reload();
 	}
 
 	export async function reloadData() {
@@ -116,6 +134,15 @@
 <div class="columns is-vcentered is-variable is-0 is-mobile">
 	{#if hubClient}
 		{#if historyFrozen}
+			<p class="control">
+				<button
+					class="button is-small pl-0 pr-0"
+					on:click={() => setDataPointer(-1)}
+					disabled={!historyFrozen || dataPointer == -(historySize - 1)}
+				>
+					<ChevronLeft size={iconSize} />
+				</button>
+			</p>
 			<button class="button is-small p-0">
 				<Pane
 					position={'inline'}
@@ -137,6 +164,15 @@
 					/>
 				</Pane>
 			</button>
+			<p class="control">
+				<button
+					class="button is-small pl-0 pr-0"
+					on:click={() => setDataPointer(1)}
+					disabled={!historyFrozen || dataPointer == 0}
+				>
+					<ChevronRight size={iconSize} />
+				</button>
+			</p>
 		{:else}
 			<!------------------->
 			<!-- Play controls -->
