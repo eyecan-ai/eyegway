@@ -5,7 +5,7 @@
 	import { ThemeUtils } from 'svelte-tweakpane-ui';
 	import { onMount } from 'svelte';
 	import { type Writable } from 'svelte/store';
-
+    import { Parameters } from '$lib/Parameters.js';
 	import { ChevronDown, X } from 'lucide-svelte';
 
 	// This is to keep updating CSS Variables when $styleSettings changes
@@ -102,6 +102,11 @@
 						<ChevronDown strokeWidth={1} />
 					{/if}
 				</button>
+			</div>
+            <div class="column has-text-centered is-flex is-justify-content-center is-align-items-center is-hidden-mobile">
+                <span class="title is-4">
+                    {Parameters.title}
+                </span>
 			</div>
 			<div
 				class="column is-flex is-justify-content-flex-end {showControls ? '' : 'is-hidden-mobile'}"
