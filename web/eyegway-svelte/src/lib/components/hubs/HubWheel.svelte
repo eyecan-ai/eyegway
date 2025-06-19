@@ -133,124 +133,139 @@
 
 <div class="columns is-vcentered is-variable is-0 is-mobile">
 	{#if hubClient}
+        <div class="column is-narrow is-flex">
 		{#if historyFrozen}
-			<p class="control">
-				<button
-					class="button is-small pl-0 pr-0"
-					on:click={() => setDataPointer(-1)}
-					disabled={!historyFrozen || dataPointer == -(historySize - 1)}
-				>
-					<ChevronLeft size={iconSize} />
-				</button>
-			</p>
-			<button class="button is-small p-0">
-				<Pane
-					position={'inline'}
-					width={125}
-					theme={{
-						baseShadowColor: 'rgba(0, 0, 0, 0)',
-						baseBackgroundColor: 'transparent'
-					}}
-				>
-					<Slider
-						bind:value={dataPointer}
-						max={0}
-						min={-(historySize - 1)}
-						step={1}
-						on:change={debouncedReload}
-						format={(value) => {
-							return `${value}`;
-						}}
-					/>
-				</Pane>
-			</button>
-			<p class="control">
-				<button
-					class="button is-small pl-0 pr-0"
-					on:click={() => setDataPointer(1)}
-					disabled={!historyFrozen || dataPointer == 0}
-				>
-					<ChevronRight size={iconSize} />
-				</button>
-			</p>
+            <!---------------------->
+			<!-- History controls -->
+			<!--------------------->
+            <div class="field has-addons is-right">
+                <!------------------->
+                <!--   Left arrow  -->
+                <!------------------->
+                <div class="control">
+                    <button
+                        class="button is-small pl-0 pr-0"
+                        on:click={() => setDataPointer(-1)}
+                        disabled={!historyFrozen || dataPointer == -(historySize - 1)}
+                    >
+                        <ChevronLeft size={iconSize} />
+                    </button>
+                </div>
+                <!------------------->
+                <!--     Slider    -->
+                <!------------------->
+                <div class="control" style="max-width: 86px; min-width: 80px;">
+                    <button class="button is-small p-0"  style="width: 100%;">
+                        <Pane
+                            position={'inline'}
+                            theme={{
+                                baseShadowColor: 'rgba(0, 0, 0, 0)',
+                                baseBackgroundColor: 'transparent'
+                            }}
+                        >
+                            <Slider
+                                bind:value={dataPointer}
+                                max={0}
+                                min={-(historySize - 1)}
+                                step={1}
+                                on:change={debouncedReload}
+                                format={(value) => {
+                                    return `${value}`;
+                                }}
+                            />
+                        </Pane>
+                    </button>
+                </div>
+                <!------------------->
+                <!--   Right arrow -->
+                <!------------------->
+                <div class="control">
+                    <button
+                        class="button is-small pl-0 pr-0"
+                        on:click={() => setDataPointer(1)}
+                        disabled={!historyFrozen || dataPointer == 0}
+                    >
+                        <ChevronRight size={iconSize} />
+                    </button>
+                </div>
+            </div>
 		{:else}
 			<!------------------->
 			<!-- Play controls -->
 			<!------------------->
-			<div class="column">
-				<!--------------------->
-				<!-- Play settings -->
-				<!--------------------->
-				<div class="field has-addons">
-					<div class="dropdown is-right {settingsOpen ? 'is-active' : ''}">
-						<div class="dropdown-trigger">
-							<button
-								class="button is-small"
-								class:is-inverted={settingsOpen}
-								disabled={historyFrozen}
-								on:click={() => {
-									settingsOpen = !settingsOpen;
-								}}
-							>
-								<Settings strokeWidth={2} size={iconSize} />
-							</button>
-						</div>
-						<div class="dropdown-menu" id="dropdown-menu4" role="menu">
-							<div class="dropdown-content settings">
-								<div class="dropdown-item">
-									<div class="field">
-										<!-- svelte-ignore a11y-label-has-associated-control -->
-										<div class="control">
-											<Stepper bind:value={autoPlayMs} label="Auto Play Delay (ms)" step={10} />
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<!--------------------->
-					<!-- Reload current -->
-					<!--------------------->
-					<p class="control">
-						<button
-							class="button is-small"
-							on:click={reload}
-							disabled={historyFrozen}
-							title="Click to trigger a single update"
-						>
-							<RotateCw strokeWidth={2} size={iconSize} />
-						</button>
-					</p>
-
-					<!--------------------->
-					<!-- Play  -->
-					<!--------------------->
-					<p class="control">
-						<button
-							class="button is-small"
-							style="--animation-time: {autoPlayMs}ms;"
-							class:blink={autoPlay}
-							disabled={historyFrozen}
-							on:click={() => {
-								autoPlay = !autoPlay;
-							}}
-							title="Click to auto update every {autoPlayMs}ms"
-						>
-							{#if !autoPlay}
-								<CirclePlay strokeWidth={2} size={iconSize} />
-							{:else}
-								<CircleStop strokeWidth={2} size={iconSize} />
-							{/if}
-						</button>
-					</p>
-				</div>
-			</div>
-		{/if}
+            <div class="field has-addons is-right">
+                <!--------------------->
+                <!--  Play settings  -->
+                <!--------------------->
+                <div class="control dropdown {settingsOpen ? 'is-active' : ''}">
+                    <div class="dropdown-trigger">
+                        <button
+                            class="button is-small"
+                            class:is-inverted={settingsOpen}
+                            disabled={historyFrozen}
+                            on:click={() => {
+                                settingsOpen = !settingsOpen;
+                            }}
+                        >
+                            <Settings strokeWidth={2} size={iconSize} />
+                        </button>
+                    </div>
+                    <div class="dropdown-menu" id="dropdown-menu4" role="menu">
+                        <div class="dropdown-content settings">
+                            <div class="dropdown-item">
+                                <div class="field">
+                                    <!-- svelte-ignore a11y-label-has-associated-control -->
+                                    <div class="control">
+                                        <Stepper bind:value={autoPlayMs} label="Auto Play Delay (ms)" step={10} />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--------------------->
+                <!--  Reload current -->
+                <!--------------------->
+                <div class="control">
+                    <button
+                        class="button is-small"
+                        on:click={reload}
+                        disabled={historyFrozen}
+                        title="Click to trigger a single update"
+                    >
+                        <RotateCw strokeWidth={2} size={iconSize} />
+                    </button>
+                </div>
+                <!--------------------->
+                <!--      Play       -->
+                <!--------------------->
+                <div class="control">
+                    <button
+                        class="button is-small"
+                        style="--animation-time: {autoPlayMs}ms;"
+                        class:blink={autoPlay}
+                        disabled={historyFrozen}
+                        on:click={() => {
+                            autoPlay = !autoPlay;
+                        }}
+                        title="Click to auto update every {autoPlayMs}ms"
+                    >
+                        {#if !autoPlay}
+                            <CirclePlay strokeWidth={2} size={iconSize} />
+                        {:else}
+                            <CircleStop strokeWidth={2} size={iconSize} />
+                        {/if}
+                    </button>
+                </div>
+            </div>
+        {/if}
+        </div>
 
 		<div class="column is-narrow is-flex">
 			<EllipsisVertical strokeWidth={0.5} />
 		</div>
-		<div class="column">
+
+		<div class="column is-narrow is-flex">
 			<button
 				class="button is-small has-text-weight-semibold is-outlined"
 				style="--animation-time: {autoPlayMs}ms;"
@@ -260,10 +275,10 @@
 				title={!historyFrozen ? 'Click to freeze History' : 'Click to unfreeze History'}
 			>
 				{#if historyFrozen}
-					<p class="is-hidden-tablet">F</p>
+					<p class="is-hidden-tablet small-play-button">F</p>
 					<p class="is-hidden-mobile play-button">Frozen</p>
 				{:else}
-					<p class="is-hidden-tablet">R</p>
+					<p class="is-hidden-tablet small-play-button">R</p>
 					<p class="is-hidden-mobile play-button">Running</p>
 				{/if}
 			</button>
@@ -275,6 +290,11 @@
 	.play-button {
 		width: 45px;
 	}
+
+    .small-play-button {
+		width: 30px;
+	}
+    
 	.settings {
 		width: 350px;
 	}
