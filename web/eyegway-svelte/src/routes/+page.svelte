@@ -105,7 +105,13 @@
 			</div>
             <div class="column has-text-centered is-flex is-justify-content-center is-align-items-center is-hidden-mobile">
                 <span class="title is-4">
+                {#if styleConfiguration}
+                    {$styleConfiguration.eyegway.title
+                    ? $styleConfiguration.eyegway.title
+                    : Parameters.title}
+                {:else}
                     {Parameters.title}
+                {/if}
                 </span>
 			</div>
 			<div

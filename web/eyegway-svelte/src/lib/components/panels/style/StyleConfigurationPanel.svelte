@@ -7,7 +7,8 @@
 		Slider,
 		Separator,
 		TabGroup,
-		TabPage
+		TabPage,
+        Text
 	} from 'svelte-tweakpane-ui';
 	import {
 		HSLStringToRGB,
@@ -21,6 +22,7 @@
 	export let styleConfiguration: StyleConfiguration;
 	export let isDisabled: boolean = true;
 
+    let title: string;
 	let logoImage: ImageValue;
 
 	let schemeRGB: { r: number; g: number; b: number };
@@ -43,6 +45,7 @@
 	});
 
 	$: if (refresh) {
+        title = $styleConfiguration.eyegway.title || '';
 		logoImage = $styleConfiguration.eyegway.logo;
 
 		schemeRGB = HSLStringToRGB(
@@ -110,6 +113,17 @@
 	>
 		<TabGroup>
 			<TabPage title="General">
+                <Text
+                    bind:value={title}
+                    label="Title"
+                    on:change={(e) => {
+                        if (e.detail.origin === 'internal') {
+                            $styleConfiguration.eyegway.title = e.detail.value;
+                            title = e.detail.value;
+                            $styleConfiguration.id = Date.now();
+                        }
+                    }}
+                />
 				<Image
 					bind:value={logoImage}
 					fit="contain"
