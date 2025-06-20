@@ -80,48 +80,77 @@
 
 <div class="container my-fluid-container">
 	<div class="box mb-1 mt-2 header">
-		<div class="columns {showControls ? '' : 'is-mobile'}">
-			<div class="column is-flex is-justify-content-space-between">
+
+        <!-- DESKTOP -->
+        <div class="is-hidden-mobile">
+            <div class="columns is-flex">
+
 				{#if styleConfiguration}
-					<img
-						src={$styleConfiguration.eyegway.logo
-							? $styleConfiguration.eyegway.logo
-							: 'images/eyegway-logo.svg'}
-						alt="Logo"
-						class="logo"
-					/>
+                    <div class="column is-flex is-justify-content-left">
+                        <img
+                            src={$styleConfiguration.eyegway.logo
+                                ? $styleConfiguration.eyegway.logo
+                                : 'images/eyegway-logo.svg'}
+                            alt="Logo"
+                            class="logo"
+                        />
+                    </div>
 				{/if}
-				<button
-					class="button is-small is-hidden-tablet"
-					class:is-active={showControls}
-					on:click={() => (showControls = !showControls)}
-				>
-					{#if showControls}
-						<X strokeWidth={1} />
-					{:else}
-						<ChevronDown strokeWidth={1} />
-					{/if}
-				</button>
-			</div>
-            <div class="column has-text-centered is-flex is-justify-content-center is-align-items-center is-hidden-mobile">
-                <span class="title is-4">
-                {#if styleConfiguration}
-                    {$styleConfiguration.eyegway.title
-                    ? $styleConfiguration.eyegway.title
-                    : Parameters.title}
-                {:else}
-                    {Parameters.title}
+
+                {#if Parameters.title}
+                <div class="column is-flex is-justify-content-center">
+                    <span class="title is-4">
+                        {Parameters.title}
+                    </span>
+                </div>
                 {/if}
-                </span>
-			</div>
-			<div
-				class="column is-flex is-justify-content-flex-end {showControls ? '' : 'is-hidden-mobile'}"
-			>
-				<div class="is-flex is-justify-content-right">
-					<HubControls bind:data={sharedData} />
-				</div>
-			</div>
-		</div>
+
+                <div class="column is-flex is-justify-content-right">
+                    <div class="is-flex">
+                        <HubControls bind:data={sharedData} />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MOBILE -->
+        <div class="is-hidden-tablet">
+
+            <div class="columns mt-0 mb-0 is-flex is-mobile">
+                {#if styleConfiguration}
+                    <div class="column is-flex is-justify-content-left is-9">
+                        <img
+                            src={$styleConfiguration.eyegway.logo
+                                ? $styleConfiguration.eyegway.logo
+                                : 'images/eyegway-logo.svg'}
+                            alt="Logo"
+                            class="logo"
+                        />
+                    </div>
+				{/if}
+
+                <div class="column is-flex is-justify-content-right is-3">
+                    <button
+                        class="button is-small"
+                        class:is-active={showControls}
+                        on:click={() => (showControls = !showControls)}
+                    >
+                        {#if showControls}
+                            <X strokeWidth={1} />
+                        {:else}
+                            <ChevronDown strokeWidth={1} />
+                        {/if}
+                    </button>
+                </div>
+
+            </div>
+
+            <div class="is-flex is-justify-content-center {showControls ? '' : 'is-hidden-mobile'}">
+                <HubControls bind:data={sharedData} />
+            </div>
+
+        </div>
+
 	</div>
 
 	<div class="card p-0 mt-4 content">
@@ -163,13 +192,12 @@
 	.container {
 		display: flex;
 		flex-direction: column;
-		height: 100vh;
+		height: 100dvh;
 		padding-bottom: 50px;
 	}
 	.logo {
 		display: flex;
 		height: 30px;
 		align-items: center;
-		padding-left: 25px;
 	}
 </style>
