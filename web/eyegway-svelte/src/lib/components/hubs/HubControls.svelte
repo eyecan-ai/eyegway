@@ -9,13 +9,13 @@
 </script>
 
 <div class="columns is-justify-content-flex-end is-vcentered is-variable is-0 is-mobile">
-	<div class="column is-narrow">
+	<div class="column is-narrow is-flex">
 		<HubWheel bind:data {hubName} />
 	</div>
 	<div class="column is-narrow is-flex">
 		<EllipsisVertical strokeWidth={0.5} />
 	</div>
-	<div class="column is-narrow">
+	<div class="column is-narrow is-flex">
 		<HubSelector bind:hubName />
 	</div>
 </div>

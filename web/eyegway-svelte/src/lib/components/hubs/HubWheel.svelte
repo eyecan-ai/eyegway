@@ -154,10 +154,11 @@
                 <!------------------->
                 <!--     Slider    -->
                 <!------------------->
-                <div class="control" style="max-width: 86px; min-width: 80px;">
-                    <button class="button is-small p-0"  style="width: 100%;">
+                <div class="control">
+                    <button class="button is-small p-0">
                         <Pane
                             position={'inline'}
+                            width={84}
                             theme={{
                                 baseShadowColor: 'rgba(0, 0, 0, 0)',
                                 baseBackgroundColor: 'transparent'
