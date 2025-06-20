@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 export const EyegwayStyleSchema = z.object({
-    title: z.string().default(''),
     logo: z.string().default('images/eyegway-logo.svg'),
     header: z.object({
         "background-color": z.object({
@@ -42,7 +41,6 @@ export const EyegwayStyleSchema = z.object({
         }),
     }),
 }).default({
-    title: '',
     logo: 'images/eyegway-logo.svg',
     header: { "background-color": { r: 255, g: 255, b: 255, a: 1 } },
     panel: { "background-color": { r: 255, g: 255, b: 255, a: 1 } },
