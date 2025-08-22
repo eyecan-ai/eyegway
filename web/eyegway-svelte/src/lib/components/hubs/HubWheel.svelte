@@ -71,13 +71,16 @@
             dataPointer = Math.min(0, dataPointer);
             dataPointer = Math.max(-(historySize - 1), dataPointer);
         }
-        await reload();
+        
+        /*
+        We don't need to call reload() explicitly: it will be called
+        automatically when dataPointer changes, as it is binded to the Slider.
+        */
     }
 
     export async function reloadData() {
         if (hubClient === null) return;
         try {
-            console.log('reloadin datapointer', dataPointer);
             data = await hubClient.last(-dataPointer);
         } catch (e) {
             console.log(e);
@@ -123,11 +126,16 @@
 
     // Auto Play Management
     $: if (autoPlay === true) {
-        play();
+        if (autoPlayTimeout === null) {
+            play();
+        }
     }
 
     $: if (autoPlay === false) {
-        if (autoPlayTimeout !== null) clearTimeout(autoPlayTimeout);
+        if (autoPlayTimeout !== null) {
+            clearInterval(autoPlayTimeout);
+            autoPlayTimeout = null;
+        }
     }
 </script>
 
