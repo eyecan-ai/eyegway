@@ -79,80 +79,62 @@
 </script>
 
 <div class="container my-fluid-container">
-	<div class="box mb-1 mt-2 header">
+	<!-- Header -->
+    <div class="box mb-1 mt-2 header">
+		<div class="columns is-flex is-vcentered is-multiline">
+            <!-- Desktop layout -->
+            <!-- [LOGO][-------TITLE-------][CONTROLS] -->
 
-        <!-- DESKTOP -->
-        <div class="is-hidden-mobile">
-            <div class="columns is-flex">
+            <!-- Mobile layout (controls not toggled) -->
+            <!-- [LOGO]       [v] -->
 
-				{#if styleConfiguration}
-                    <div class="column is-flex is-justify-content-left">
-                        <img
-                            src={$styleConfiguration.eyegway.logo
-                                ? $styleConfiguration.eyegway.logo
-                                : 'images/eyegway-logo.svg'}
-                            alt="Logo"
-                            class="logo"
-                        />
-                    </div>
-				{/if}
+            <!-- Mobile layout (controls toggled) -->
+            <!-- [LOGO]       [X] -->
+            <!-- [---CONTROLS---] -->
 
-                {#if Parameters.title}
-                <div class="column is-flex is-justify-content-center">
-                    <span class="title is-4">
-                        {Parameters.title}
-                    </span>
-                </div>
-                {/if}
+            <!-- Logo: left-justified and "is-narrow" to avoid extra margin -->
+			{#if styleConfiguration}
+				<div class="column is-justify-content-left is-narrow">
+					<img
+						src={$styleConfiguration.eyegway.logo
+							? $styleConfiguration.eyegway.logo
+							: 'images/eyegway-logo.svg'}
+						alt="Logo"
+						class="logo"
+					/>
+				</div>
+			{/if}
 
-                <div class="column is-flex is-justify-content-right">
-                    <div class="is-flex">
-                        <HubControls bind:data={sharedData} />
-                    </div>
-                </div>
-            </div>
-        </div>
+            <!-- Title (only desktop): centered and taking all the available space -->
+			{#if Parameters.title}
+				<div class="column has-text-centered is-hidden-mobile">
+					<span class="title is-4">{Parameters.title}</span>
+				</div>
+			{/if}
 
-        <!-- MOBILE -->
-        <div class="is-hidden-tablet">
+			<!-- Controls toggle button (only mobile): right-justified ans "is-narrow" to avoid extra margin -->
+			<div class="column controls-toggle-column is-narrow is-hidden-desktop is-justify-content-right">
+				<button
+					class="button is-small"
+					class:is-active={showControls}
+					on:click={() => (showControls = !showControls)}
+				>
+					{#if showControls}
+						<X strokeWidth={1} />
+					{:else}
+						<ChevronDown strokeWidth={1} />
+					{/if}
+				</button>
+			</div>
 
-            <div class="columns mt-0 mb-0 is-flex is-mobile">
-                {#if styleConfiguration}
-                    <div class="column is-flex is-justify-content-left is-9">
-                        <img
-                            src={$styleConfiguration.eyegway.logo
-                                ? $styleConfiguration.eyegway.logo
-                                : 'images/eyegway-logo.svg'}
-                            alt="Logo"
-                            class="logo"
-                        />
-                    </div>
-				{/if}
-
-                <div class="column is-flex is-justify-content-right is-3">
-                    <button
-                        class="button is-small"
-                        class:is-active={showControls}
-                        on:click={() => (showControls = !showControls)}
-                    >
-                        {#if showControls}
-                            <X strokeWidth={1} />
-                        {:else}
-                            <ChevronDown strokeWidth={1} />
-                        {/if}
-                    </button>
-                </div>
-
-            </div>
-
-            <div class="is-flex is-justify-content-center {showControls ? '' : 'is-hidden-mobile'}">
-                <HubControls bind:data={sharedData} />
-            </div>
-
-        </div>
-
+			<!-- HubControls (see CSS at the bottom for style) -->
+			<div class="column hubcontrols-container" class:show-controls={showControls}>
+				<HubControls bind:data={sharedData} />
+			</div>
+		</div>
 	</div>
 
+    <!-- Main content area -->
 	<div class="card p-0 mt-4 content">
 		<Wall dataStream={sharedData} editMode={editableMosaic} />
 	</div>
@@ -170,6 +152,7 @@
 			padding-right: 32px;
 		}
 	}
+
 	.header {
 		background-color: rgba(
 			var(--eyegway-header-background-color-r),
@@ -178,6 +161,7 @@
 			var(--eyegway-header-background-color-a)
 		);
 	}
+
 	.content {
 		flex-grow: 1;
 		height: 100%;
@@ -189,15 +173,50 @@
 			var(--eyegway-content-background-color-a)
 		);
 	}
+
 	.container {
 		display: flex;
 		flex-direction: column;
 		height: 100dvh;
 		padding-bottom: 50px;
 	}
+
 	.logo {
 		display: flex;
 		height: 30px;
 		align-items: center;
+	}
+
+	/* HubControls settings (Mobile layout) */
+	.hubcontrols-container {
+		display: none;  /* hidden by default */
+		width: 100%;
+		justify-content: center;
+        /* the next two lines ensure that controls go on a new line */
+        flex: 0 0 100%;
+		order: 4; 
+	}
+	.hubcontrols-container.show-controls {
+		display: flex;  /* show when toggled */
+	}
+	.controls-toggle-column {
+		display: flex;
+		justify-content: flex-end;
+        flex: none;
+	}
+
+	/* Desktop layout */
+	@media screen and (min-width: 1024px) {
+		.hubcontrols-container {
+            display: flex !important;  /* always visible on desktop */
+            justify-content: flex-end;
+            flex: none; /* reset to normal flex behavior (if switching from mobile) */
+            max-width: none; /* no forced width */
+            width: auto; /* shrink to fit */
+            order: 3; /* inline in header row */
+        }
+		.controls-toggle-column {
+			display: none; /* no controls toggle on desktop */
+		}
 	}
 </style>
