@@ -106,11 +106,11 @@
 			{/if}
 
             <!-- Title (only desktop): centered and taking all the available space -->
-			{#if Parameters.title}
-				<div class="column has-text-centered is-hidden-mobile">
+            <div class="column has-text-centered is-hidden-mobile">
+                {#if Parameters.title}
 					<span class="title is-4">{Parameters.title}</span>
-				</div>
-			{/if}
+                {/if}
+            </div>
 
 			<!-- Controls toggle button (only mobile): right-justified ans "is-narrow" to avoid extra margin -->
 			<div class="column controls-toggle-column is-narrow is-hidden-desktop is-justify-content-right">
