@@ -3,6 +3,7 @@ import { env } from '$env/dynamic/public'
 export class Parameters {
 	static host: string = env.PUBLIC_EYEGWAY_HOST || 'http://localhost:55221';
 	static hubTriggerKey: string = env.PUBLIC_EYEGWAY_HUB_TRIGGER_KEY || '';
+    static defaultHubName: string | null = env.PUBLIC_EYEGWAY_DEFAULT_HUB_NAME || null;
 	static title: string = env.PUBLIC_EYEGWAY_TITLE || '';
 	static themes: string = env.PUBLIC_EYEGWAY_THEMES || 'ayu_light:ayu_mirage:bulma:dracula:monokai_pro:one_dark_pro';
 	static defaultTheme: string = env.PUBLIC_EYEGWAY_DEFAULT_THEME || 'bulma';
