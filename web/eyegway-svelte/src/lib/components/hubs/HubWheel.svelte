@@ -166,7 +166,7 @@
                     <button class="button is-small p-0">
                         <Pane
                             position={'inline'}
-                            width={84}
+                            width={108}
                             theme={{
                                 baseShadowColor: 'rgba(0, 0, 0, 0)',
                                 baseBackgroundColor: 'transparent'
@@ -209,7 +209,7 @@
                 <div class="control dropdown {settingsOpen ? 'is-active' : ''}">
                     <div class="dropdown-trigger">
                         <button
-                            class="button is-small"
+                            class="button control-button"
                             class:is-inverted={settingsOpen}
                             disabled={historyFrozen}
                             on:click={() => {
@@ -237,7 +237,7 @@
                 <!--------------------->
                 <div class="control">
                     <button
-                        class="button is-small"
+                        class="button control-button"
                         on:click={reload}
                         disabled={historyFrozen}
                         title="Click to trigger a single update"
@@ -250,7 +250,7 @@
                 <!--------------------->
                 <div class="control">
                     <button
-                        class="button is-small"
+                        class="button control-button"
                         style="--animation-time: {autoPlayMs}ms;"
                         class:blink={autoPlay}
                         disabled={historyFrozen}
@@ -301,7 +301,12 @@
     }
 
     .small-play-button {
-        width: 30px;
+        width: 5px;
+    }
+
+    .control-button {
+        width: 50px;
+        height: 30px;
     }
     
     .settings {
