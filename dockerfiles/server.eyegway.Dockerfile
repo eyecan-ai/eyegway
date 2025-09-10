@@ -1,5 +1,5 @@
-ARG pyver=3.10
-ARG debianver=bookworm
+ARG pyver=3.11
+ARG debianver=trixie
 
 FROM python:${pyver}-${debianver} AS venv_stage
 
@@ -11,7 +11,7 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 FROM venv_stage AS requirements_stage
 
 # install hatch in the virtual environment
-RUN pip install --no-cache-dir --upgrade pip wheel hatch
+RUN pip install --no-cache-dir --upgrade pip wheel hatch setuptools
 
 # use hatch to generate requirements.txt
 COPY pyproject.toml /opt/eyecan.ai/
@@ -25,7 +25,7 @@ COPY --from=requirements_stage /opt/eyecan.ai/requirements.txt /opt/eyecan.ai/
 
 # install dependencies in the virtual environment
 WORKDIR /opt/eyecan.ai
-RUN pip install --no-cache-dir --upgrade pip wheel && \
+RUN pip install --no-cache-dir --upgrade pip wheel setuptools && \
     pip install --no-cache-dir --upgrade -r requirements.txt
 
 FROM deps_stage AS install_stage
