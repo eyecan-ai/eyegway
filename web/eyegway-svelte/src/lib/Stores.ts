@@ -17,6 +17,8 @@ export interface HubsPreferences {
 	activeHub: string | null;
 }
 
-export const HubsPreferences: Writable<HubsPreferences> = persisted('HubsPreferences', {
-	activeHub: null
-});
+const defaultHubsPreferences: HubsPreferences = {
+	activeHub: Parameters.defaultHubName
+};
+
+export const HubsPreferences: Writable<HubsPreferences> = persisted('HubsPreferences', defaultHubsPreferences);

@@ -5,7 +5,7 @@
 	import { ThemeUtils } from 'svelte-tweakpane-ui';
 	import { onMount } from 'svelte';
 	import { type Writable } from 'svelte/store';
-
+    import { Parameters } from '$lib/Parameters.js';
 	import { ChevronDown, X } from 'lucide-svelte';
 
 	// This is to keep updating CSS Variables when $styleSettings changes
@@ -79,10 +79,22 @@
 </script>
 
 <div class="container my-fluid-container">
-	<div class="box mb-1 mt-2 header">
-		<div class="columns {showControls ? '' : 'is-mobile'}">
-			<div class="column is-flex is-justify-content-space-between">
-				{#if styleConfiguration}
+	<!-- Header -->
+    <div class="box mb-1 mt-2 header">
+		<div class="columns is-flex is-vcentered is-multiline">
+            <!-- Desktop layout -->
+            <!-- [LOGO][-------TITLE-------][CONTROLS] -->
+
+            <!-- Mobile layout (controls not toggled) -->
+            <!-- [LOGO]       [v] -->
+
+            <!-- Mobile layout (controls toggled) -->
+            <!-- [LOGO]       [X] -->
+            <!-- [---CONTROLS---] -->
+
+            <!-- Logo: left-justified and "is-narrow" to avoid extra margin -->
+			{#if styleConfiguration}
+				<div class="column is-justify-content-left is-narrow">
 					<img
 						src={$styleConfiguration.eyegway.logo
 							? $styleConfiguration.eyegway.logo
@@ -90,9 +102,20 @@
 						alt="Logo"
 						class="logo"
 					/>
-				{/if}
+				</div>
+			{/if}
+
+            <!-- Title (only desktop): centered and taking all the available space -->
+            <div class="column has-text-centered is-hidden-mobile">
+                {#if Parameters.title}
+					<span class="title is-4">{Parameters.title}</span>
+                {/if}
+            </div>
+
+			<!-- Controls toggle button (only mobile): right-justified ans "is-narrow" to avoid extra margin -->
+			<div class="column controls-toggle-column is-narrow is-hidden-desktop is-justify-content-right">
 				<button
-					class="button is-small is-hidden-tablet"
+					class="button is-small"
 					class:is-active={showControls}
 					on:click={() => (showControls = !showControls)}
 				>
@@ -103,16 +126,15 @@
 					{/if}
 				</button>
 			</div>
-			<div
-				class="column is-flex is-justify-content-flex-end {showControls ? '' : 'is-hidden-mobile'}"
-			>
-				<div class="is-flex is-justify-content-right">
-					<HubControls bind:data={sharedData} />
-				</div>
+
+			<!-- HubControls (see CSS at the bottom for style) -->
+			<div class="column hubcontrols-container" class:show-controls={showControls}>
+				<HubControls bind:data={sharedData} />
 			</div>
 		</div>
 	</div>
 
+    <!-- Main content area -->
 	<div class="card p-0 mt-4 content">
 		<Wall dataStream={sharedData} editMode={editableMosaic} />
 	</div>
@@ -130,6 +152,7 @@
 			padding-right: 32px;
 		}
 	}
+
 	.header {
 		background-color: rgba(
 			var(--eyegway-header-background-color-r),
@@ -138,6 +161,7 @@
 			var(--eyegway-header-background-color-a)
 		);
 	}
+
 	.content {
 		flex-grow: 1;
 		height: 100%;
@@ -149,16 +173,50 @@
 			var(--eyegway-content-background-color-a)
 		);
 	}
+
 	.container {
 		display: flex;
 		flex-direction: column;
-		height: 100vh;
+		height: 100dvh;
 		padding-bottom: 50px;
 	}
+
 	.logo {
 		display: flex;
 		height: 30px;
 		align-items: center;
-		padding-left: 25px;
+	}
+
+	/* HubControls settings (Mobile layout) */
+	.hubcontrols-container {
+		display: none;  /* hidden by default */
+		width: 100%;
+		justify-content: center;
+        /* the next two lines ensure that controls go on a new line */
+        flex: 0 0 100%;
+		order: 4; 
+	}
+	.hubcontrols-container.show-controls {
+		display: flex;  /* show when toggled */
+	}
+	.controls-toggle-column {
+		display: flex;
+		justify-content: flex-end;
+        flex: none;
+	}
+
+	/* Desktop layout */
+	@media screen and (min-width: 1024px) {
+		.hubcontrols-container {
+            display: flex !important;  /* always visible on desktop */
+            justify-content: flex-end;
+            flex: none; /* reset to normal flex behavior (if switching from mobile) */
+            max-width: none; /* no forced width */
+            width: auto; /* shrink to fit */
+            order: 3; /* inline in header row */
+        }
+		.controls-toggle-column {
+			display: none; /* no controls toggle on desktop */
+		}
 	}
 </style>

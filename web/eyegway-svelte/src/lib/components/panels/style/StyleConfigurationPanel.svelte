@@ -7,7 +7,7 @@
 		Slider,
 		Separator,
 		TabGroup,
-		TabPage
+		TabPage,
 	} from 'svelte-tweakpane-ui';
 	import {
 		HSLStringToRGB,
