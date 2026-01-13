@@ -27,9 +27,10 @@
 		styleMode = !styleMode;
 	}
 
-	function handleUpdate() {
-		if (paneConfiguration) {
-			if (!refreshingPane && !refreshPane) $paneConfiguration.id = Date.now();
+	function handleUpdate(event: CustomEvent<{ pane?: PaneConfiguration }>) {
+		const updated = event.detail?.pane ?? event.detail;
+		if (updated && paneConfiguration) {
+			paneConfiguration.set({ ...updated, id: Date.now() });
 		}
 	}
 
@@ -74,7 +75,7 @@
 			{#key refreshPane}
 				<PaneNode
 					draggingStep={1}
-					bind:pane={$paneConfiguration}
+					pane={$paneConfiguration}
 					{editMode}
 					{dataStream}
 					tips={dataStream ? Object.keys(dataStream) : []}

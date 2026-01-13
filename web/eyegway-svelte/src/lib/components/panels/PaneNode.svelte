@@ -18,8 +18,8 @@
 	let showPercentage: boolean = false;
 
 	function dispatchUpdate() {
-		pane = { ...pane };
-		dispatch('update');
+		const updated = { ...pane };
+		dispatch('update', { pane: updated });
 	}
 
 	function dispatchDelete() {
