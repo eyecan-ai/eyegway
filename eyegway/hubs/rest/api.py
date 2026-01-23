@@ -17,9 +17,12 @@ class VariableValue(pyd.BaseModel):
 
 
 class HubsRestAPI(fa.FastAPI):
-
-    def __init__(self, config: t.Optional[eh.HubsConfig] = None):
-        super().__init__()
+    def __init__(
+        self,
+        config: t.Optional[eh.HubsConfig] = None,
+        root_path: t.Optional[str] = None,
+    ):
+        super().__init__(root_path=root_path)
         self.config = config
         self._message_hubs_map: t.Dict[str, eha.AsyncMessageHub] = {}
         self._message_hubs_manager = eha.AsyncMessageHubManager.create(config=config)

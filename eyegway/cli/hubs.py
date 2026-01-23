@@ -28,12 +28,13 @@ def rest_serve(
         "-p",
         help="Port to serve the API",
     ),
+    api_root_path: str = tp.Option("/", help="API Root Path"),
 ):
     import uvicorn
 
     import eyegway.hubs.rest.api as erha
 
-    api = erha.HubsRestAPI()
+    api = erha.HubsRestAPI(root_path=api_root_path)
     uvicorn.run(api, host=host, port=port)
 
 
@@ -139,7 +140,7 @@ def clear(
         "--name",
         "-n",
         help="Hub name",
-    )
+    ),
 ):
     import rich
 
@@ -164,7 +165,7 @@ def history_clear(
         "--name",
         "-n",
         help="Hub name",
-    )
+    ),
 ):
     import rich
 
@@ -222,7 +223,7 @@ def buffer_clear(
         "--name",
         "-n",
         help="Hub name",
-    )
+    ),
 ):
     import rich
 

@@ -25,7 +25,7 @@
     let autoPlayMs: number = 500;
     let sliderDebounce: number = 5;
     let sliderTimeout: number | null = null;
-    let autoPlayTimeout: number | null = null;
+    let autoPlayId: number = 0;
     let settingsOpen: boolean = false;
 
     export async function reloadInfo() {
@@ -90,7 +90,7 @@
 
     async function play() {
         dataPointer = 0;
-        autoPlayTimeout = setInterval(async () => {
+        autoPlayId = setInterval(async () => {
             await reload();
         }, autoPlayMs);
     }
@@ -110,7 +110,7 @@
     }
 
     onDestroy(() => {
-        if (autoPlayTimeout !== null) clearTimeout(autoPlayTimeout);
+        clearInterval(autoPlayId);
     });
 
     // On hubName change
@@ -124,18 +124,12 @@
         reload();
     }
 
-    // Auto Play Management
-    $: if (autoPlay === true) {
-        if (autoPlayTimeout === null) {
-            play();
-        }
+    $: if (autoPlay && autoPlayMs) {
+        clearInterval(autoPlayId);
+        play();
     }
-
-    $: if (autoPlay === false) {
-        if (autoPlayTimeout !== null) {
-            clearInterval(autoPlayTimeout);
-            autoPlayTimeout = null;
-        }
+    else {
+        clearInterval(autoPlayId);
     }
 </script>
 
@@ -225,7 +219,7 @@
                                 <div class="field">
                                     <!-- svelte-ignore a11y-label-has-associated-control -->
                                     <div class="control">
-                                        <Stepper bind:value={autoPlayMs} label="Auto Play Delay (ms)" step={10} />
+                                        <Stepper bind:value={autoPlayMs} label="Auto Play Delay (ms)" step={10} min={10} />
                                     </div>
                                 </div>
                             </div>
