@@ -15,4 +15,4 @@ class LoguruTimer:
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.end = time.time()
-        loguru.logger.debug(f"{self.name} took {self.end - self.start:.3f} seconds")
+        loguru.logger.trace(f"{self.name} took {self.end - self.start:.3f} seconds")
