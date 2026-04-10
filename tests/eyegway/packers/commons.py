@@ -55,11 +55,11 @@ def numpy_messages():
     ]
 
 
-def valid_numpy_messages() -> t.List[t.Any]:
+def valid_numpy_messages() -> list[t.Any]:
     return simple_messages() + numpy_messages()
 
 
-def valid_messages() -> t.List[t.Any]:
+def valid_messages() -> list[t.Any]:
     return valid_numpy_messages() + []
 
 
@@ -70,5 +70,5 @@ class InvalidObject(pyd.BaseModel):
     a: int = 2
 
 
-def invalid_messages() -> t.List[t.Any]:
+def invalid_messages() -> list[t.Any]:
     return [InvalidObject()]

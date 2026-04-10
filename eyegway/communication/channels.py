@@ -1,8 +1,8 @@
+from abc import ABC
+
 import loguru
 from redis import Redis
 from redis.client import Pipeline
-import typing as t
-from abc import ABC
 
 
 class Channel(ABC):
@@ -12,7 +12,7 @@ class Channel(ABC):
         name: str,
         max_size: int = -1,
         push_method: str = "lpush",
-        pop_method: t.Optional[str] = "brpop",
+        pop_method: str | None = "brpop",
     ):
         """Generic  channel. It can be used as FIFO, LIFO or History channel by
         changing push and pop methods. The push method is used to push data to the
@@ -27,7 +27,7 @@ class Channel(ABC):
             max_size (int, optional): the max size of the channel (-1 for unlimited).
                 Defaults to -1.
             push_method (str, optional): push method. Defaults to "lpush".
-            pop_method (t.Optional[str], optional): pop method. Defaults to "brpop".
+            pop_method (str | None, optional): pop method. Defaults to "brpop".
         """
         self.redis = redis
         self.channel_name = name
@@ -35,7 +35,7 @@ class Channel(ABC):
         self.push_method = push_method
         self.pop_method = pop_method
 
-    def push(self, data: bytes, external_pipe: t.Optional[Pipeline] = None):
+    def push(self, data: bytes, external_pipe: Pipeline | None = None):
         if self.max_size == 0:
             return
 
@@ -51,7 +51,7 @@ class Channel(ABC):
         if external_pipe is None:
             pipe.execute()
 
-    def pop(self, timeout: int = 0) -> t.Optional[bytes]:
+    def pop(self, timeout: float = 0) -> bytes | None:
         if self.pop_method is None:
             raise PermissionError("pop method is not allowed for this channel")
         res = self.redis.execute_command(
@@ -64,10 +64,10 @@ class Channel(ABC):
         _, payload = res
         return payload
 
-    def get(self, index: int) -> t.Optional[bytes]:
+    def get(self, index: int) -> bytes | None:
         return self.redis.lindex(self.channel_name, index)
 
-    def slice(self, start: int, stop: int) -> t.List[bytes]:
+    def slice(self, start: int, stop: int) -> list[bytes]:
         return self.redis.lrange(self.channel_name, start, stop)
 
     def size(self) -> int:

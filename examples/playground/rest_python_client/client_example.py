@@ -1,11 +1,13 @@
 import asyncio
-import rich
-import numpy as np
-import httpx
-import eyegway.packers.factory as epf
-import eyegway.hubs.rest.api as erha
-import pydantic as pyd
 import typing as t
+
+import httpx
+import numpy as np
+import pydantic as pyd
+import rich
+
+import eyegway.hubs.rest.api as erha
+import eyegway.packers.factory as epf
 
 
 class HubsRestAPIClientAsync(pyd.BaseModel):
@@ -50,7 +52,7 @@ class HubsRestAPIClientAsync(pyd.BaseModel):
         unpacked = epf.PackersFactory.default().unpack(raw_data)
         return unpacked
 
-    async def pop_raw(self, name: str, timeout: int = 1) -> t.Any:
+    async def pop_raw(self, name: str, timeout: float = 1) -> t.Any:
         async with httpx.AsyncClient() as client:
             response = await client.get(
                 f"http://{self.host}:{self.port}/hubs/{name}/pop?timeout={timeout}"
@@ -59,7 +61,7 @@ class HubsRestAPIClientAsync(pyd.BaseModel):
                 return None
             return response.content
 
-    async def pop(self, name: str, timeout: int = 1) -> t.Any:
+    async def pop(self, name: str, timeout: float = 1) -> t.Any:
         raw_data = await self.pop_raw(name, timeout)
         if raw_data is None:
             return None
@@ -112,7 +114,7 @@ async def run():
     history_size = await client.history_size(hub_name)
 
     last_data = [
-        (await client.last(hub_name, idx))['time'] for idx in range(history_size)
+        (await client.last(hub_name, idx))["time"] for idx in range(history_size)
     ]
     rich.print("Last Data:", last_data)
 

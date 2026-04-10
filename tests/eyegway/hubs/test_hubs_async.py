@@ -1,13 +1,14 @@
+import typing as t
+
+import pytest
+import redis.asyncio as aioredis
+
 import eyegway.hubs as eh
 import eyegway.hubs.asyn as eha
 import eyegway.packers as ecm
-import redis.asyncio as aioredis
-import pytest
-import typing as t
 
 
 class TestMessageHub:
-
     @pytest.mark.asyncio
     async def test_lifecycle(self, redis_test_mock_async: aioredis.Redis):
 
@@ -28,7 +29,7 @@ class TestMessageHub:
         data_size = max_buffer_size
         datas = []
         for idx in range(data_size):
-            datas.append({'idx': idx, 'data': f"data-{idx}"})
+            datas.append({"idx": idx, "data": f"data-{idx}"})
         reversed_datas = datas[::-1]
 
         # Push all messages
@@ -96,7 +97,7 @@ class TestMessageHub:
             data_size = max_buffer_size
             datas = []
             for idx in range(data_size):
-                datas.append({'idx': idx, 'data': f"data-{idx}"})
+                datas.append({"idx": idx, "data": f"data-{idx}"})
 
             # Push all messages
             for data in datas:
@@ -157,7 +158,7 @@ class TestMessageHub:
         await hub.clear_buffer()
         await hub.clear_history()
 
-        data = [b'0' * max_payload_size * 2]
+        data = [b"0" * max_payload_size * 2]
 
         with pytest.raises(ValueError):
             await hub.push(data)
@@ -183,7 +184,7 @@ class TestMessageHub:
 
         assert len(await _hub().list_variables()) == 0
 
-        variables = {'alpha': 1, 'beta': False, 'gamma': 3.14}
+        variables = {"alpha": 1, "beta": False, "gamma": 3.14}
         for key, value in variables.items():
             assert await _hub().get_variable_value(key) is None
 
@@ -237,7 +238,7 @@ class TestMessageHub:
         await hub.clear_buffer()
         await hub.clear_history()
 
-        data = [b'0']
+        data = [b"0"]
         for _ in range(max_buffer_size):
             await hub.push(data)
 
@@ -248,7 +249,6 @@ class TestMessageHub:
 
 
 class TestMessageHubManager:
-
     @pytest.mark.asyncio
     async def test_lifecycle(self, redis_test_mock_async: aioredis.Redis):
 
@@ -263,7 +263,7 @@ class TestMessageHubManager:
 
         hubs_number = 5
         hubs_names = [f"test-{idx}" for idx in range(hubs_number)]
-        hubs: t.Dict[str, eha.AsyncMessageHub] = {}
+        hubs: dict[str, eha.AsyncMessageHub] = {}
 
         for hub_name in hubs_names:
             hub = eha.AsyncMessageHub.create(
@@ -274,7 +274,7 @@ class TestMessageHubManager:
             await hub.freeze(False)
             hubs[hub_name] = hub
             await hub.clear()
-            await hub.push("data".encode('utf-8'))
+            await hub.push(b"data")
 
         manager = eha.AsyncMessageHubManager.create(config, redis=redis_test_mock_async)
 

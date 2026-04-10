@@ -16,7 +16,7 @@ class HubView(ABC, pyd.BaseModel):
     model_config = pyd.ConfigDict(arbitrary_types_allowed=True)
 
     @abstractmethod
-    def _rearrange(self, elements: list) -> t.Dict[str, t.Any]:
+    def _rearrange(self, elements: list) -> dict[str, t.Any]:
         """
         Rearranges a list of elements into a dictionary.
 
@@ -24,12 +24,12 @@ class HubView(ABC, pyd.BaseModel):
             elements (list): A list of elements to be rearranged.
 
         Returns:
-            Dict[str, Any]: A dictionary where keys are string indices and values
+            dict[str, Any]: A dictionary where keys are string indices and values
                             are the elements.
         """
         pass
 
-    def _sync_view(self, hub: MessageHub) -> t.Dict[str, t.Any]:
+    def _sync_view(self, hub: MessageHub) -> dict[str, t.Any]:
         """
         Provides a view of the elements of a sync hub by rearranging them.
 
@@ -37,13 +37,13 @@ class HubView(ABC, pyd.BaseModel):
             hub (MessageHub): The sync message hub.
 
         Returns:
-            Dict[str, Any]: A dictionary where keys are string indices and values
+            dict[str, Any]: A dictionary where keys are string indices and values
                             are rearrangement of the elements.
         """
         elements = hub.last_multiple(0, hub.history_size())
         return self._rearrange(elements)
 
-    async def _async_view(self, hub: AsyncMessageHub) -> t.Dict[str, t.Any]:
+    async def _async_view(self, hub: AsyncMessageHub) -> dict[str, t.Any]:
         """
         Provides a view of the elements of an async hub by rearranging them.
 
@@ -51,32 +51,32 @@ class HubView(ABC, pyd.BaseModel):
             hub (AsyncMessageHub): The async message hub.
 
         Returns:
-            Dict[str, Any]: A dictionary where keys are string indices and values
+            dict[str, Any]: A dictionary where keys are string indices and values
                             are rearrangement of the elements.
         """
         elements = await hub.last_multiple(0, await hub.history_size())
         return self._rearrange(elements)
 
     @t.overload
-    def view(self, hub: MessageHub) -> t.Dict[str, t.Any]: ...
+    def view(self, hub: MessageHub) -> dict[str, t.Any]: ...
 
     @t.overload
     def view(
         self, hub: AsyncMessageHub
-    ) -> t.Coroutine[t.Any, t.Any, t.Dict[str, t.Any]]: ...
+    ) -> t.Coroutine[t.Any, t.Any, dict[str, t.Any]]: ...
 
     def view(
-        self, hub: t.Union[MessageHub, AsyncMessageHub]
-    ) -> t.Union[t.Dict[str, t.Any], t.Coroutine[t.Any, t.Any, t.Dict[str, t.Any]]]:
+        self, hub: MessageHub | AsyncMessageHub
+    ) -> dict[str, t.Any] | t.Coroutine[t.Any, t.Any, dict[str, t.Any]]:
         """
         Provides a view of the elements of a hub by rearranging them.
 
         Args:
-            hub (Union[MessageHub, AsyncMessageHub]):
+            hub (MessageHub | AsyncMessageHub):
                 The message hub, either sync or async.
 
         Returns:
-            Union[Dict[str, Any], Coroutine[Any, Any, Dict[str, Any]]]:
+            dict[str, Any] | Coroutine[Any, Any, dict[str, Any]]:
                 A dictionary where keys are string indices and values
                 are rearrangement of the elements, or a coroutine
                 if the hub is async.
@@ -101,7 +101,7 @@ class SequentialDictView(HubView):
         result -> {'0': 'a', '1': 'b', '2': 'c'}
     """
 
-    def _rearrange(self, elements: list) -> t.Dict[str, t.Any]:
+    def _rearrange(self, elements: list) -> dict[str, t.Any]:
         """
         Rearranges a list of elements into a dictionary with sequential keys.
 
@@ -109,7 +109,7 @@ class SequentialDictView(HubView):
             elements (list): A list of elements to be rearranged.
 
         Returns:
-            Dict[str, Any]: A dictionary where keys are string indices and values
+            dict[str, Any]: A dictionary where keys are string indices and values
                             are the elements.
         """
         return {str(i): element for i, element in enumerate(elements)}
@@ -130,7 +130,7 @@ class ReverseSequentialDictView(HubView):
         result -> {'0': 'c', '1': 'b', '2': 'a'}
     """
 
-    def _rearrange(self, elements: list) -> t.Dict[str, t.Any]:
+    def _rearrange(self, elements: list) -> dict[str, t.Any]:
         """
         Rearranges a list of elements into a dictionary with sequential keys
             in reverse order.
@@ -139,7 +139,7 @@ class ReverseSequentialDictView(HubView):
             elements (list): A list of elements to be rearranged.
 
         Returns:
-            Dict[str, Any]: A dictionary where keys are string indices and values
+            dict[str, Any]: A dictionary where keys are string indices and values
                             are the elements in reverse order.
         """
         return {str(i): element for i, element in enumerate(elements[::-1])}
@@ -150,7 +150,7 @@ class ValueAccumulatorView(HubView):
     A view that accumulates values from nested dictionaries based on specified keys.
 
     Attributes:
-        keys (List[str]): A list of dot notation keys used to extract values from
+        keys (list[str]): A list of dot notation keys used to extract values from
                           nested dictionaries.
 
     Example:
@@ -164,14 +164,14 @@ class ValueAccumulatorView(HubView):
         result -> {'a.b': [1, 2, 3]}
     """
 
-    keys: t.List[str] = pyd.Field(..., description="Keys")
+    keys: list[str] = pyd.Field(..., description="Keys")
 
-    def _get_value(self, data: t.Dict[str, t.Any], dotted_key: str) -> t.Any:
+    def _get_value(self, data: dict[str, t.Any], dotted_key: str) -> t.Any:
         """
         Retrieves the value from a nested dictionary using a dot notation key.
 
         Args:
-            data (Dict[str, Any]): The dictionary to retrieve the value from.
+            data (dict[str, Any]): The dictionary to retrieve the value from.
             dotted_key (str): The dot notation key to access the nested value.
 
         Returns:
@@ -186,14 +186,12 @@ class ValueAccumulatorView(HubView):
                 return None
         return data
 
-    def _set_value(
-        self, data: t.Dict[str, t.Any], dotted_key: str, value: t.Any
-    ) -> None:
+    def _set_value(self, data: dict[str, t.Any], dotted_key: str, value: t.Any) -> None:
         """
         Sets the value in a nested dictionary using a dot notation key.
 
         Args:
-            data (Dict[str, Any]): The dictionary to set the value in.
+            data (dict[str, Any]): The dictionary to set the value in.
             dotted_key (str): The dot notation key to access the nested location.
             value (Any): The value to set at the specified location.
         """
@@ -204,7 +202,7 @@ class ValueAccumulatorView(HubView):
             data = data[key]
         data[keys[-1]] = value
 
-    def _rearrange(self, elements: list) -> t.Dict[str, t.Any]:
+    def _rearrange(self, elements: list) -> dict[str, t.Any]:
         """
         Rearranges a list of elements into a dictionary of accumulated values.
 
@@ -216,10 +214,10 @@ class ValueAccumulatorView(HubView):
             elements (list): A list of dictionaries from which values will be extracted.
 
         Returns:
-            Dict[str, Any]: A dictionary where each key corresponds to a list of
+            dict[str, Any]: A dictionary where each key corresponds to a list of
                             accumulated values.
         """
-        accumulated_data: t.Dict[str, t.Any] = {}
+        accumulated_data: dict[str, t.Any] = {}
         for key in self.keys:
             values = deque()
             for element in elements:

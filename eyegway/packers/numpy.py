@@ -74,7 +74,7 @@ class NumpyConversion(pyd.BaseModel, arbitrary_types_allowed=True):
         )
 
     def __str__(self) -> str:
-        return f"{str(self.numpy_format)}={self.image_encoder.name()}"
+        return f"{self.numpy_format!s}={self.image_encoder.name()}"
 
     @classmethod
     def parse(cls, string: str) -> NumpyConversion:
@@ -94,12 +94,12 @@ class NumpyConversion(pyd.BaseModel, arbitrary_types_allowed=True):
 
 
 class NumpyMessageParser(GenericMessageParser):
-    numpy_conversions: t.List[NumpyConversion] = pyd.Field(default_factory=list)
+    numpy_conversions: list[NumpyConversion] = pyd.Field(default_factory=list)
 
     def match(self, obj) -> bool:
         return isinstance(obj, np.ndarray)
 
-    def __call__(self, obj) -> t.Union[msgpack.ExtType, t.Any]:
+    def __call__(self, obj) -> msgpack.ExtType | t.Any:
         if not self.match(obj):
             return obj  # pragma: no cover
 
@@ -129,7 +129,6 @@ class NumpyMessageParser(GenericMessageParser):
 
 
 class NumpyMessageUnparser(GenericMessageUnparser):
-
     def match(self, code: int) -> bool:
         return code in [CustomMessageTypes.TENSOR.value, CustomMessageTypes.IMAGE.value]
 
