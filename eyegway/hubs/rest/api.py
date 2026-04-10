@@ -19,12 +19,12 @@ class VariableValue(pyd.BaseModel):
 class HubsRestAPI(fa.FastAPI):
     def __init__(
         self,
-        config: t.Optional[eh.HubsConfig] = None,
-        root_path: t.Optional[str] = None,
+        config: eh.HubsConfig | None = None,
+        root_path: str | None = None,
     ):
         super().__init__(root_path=root_path)
         self.config = config
-        self._message_hubs_map: t.Dict[str, eha.AsyncMessageHub] = {}
+        self._message_hubs_map: dict[str, eha.AsyncMessageHub] = {}
         self._message_hubs_manager = eha.AsyncMessageHubManager.create(config=config)
 
         self.add_middleware(
@@ -81,7 +81,7 @@ class HubsRestAPI(fa.FastAPI):
             )
         return self._message_hubs_map[name]
 
-    async def hubs_list(self) -> t.List[str]:
+    async def hubs_list(self) -> list[str]:
         return await self._message_hubs_manager.list()
 
     async def clear_buffer(self, name: str) -> None:
@@ -100,7 +100,7 @@ class HubsRestAPI(fa.FastAPI):
         hub = self.get_hub(name)
         return await hub.buffer_size()
 
-    async def pop(self, name: str, timeout: int = 1) -> far.Response:
+    async def pop(self, name: str, timeout: float = 1) -> far.Response:
         timeout = max(timeout, 1)
         hub = self.get_hub(name)
         data = await hub.pop_raw(timeout)
@@ -163,6 +163,6 @@ class HubsRestAPI(fa.FastAPI):
         hub = self.get_hub(name)
         await hub.delete_variable(variable)
 
-    async def list_variables(self, name: str) -> t.List[str]:
+    async def list_variables(self, name: str) -> list[str]:
         hub = self.get_hub(name)
         return await hub.list_variables(include_privates=False)

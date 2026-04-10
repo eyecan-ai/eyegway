@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import builtins
 import typing as t
 
 from redis.asyncio import Redis
@@ -14,7 +15,6 @@ import eyegway.utils.logging as eul
 
 
 class AsyncMessageHub:
-
     def __init__(
         self,
         redis: Redis,
@@ -23,7 +23,7 @@ class AsyncMessageHub:
         max_buffer_size: int = 0,
         max_history_size: int = 0,
         max_payload_size: int = 0,
-        connectors: t.Optional[t.List[ehc.HubConnector]] = None,
+        connectors: list[ehc.HubConnector] | None = None,
     ):
         self.redis = redis
         self.name = name
@@ -47,7 +47,7 @@ class AsyncMessageHub:
             max_history_size,
         )
 
-        self._variables: t.Dict[str, ecov.AsyncSharedVariable] = {}
+        self._variables: dict[str, ecov.AsyncSharedVariable] = {}
         self._history_frozen = self._create_variable("history_frozen", True)
         self._buffer_frozen = self._create_variable("buffer_frozen", True)
 
@@ -82,29 +82,29 @@ class AsyncMessageHub:
 
         await self.push_raw(data)
 
-    async def pop_raw(self, timeout: int = 0) -> t.Optional[bytes]:
+    async def pop_raw(self, timeout: float = 0) -> bytes | None:
         return await self.buffer.pop(timeout)
 
-    async def pop(self, timeout: int = 0) -> t.Optional[t.Any]:
+    async def pop(self, timeout: float = 0) -> t.Any | None:
         data = await self.pop_raw(timeout)
         if data is None:
             return None
         return self.hub_to_world(self.packer.unpack(data))
 
-    async def last_raw(self, offset: int = 0) -> t.Optional[bytes]:
+    async def last_raw(self, offset: int = 0) -> bytes | None:
         return await self.history.get(offset)
 
-    async def last(self, offset: int = 0) -> t.Optional[t.Any]:
+    async def last(self, offset: int = 0) -> t.Any | None:
         data = await self.last_raw(offset)
         if data is None:
             return None
         return self.hub_to_world(self.packer.unpack(data))
 
-    async def last_multiple_raw(self, start: int, stop: int) -> t.List[bytes]:
+    async def last_multiple_raw(self, start: int, stop: int) -> list[bytes]:
         datas = await self.history.slice(start, stop)
         return datas
 
-    async def last_multiple(self, start: int, stop: int) -> t.List[t.Any]:
+    async def last_multiple(self, start: int, stop: int) -> list[t.Any]:
         datas = await self.last_multiple_raw(start, stop)
         return [self.hub_to_world(self.packer.unpack(data)) for data in datas]
 
@@ -140,7 +140,7 @@ class AsyncMessageHub:
     async def is_buffer_frozen(self) -> bool:
         return (await self._buffer_frozen.get()) is True
 
-    async def list_variables(self, include_privates: bool = False) -> t.List[str]:
+    async def list_variables(self, include_privates: bool = False) -> list[str]:
         variables = await self.redis.keys(
             f"{eh.HubsParametrization.variable_name(self.name, '*')}"
         )
@@ -166,7 +166,7 @@ class AsyncMessageHub:
         self._variables[name] = variable
         return variable
 
-    def _get_variable(self, name: str) -> t.Optional[ecov.AsyncSharedVariable]:
+    def _get_variable(self, name: str) -> ecov.AsyncSharedVariable | None:
         if name not in self._variables:
             return None
         return self._variables[name]
@@ -177,7 +177,7 @@ class AsyncMessageHub:
             variable = self._create_variable(name, False)
         await variable.set(value)
 
-    async def get_variable_value(self, name: str) -> t.Optional[t.Any]:
+    async def get_variable_value(self, name: str) -> t.Any | None:
         variable = self._get_variable(name)
         if variable is None:
             variable = self._create_variable(name, False)
@@ -191,9 +191,9 @@ class AsyncMessageHub:
 
     @staticmethod
     def create(
-        name: t.Optional[str] = None,
-        config: t.Optional[eh.HubsConfig] = None,
-        redis: t.Optional[Redis] = None,
+        name: str | None = None,
+        config: eh.HubsConfig | None = None,
+        redis: Redis | None = None,
     ) -> AsyncMessageHub:
         if config is None:
             config = eh.HubsConfig()
@@ -209,19 +209,18 @@ class AsyncMessageHub:
 
 
 class AsyncMessageHubManager:
-
     def __init__(self, redis: Redis):
         self.redis = redis
 
-    async def list(self) -> t.List[str]:
+    async def list(self) -> builtins.list[str]:
         channels = await self.redis.keys(f"{eh.HubsParametrization.HUBS_PREFIX}*")
         channels = [channel.decode() for channel in channels]
         return eh.HubsParametrization.retrieve_hubs_names_from_channel_list(channels)
 
     @staticmethod
     def create(
-        config: t.Optional[eh.HubsConfig] = None,
-        redis: t.Optional[Redis] = None,
+        config: eh.HubsConfig | None = None,
+        redis: Redis | None = None,
     ) -> AsyncMessageHubManager:
         if config is None:
             config = eh.HubsConfig()

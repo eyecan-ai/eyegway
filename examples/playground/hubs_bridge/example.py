@@ -1,24 +1,24 @@
-import numpy as np
 import asyncio
 import typing as t
-import eyegway.hubs as eh
-import eyegway.hubs.connectors as ehc
-import eyegway.hubs.asyn as eha
-import eyegway.utils as eut
-import eyegway.hubs.connectors.pipelime as ehcp
-import pipelime.stages as pst
-import pipelime.sequences as pls
-import pipelime.items as pli
-import pydantic as pyd
 from abc import ABC, abstractmethod
+
 import cv2
+import numpy as np
+import pipelime.items as pli
+import pipelime.sequences as pls
 import pipelime.stages as pst
+import pydantic as pyd
+
+import eyegway.hubs as eh
+import eyegway.hubs.asyn as eha
+import eyegway.hubs.connectors as ehc
+import eyegway.hubs.connectors.pipelime as ehcp
+import eyegway.utils as eut
 
 
 class StageDrawing(pst.SampleStage):
-
     def __call__(self, x: pls.Sample) -> pls.Sample:
-        image = x['backl_image']()
+        image = x["backl_image"]()
         h, w = image.shape[:2]
 
         # draw random circles with opencv
@@ -32,14 +32,14 @@ class StageDrawing(pst.SampleStage):
                 np.random.randint(0, 255),
             )
             cv2.circle(image, (cx, cy), radius, color, -1)
-        return x.set_value('backl_image', image)
+        return x.set_value("backl_image", image)
 
 
 class HubBridgeAsync(pyd.BaseModel, ABC):
     hub_from: str
     hub_to: str
-    hub_from_connectors: t.List[ehc.HubConnector] = []
-    hub_to_connectors: t.List[ehc.HubConnector] = []
+    hub_from_connectors: list[ehc.HubConnector] = []
+    hub_to_connectors: list[ehc.HubConnector] = []
     clear_hub_to: bool = True
 
     model_config = pyd.ConfigDict(arbitrary_types_allowed=True)
@@ -67,8 +67,8 @@ class HubBridgeAsync(pyd.BaseModel, ABC):
 class MyBridge(HubBridgeAsync):
     hub_from: str = "osella"
     hub_to: str = "osella2"
-    hub_from_connectors: t.List[ehc.HubConnector] = [ehcp.PipelimeHubConnector()]
-    hub_to_connectors: t.List[ehc.HubConnector] = [ehcp.PipelimeHubConnector()]
+    hub_from_connectors: list[ehc.HubConnector] = [ehcp.PipelimeHubConnector()]
+    hub_to_connectors: list[ehc.HubConnector] = [ehcp.PipelimeHubConnector()]
 
     def process(self, data: t.Any) -> t.Any:
         stage = StageDrawing()
@@ -92,7 +92,6 @@ class MyBridge(HubBridgeAsync):
         return data
 
 
-if __name__ == '__main__':
-
+if __name__ == "__main__":
     bridge = MyBridge()
     asyncio.run(bridge.run())

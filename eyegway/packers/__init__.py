@@ -24,12 +24,12 @@ class GenericMessageParser(ABC, pyd.BaseModel):
         pass
 
     @abstractmethod
-    def __call__(self, obj) -> t.Union[msgpack.ExtType, t.Any]:
+    def __call__(self, obj) -> msgpack.ExtType | t.Any:
         pass
 
 
 class MessageParserCompose(GenericMessageParser):
-    parsers: t.List[GenericMessageParser] = pyd.Field(...)
+    parsers: list[GenericMessageParser] = pyd.Field(...)
 
     def match(self, obj) -> bool:
         for parser in self.parsers:
@@ -37,7 +37,7 @@ class MessageParserCompose(GenericMessageParser):
                 return True
         return False  # pragma: no cover
 
-    def __call__(self, obj) -> t.Union[msgpack.ExtType, t.Any]:
+    def __call__(self, obj) -> msgpack.ExtType | t.Any:
         if not self.match(obj):
             return obj
         for parser in self.parsers:
@@ -62,7 +62,7 @@ class GenericMessageUnparser(ABC, pyd.BaseModel):
 
 
 class MessageUnparserCompose(GenericMessageUnparser):
-    unparsers: t.List[GenericMessageUnparser] = pyd.Field(...)
+    unparsers: list[GenericMessageUnparser] = pyd.Field(...)
 
     def match(self, code: int) -> bool:
         for unparser in self.unparsers:

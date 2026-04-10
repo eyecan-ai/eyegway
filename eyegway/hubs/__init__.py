@@ -33,9 +33,7 @@ class HubsParametrization:
         return cls.channel_name(hub_name, cls.HISTORY_NAME)
 
     @classmethod
-    def retrieve_hubs_names_from_channel_list(
-        cls, channels: t.List[str]
-    ) -> t.List[str]:
+    def retrieve_hubs_names_from_channel_list(cls, channels: list[str]) -> list[str]:
         channels = [channel.replace(cls.HUBS_PREFIX, "") for channel in channels]
         channels = [channel.split(cls.SEPARATOR)[0] for channel in channels]
         return list(set(channels))
@@ -51,7 +49,7 @@ class HubsParametrization:
         )
 
     @classmethod
-    def retrieve_variables_names_from_list(cls, variables: t.List[str]) -> t.List[str]:
+    def retrieve_variables_names_from_list(cls, variables: list[str]) -> list[str]:
         variables = [
             variable.replace(cls.HUBS_VARIABLES_PREFIX, "") for variable in variables
         ]
@@ -68,10 +66,10 @@ class HubsConfig(pyds.BaseSettings):
     max_payload_size: int = 64_000_000
     redis_host: str = "localhost"
     redis_port: int = 6379
-    redis_username: t.Optional[str] = None
-    redis_password: t.Optional[str] = None
+    redis_username: str | None = None
+    redis_password: str | None = None
     redis_extra_options: t.Mapping[str, t.Any] = pyd.Field(default_factory=dict)
-    packer: t.Optional[str] = None
+    packer: str | None = None
 
     model_config = pyds.SettingsConfigDict(env_prefix="eyegway_hubs_")
 
