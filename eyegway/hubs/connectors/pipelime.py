@@ -42,19 +42,18 @@ PlainDataToItemCallable = t.Callable[[t.Any], pli.Item]
 
 
 class PipelimeHubConnector(ehc.HubConnector):
-
     def __init__(
         self,
-        item_to_plaindata: t.List[t.Tuple[type, ItemToPlainDataCallable]] = [],
-        plaindata_to_item: t.List[t.Tuple[type, PlainDataToItemCallable]] = [],
+        item_to_plaindata: list[tuple[type, ItemToPlainDataCallable]] = [],
+        plaindata_to_item: list[tuple[type, PlainDataToItemCallable]] = [],
     ):
         self.custom_item_to_plaindata = item_to_plaindata
         self.custom_plaindata_to_item = plaindata_to_item
 
-    def item_to_plaindata(self) -> t.Dict[type, ItemToPlainDataCallable]:
+    def item_to_plaindata(self) -> dict[type, ItemToPlainDataCallable]:
         return {**DEFAULT_ITEM_TO_PLAINDATA, **dict(self.custom_item_to_plaindata)}
 
-    def plaindata_to_item(self) -> t.Dict[type, PlainDataToItemCallable]:
+    def plaindata_to_item(self) -> dict[type, PlainDataToItemCallable]:
         return {**DEFAULT_PLAINDATA_TO_ITEM, **dict(self.custom_plaindata_to_item)}
 
     def world_to_hub(self, data: pls.Sample) -> dict:

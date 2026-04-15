@@ -57,7 +57,7 @@ class PackersFactory:
     }
 
     @classmethod
-    def create(cls, name: t.Optional[str] = None) -> ep.MessagePacker:
+    def create(cls, name: str | None = None) -> ep.MessagePacker:
         if name is None:
             name = "default"
         if name not in cls.PACKERS:

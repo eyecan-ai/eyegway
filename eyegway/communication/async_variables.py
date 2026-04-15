@@ -1,6 +1,7 @@
-from redis.asyncio import Redis
-import typing as t
 import pickle
+import typing as t
+
+from redis.asyncio import Redis
 
 
 class AsyncSharedVariable:
@@ -15,7 +16,7 @@ class AsyncSharedVariable:
     async def set(self, value: t.Any):
         await self.redis.set(self.variable_name, pickle.dumps(value))
 
-    async def get(self) -> t.Optional[t.Any]:
+    async def get(self) -> t.Any | None:
         output = await self.redis.get(self.variable_name)
         if output is None:
             return None

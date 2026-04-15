@@ -25,12 +25,12 @@ class DataGenerator(ABC):
     """
 
     @abstractmethod
-    def generate(self) -> t.Dict[str, t.Any]:
+    def generate(self) -> dict[str, t.Any]:
         """
         Generate data to be pushed to the hub.
 
         Returns:
-            Dict[str, Any]: The generated data.
+            dict[str, Any]: The generated data.
         """
         pass
 
@@ -39,14 +39,14 @@ class DataPusher:
     def __init__(
         self,
         generator: DataGenerator,
-        target_hub: t.Union[MessageHub, AsyncMessageHub],
+        target_hub: MessageHub | AsyncMessageHub,
         interval: float = 0.1,
     ) -> None:
         """
         Initialize the data generator.
 
         Args:
-            hub (Union[MessageHub, AsyncMessageHub]): The message hub to push data to.
+            hub (MessageHub | AsyncMessageHub): The message hub to push data to.
             interval (float): The time interval between data generations.
         """
         self.hub = target_hub
@@ -88,12 +88,12 @@ class RandomWalkGenerator(DataGenerator):
         super().__init__()
         self.current_value: float = 0.0
 
-    def generate(self) -> t.Dict[str, t.Any]:
+    def generate(self) -> dict[str, t.Any]:
         """
         Generate the next value in the random walk.
 
         Returns:
-            Dict[str, Any]: The generated data point.
+            dict[str, Any]: The generated data point.
         """
         self.current_value += random.uniform(-1, 1)  # noqa: S311
         return {
@@ -115,12 +115,12 @@ class SineGenerator(DataGenerator):
         self.interval = interval
         self.time_step: float = 0.0
 
-    def generate(self) -> t.Dict[str, t.Any]:
+    def generate(self) -> dict[str, t.Any]:
         """
         Generate the next value in the sine wave.
 
         Returns:
-            Dict[str, Any]: The generated data point.
+            dict[str, Any]: The generated data point.
         """
         self.time_step += self.interval
         value = math.sin(self.time_step)
@@ -137,12 +137,12 @@ class HelixGenerator(DataGenerator):
         self.interval = interval
         self.time_step: float = 0.0
 
-    def generate(self) -> t.Dict[str, t.Any]:
+    def generate(self) -> dict[str, t.Any]:
         """
         Generate the next value in the helix.
 
         Returns:
-            Dict[str, Any]: The generated data point.
+            dict[str, Any]: The generated data point.
         """
         self.time_step += self.interval
         value_y = math.sin(self.time_step)
@@ -166,12 +166,12 @@ class DailyProductionGenerator(DataGenerator):
         self.min_value = min_value
         self.max_value = max_value
 
-    def generate(self) -> t.Dict[str, t.Any]:
+    def generate(self) -> dict[str, t.Any]:
         """
         Generate a random production value.
 
         Returns:
-            Dict[str, Any]: The generated data point.
+            dict[str, Any]: The generated data point.
         """
         value = random.uniform(self.min_value, self.max_value)  # noqa: S311
         return {"time": time.time() - start_time, "value": value}
@@ -292,12 +292,12 @@ class DemoDataGenerator(DataGenerator):
         image = cv2.resize(image, size)
         return image
 
-    def generate(self) -> t.Dict[str, t.Any]:
+    def generate(self) -> dict[str, t.Any]:
         """
         Generate demo data.
 
         Returns:
-            Dict[str, Any]: The generated data.
+            dict[str, Any]: The generated data.
         """
         data = {
             "image_0": self.generate_image_with_opencv(

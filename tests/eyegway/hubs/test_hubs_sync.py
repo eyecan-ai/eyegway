@@ -1,13 +1,14 @@
+import typing as t
+
+import pytest
+import redis
+
 import eyegway.hubs as eh
 import eyegway.hubs.sync as ehs
 import eyegway.packers as ecm
-import redis
-import pytest
-import typing as t
 
 
 class TestMessageHub:
-
     def test_lifecycle(self, redis_test_mock_sync: redis.Redis):
 
         max_buffer_size = 10
@@ -27,7 +28,7 @@ class TestMessageHub:
         data_size = max_buffer_size
         datas = []
         for idx in range(data_size):
-            datas.append({'idx': idx, 'data': f"data-{idx}"})
+            datas.append({"idx": idx, "data": f"data-{idx}"})
         reversed_datas = datas[::-1]
 
         # Push all messages
@@ -94,7 +95,7 @@ class TestMessageHub:
             data_size = max_buffer_size
             datas = []
             for idx in range(data_size):
-                datas.append({'idx': idx, 'data': f"data-{idx}"})
+                datas.append({"idx": idx, "data": f"data-{idx}"})
 
             # Push all messages
             for data in datas:
@@ -154,7 +155,7 @@ class TestMessageHub:
         hub.clear_buffer()
         hub.clear_history()
 
-        data = [b'0' * max_payload_size * 2]
+        data = [b"0" * max_payload_size * 2]
 
         with pytest.raises(ValueError):
             hub.push(data)
@@ -179,7 +180,7 @@ class TestMessageHub:
 
         assert len(_hub().list_variables()) == 0
 
-        variables = {'alpha': 1, 'beta': False, 'gamma': 3.14}
+        variables = {"alpha": 1, "beta": False, "gamma": 3.14}
         for key, value in variables.items():
             assert _hub().get_variable_value(key) is None
 
@@ -231,7 +232,7 @@ class TestMessageHub:
         hub.clear_buffer()
         hub.clear_history()
 
-        data = [b'0']
+        data = [b"0"]
         for _ in range(max_buffer_size):
             hub.push(data)
 
@@ -242,7 +243,6 @@ class TestMessageHub:
 
 
 class TestMessageHubManager:
-
     def test_lifecycle(self, redis_test_mock_sync: redis.Redis):
 
         max_buffer_size = 10
@@ -256,7 +256,7 @@ class TestMessageHubManager:
 
         hubs_number = 5
         hubs_names = [f"test-{idx}" for idx in range(hubs_number)]
-        hubs: t.Dict[str, ehs.MessageHub] = {}
+        hubs: dict[str, ehs.MessageHub] = {}
 
         for hub_name in hubs_names:
             hub = ehs.MessageHub.create(
@@ -266,7 +266,7 @@ class TestMessageHubManager:
             )
             hubs[hub_name] = hub
             hub.clear()
-            hub.push("data".encode('utf-8'))
+            hub.push(b"data")
 
         manager = ehs.MessageHubManager.create(config, redis=redis_test_mock_sync)
 

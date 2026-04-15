@@ -1,6 +1,7 @@
-from redis import Redis
-import typing as t
 import pickle
+import typing as t
+
+from redis import Redis
 
 
 class SharedVariable:
@@ -15,7 +16,7 @@ class SharedVariable:
     def set(self, value: t.Any):
         self.redis.set(self.variable_name, pickle.dumps(value))
 
-    def get(self) -> t.Optional[t.Any]:
+    def get(self) -> t.Any | None:
         output = self.redis.get(self.variable_name)
         if output is None:
             return None

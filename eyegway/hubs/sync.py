@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import builtins
 import typing as t
 
 from redis import Redis
@@ -14,7 +15,6 @@ import eyegway.utils.logging as eul
 
 
 class MessageHub:
-
     def __init__(
         self,
         redis: Redis,
@@ -23,7 +23,7 @@ class MessageHub:
         max_buffer_size: int = 0,
         max_history_size: int = 0,
         max_payload_size: int = 0,
-        connectors: t.Optional[t.List[ehc.HubConnector]] = None,
+        connectors: list[ehc.HubConnector] | None = None,
     ):
         self.redis = redis
         self.name = name
@@ -79,29 +79,29 @@ class MessageHub:
                 self.history.push(data, pipe)
             pipe.execute()
 
-    def pop_raw(self, timeout: int = 0) -> t.Optional[bytes]:
+    def pop_raw(self, timeout: float = 0) -> bytes | None:
         return self.buffer.pop(timeout)
 
-    def pop(self, timeout: int = 0) -> t.Optional[t.Any]:
+    def pop(self, timeout: float = 0) -> t.Any | None:
         data = self.pop_raw(timeout)
         if data is None:
             return None
         return self.hub_to_world(self.packer.unpack(data))
 
-    def last_raw(self, offset: int = 0) -> t.Optional[bytes]:
+    def last_raw(self, offset: int = 0) -> bytes | None:
         return self.history.get(offset)
 
-    def last(self, offset: int = 0) -> t.Optional[t.Any]:
+    def last(self, offset: int = 0) -> t.Any | None:
         data = self.last_raw(offset)
         if data is None:
             return None
         return self.hub_to_world(self.packer.unpack(data))
 
-    def last_multiple_raw(self, start: int, stop: int) -> t.List[bytes]:
+    def last_multiple_raw(self, start: int, stop: int) -> list[bytes]:
         datas = self.history.slice(start, stop)
         return datas
 
-    def last_multiple(self, start: int, stop: int) -> t.List[t.Any]:
+    def last_multiple(self, start: int, stop: int) -> list[t.Any]:
         datas = self.last_multiple_raw(start, stop)
         return [self.hub_to_world(self.packer.unpack(data)) for data in datas]
 
@@ -137,7 +137,7 @@ class MessageHub:
         self.freeze_buffer(status)
         self.freeze_history(status)
 
-    def list_variables(self, include_privates: bool = False) -> t.List[str]:
+    def list_variables(self, include_privates: bool = False) -> list[str]:
         variables = self.redis.keys(
             f"{eh.HubsParametrization.variable_name(self.name, '*')}"
         )
@@ -163,7 +163,7 @@ class MessageHub:
         self._variables[name] = variable
         return variable
 
-    def _get_variable(self, name: str) -> t.Optional[ecov.SharedVariable]:
+    def _get_variable(self, name: str) -> ecov.SharedVariable | None:
         if name not in self._variables:
             return None
         return self._variables[name]
@@ -174,7 +174,7 @@ class MessageHub:
             variable = self._create_variable(name, False)
         variable.set(value)
 
-    def get_variable_value(self, name: str) -> t.Optional[t.Any]:
+    def get_variable_value(self, name: str) -> t.Any | None:
         variable = self._get_variable(name)
         if variable is None:
             variable = self._create_variable(name, False)
@@ -188,9 +188,9 @@ class MessageHub:
 
     @staticmethod
     def create(
-        name: t.Optional[str] = None,
-        config: t.Optional[eh.HubsConfig] = None,
-        redis: t.Optional[Redis] = None,
+        name: str | None = None,
+        config: eh.HubsConfig | None = None,
+        redis: Redis | None = None,
     ) -> MessageHub:
         if config is None:
             config = eh.HubsConfig()
@@ -206,19 +206,18 @@ class MessageHub:
 
 
 class MessageHubManager:
-
     def __init__(self, redis: Redis):
         self.redis = redis
 
-    def list(self) -> t.List[str]:
+    def list(self) -> builtins.list[str]:
         channels = self.redis.keys(f"{eh.HubsParametrization.HUBS_PREFIX}*")
         channels = [channel.decode() for channel in channels]
         return eh.HubsParametrization.retrieve_hubs_names_from_channel_list(channels)
 
     @staticmethod
     def create(
-        config: t.Optional[eh.HubsConfig] = None,
-        redis: t.Optional[Redis] = None,
+        config: eh.HubsConfig | None = None,
+        redis: Redis | None = None,
     ) -> MessageHubManager:
         if config is None:
             config = eh.HubsConfig()

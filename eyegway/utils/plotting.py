@@ -7,9 +7,9 @@ class Plot:
     Prepare and update plots with data from hubs.
 
     Attributes:
-        data (Optional[List]): The data for the plot.
-        layout (Optional[dict]): The layout configuration for the plot.
-        config (Optional[dict]): The configuration for the plot.
+        data (list | None): The data for the plot.
+        layout (dict | None): The layout configuration for the plot.
+        config (dict | None): The configuration for the plot.
 
     Example:
         # Basic example
@@ -26,9 +26,9 @@ class Plot:
 
     def __init__(
         self,
-        data: t.Optional[t.List] = None,
-        layout: t.Optional[dict] = None,
-        config: t.Optional[dict] = None,
+        data: list | None = None,
+        layout: dict | None = None,
+        config: dict | None = None,
     ):
         if data is None:
             data = []
@@ -73,7 +73,7 @@ class Plot:
             json.dump(self.to_dict(), f)
 
     @classmethod
-    def from_dict(cls, params: t.Dict) -> "Plot":
+    def from_dict(cls, params: dict) -> "Plot":
         """
         Creates a Plot instance from a dictionary.
 
@@ -86,7 +86,7 @@ class Plot:
         return cls(**params)
 
     @staticmethod
-    def _merge(d1: t.Dict[str, t.Any], d2: t.Dict[str, t.Any]) -> t.Dict[str, t.Any]:
+    def _merge(d1: dict[str, t.Any], d2: dict[str, t.Any]) -> dict[str, t.Any]:
         """
         Recursively merges two dictionaries.
         If there are nested dictionaries or lists, they are merged as well.
@@ -116,16 +116,16 @@ class Plot:
                 d1[key] = value
         return d1
 
-    def to_dict(self) -> t.Dict[str, t.Any]:
+    def to_dict(self) -> dict[str, t.Any]:
         """
         Packs the plot data into a dictionary.
 
         Returns:
-            Dict[str, Any]: A dictionary containing the plot data ready to be pushed.
+            dict[str, Any]: A dictionary containing the plot data ready to be pushed.
         """
         return {"data": self.data, "layout": self.layout, "config": self.config}
 
-    def update(self, params: t.Dict) -> None:
+    def update(self, params: dict) -> None:
         """
         Updates the plot with new parameters.
 
