@@ -23,13 +23,13 @@
 
 	.image-container img {
 		/* "position: absolute" makes the image behave as the background of its
-        container, without changing the size of the container itself */
+         container, without changing the size of the container itself */
 		position: absolute;
 		top: 0;
 		left: 0;
 
 		/* size the image to the container; `object-fit` (contain/cover)
-        controls how it scales */
+         controls how it scales */
 		width: 100%;
 		height: 100%;
 
