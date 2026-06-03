@@ -26,9 +26,17 @@
     }
 
     .image-container img {
+        /* "position: absolute" makes the image to behave as the background
+           of its container, without changing the size of the container itself */
+        position: absolute; 
+        top: 0;
+        left: 0;
+
+        /* fill the container, but keep the aspect ratio of the image */
         width: 100%;
         height: 100%;
-        display: block;
+
+        /* center the image in the container */
         object-position: center;
     }
 </style>
