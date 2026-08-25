@@ -110,4 +110,9 @@ class HubsConfig(pyds.BaseSettings):
                 username=config.redis_username,
                 password=config.redis_password,
                 **config.redis_extra_options,
+                # From redis-py 8.0.0, the default socket timeout has been changed from
+                # None to 5 seconds. This causes commands with timeout=0 to
+                # fail with a TimeoutError instead of blocking indefinitely.
+                # To maintain the previous behavior, we set socket_timeout=None here.
+                socket_timeout=None,
             )
