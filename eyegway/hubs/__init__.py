@@ -87,12 +87,12 @@ class HubsConfig(pyds.BaseSettings):
                 port=config.redis_port,
                 username=config.redis_username,
                 password=config.redis_password,
-                **config.redis_extra_options,
                 # From redis-py 8.0.0, the default socket timeout has been changed from
-                # None to 5 seconds. This causes commands with timeout=0 to
-                # fail with a TimeoutError instead of blocking indefinitely.
-                # To maintain the previous behavior, we set socket_timeout=None here.
-                socket_timeout=None,
+                # None to 5 seconds. This causes commands with timeout=0 to fail with a
+                # TimeoutError instead of blocking indefinitely. To maintain the
+                # previous behavior, we force socket_timeout=None here (only if not
+                # explicitly set by the user in redis_extra_options)
+                **{"socket_timeout": None, **config.redis_extra_options},
             )
 
     @classmethod
@@ -109,10 +109,10 @@ class HubsConfig(pyds.BaseSettings):
                 port=config.redis_port,
                 username=config.redis_username,
                 password=config.redis_password,
-                **config.redis_extra_options,
                 # From redis-py 8.0.0, the default socket timeout has been changed from
-                # None to 5 seconds. This causes commands with timeout=0 to
-                # fail with a TimeoutError instead of blocking indefinitely.
-                # To maintain the previous behavior, we set socket_timeout=None here.
-                socket_timeout=None,
+                # None to 5 seconds. This causes commands with timeout=0 to fail with a
+                # TimeoutError instead of blocking indefinitely. To maintain the
+                # previous behavior, we force socket_timeout=None here (only if not
+                # explicitly set by the user in redis_extra_options)
+                **{"socket_timeout": None, **config.redis_extra_options},
             )
