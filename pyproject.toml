@@ -27,7 +27,7 @@ dependencies = [
     "redis[hiredis]>=5.2.1",
     "msgpack>=1.0.7",
     "pipelime-python>=2,<3",
-    "numpy<2",
+    "numpy",
     "fastapi>=0.115.0",
     "fakeredis",
     "uvicorn[standard]>=0.30",
