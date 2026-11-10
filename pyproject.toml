@@ -20,13 +20,13 @@ classifiers = [
     "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
-    "pydantic>=2,<3",
+    "pydantic>=2.10,<3",
     "pydantic-settings",
     "httpx[http2]",
     "typer",
     "redis[hiredis]>=5.2.1",
     "msgpack>=1.0.7",
-    "pipelime-python>=2,<3",
+    "pipelime-python>=3,<4",
     "numpy",
     "fastapi>=0.115.0",
     "fakeredis",
